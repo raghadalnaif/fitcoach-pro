@@ -73,6 +73,22 @@ function parsePrice(raw) {
   return isNaN(n) ? null : n;
 }
 
+const PLT_SEARCH_URL = {
+  amazon:     q => `https://www.amazon.sa/s?k=${encodeURIComponent(q)}&ref=qaren`,
+  noon:       q => `https://www.noon.com/saudi-en/search/?q=${encodeURIComponent(q)}`,
+  aliexpress: q => `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(q)}`,
+  shein:      q => `https://www.shein.com/search.html?q=${encodeURIComponent(q)}`,
+  temu:       q => `https://www.temu.com/search_result.html?search_key=${encodeURIComponent(q)}`,
+};
+
+function resolveLink(item, plt) {
+  const raw = item.product_link || item.link || '';
+  // Use direct link only if it points to the actual platform (not google)
+  if (raw && !raw.includes('google.com') && !raw.includes('gstatic')) return raw;
+  // Fall back to platform search with product name
+  return PLT_SEARCH_URL[plt] ? PLT_SEARCH_URL[plt](item.title || '') : raw;
+}
+
 function toProduct(item, plt) {
   const price = parsePrice(item.price ?? item.extracted_price);
   if (!price) return null;
@@ -82,7 +98,7 @@ function toProduct(item, plt) {
     price,
     priceRaw: item.price ?? `${price} ر.س`,
     image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
-    link: item.product_link || item.link || '',   // product_link = direct retailer URL
+    link: resolveLink(item, plt),
     source: item.source || '',
     rating: item.rating ?? null,
     reviews: item.reviews ?? item.reviews_count ?? null,
