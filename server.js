@@ -63,7 +63,13 @@ function detectPlatform(source = '', link = '') {
 
 function parsePrice(raw) {
   if (!raw) return null;
-  const n = parseFloat(String(raw).replace(/[^\d.]/g, ''));
+  // Convert Arabic-Indic (٠-٩) and Extended Arabic (۰-۹) numerals to ASCII
+  const normalized = String(raw)
+    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660)
+    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06F0)
+    .replace(/،/g, '')   // Arabic thousands separator
+    .replace(/٬/g, '');  // Arabic comma
+  const n = parseFloat(normalized.replace(/[^\d.]/g, ''));
   return isNaN(n) ? null : n;
 }
 
