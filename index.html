@@ -235,10 +235,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .badge-fast{background:rgba(0,212,168,.1);color:var(--secondary);border:1px solid rgba(0,212,168,.3)}
 
 /* PRODUCT IMAGE — real or emoji */
-.pimg-wrap{width:100%;height:130px;border-radius:10px;margin-bottom:12px;
+.pimg-wrap{width:100%;height:160px;border-radius:10px;margin-bottom:12px;
   overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center}
-.pimg-wrap img{width:100%;height:100%;object-fit:contain;padding:8px}
-.pimg-emoji{font-size:56px}
+.pimg-wrap img{width:100%;height:100%;object-fit:contain;padding:8px;display:block}
+.pimg-emoji{font-size:56px;display:flex;align-items:center;justify-content:center}
 
 /* HEART BUTTON */
 .heart-btn{position:absolute;top:46px;left:14px;
@@ -1083,9 +1083,10 @@ function renderGrid(res) {
     const fast = parseInt(r.delivery||'99')<=3;
     const fkey = favKey(r);
     const saved = !!S.favs[fkey];
+    const emoji = r._emoji||PLT_EMOJI[r.platform]||'📦';
     const imgHtml = r.image
-      ? `<img src="${r.image}" alt="${r.name}" onerror="this.style.display='none'">`
-      : `<span class="pimg-emoji">${r._emoji||PLT_EMOJI[r.platform]||'📦'}</span>`;
+      ? `<img src="${r.image}" alt="${r.name}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="pimg-emoji" style="display:none">${emoji}</span>`
+      : `<span class="pimg-emoji">${emoji}</span>`;
     const bgStyle = r.image ? '' : `background:${r._bg||'var(--surface3)'}`;
     return `
       <div class="pcard ${best?'top-deal':''}" style="animation-delay:${i*.08}s">
