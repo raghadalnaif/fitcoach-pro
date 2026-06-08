@@ -159,25 +159,43 @@ app.get('/api/search', async (req, res) => {
     return res.status(503).json({ error: 'SERP_API_KEY not configured', fallback: true });
 
   try {
-    const searchParams = { engine: 'google_shopping', q, gl: 'sa', hl: 'ar', num: 60, api_key: process.env.SERP_API_KEY };
+    const key = process.env.SERP_API_KEY;
+    const base = { engine: 'google_shopping', q, num: 60, api_key: key };
 
-    let { data } = await axios.get('https://serpapi.com/search.json', { params: searchParams, timeout: 20000 });
-    let results = groupByPlatform(data.shopping_results || []);
+    // Run Saudi + Global searches in parallel
+    const [saRes, usRes] = await Promise.allSettled([
+      axios.get('https://serpapi.com/search.json', { params: { ...base, gl: 'sa', hl: 'ar' }, timeout: 20000 }),
+      axios.get('https://serpapi.com/search.json', { params: { ...base, gl: 'us', hl: 'en' }, timeout: 20000 }),
+    ]);
 
-    // If Saudi search yields fewer than 2 platforms, try global search
-    if (results.length < 2) {
-      const { data: globalData } = await axios.get('https://serpapi.com/search.json', {
-        params: { ...searchParams, gl: 'us', hl: 'en' },
-        timeout: 20000,
-      });
-      const globalResults = groupByPlatform(globalData.shopping_results || []);
-      if (globalResults.length > results.length) results = globalResults;
+    const saItems = saRes.status === 'fulfilled' ? (saRes.value.data.shopping_results || []) : [];
+    const usItems = usRes.status === 'fulfilled' ? (usRes.value.data.shopping_results || []) : [];
+
+    // Merge: Saudi prices take priority (more accurate for SAR), global fills missing platforms
+    const merged = {};
+    for (const item of [...saItems, ...usItems]) {
+      const plt = detectPlatform(item.source, item.link);
+      if (!plt) continue;
+      const price = parsePrice(item.price ?? item.extracted_price);
+      if (!price) continue;
+      if (!merged[plt] || price < merged[plt].price) {
+        merged[plt] = {
+          platform: plt,
+          name: item.title,
+          price,
+          priceRaw: item.price ?? `${price} ر.س`,
+          image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
+          link: item.link || '',
+          source: item.source || '',
+          rating: item.rating ?? null,
+          reviews: item.reviews ?? item.reviews_count ?? null,
+          delivery: DELIVERY[plt],
+        };
+      }
     }
 
-    // Log raw sources for debugging
+    const results = Object.values(merged);
     console.log('Platforms found:', results.map(r => r.platform));
-    console.log('Raw sources sample:', (data.shopping_results || []).slice(0, 5).map(i => i.source));
-
     res.json({ results, query: q, fallback: results.length === 0 });
   } catch (err) {
     console.error('Text search error:', err.response?.data || err.message);
