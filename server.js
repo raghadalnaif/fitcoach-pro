@@ -35,11 +35,18 @@ try {
    HELPERS
 ═══════════════════════════════════════ */
 const PLT_MAP = {
+  // English / domains
   'amazon.sa': 'amazon', 'amazon.com': 'amazon', 'amazon.ae': 'amazon', 'amazon': 'amazon',
-  'noon.com': 'noon', 'noon': 'noon',
+  'noon.com': 'noon', 'noon.sa': 'noon', 'noon': 'noon',
   'aliexpress.com': 'aliexpress', 'ar.aliexpress': 'aliexpress', 'aliexpress': 'aliexpress',
-  'shein.com': 'shein', 'ar.shein': 'shein', 'shein': 'shein',
+  'shein.com': 'shein', 'ar.shein': 'shein', 'us.shein': 'shein', 'shein': 'shein',
   'temu.com': 'temu', 'temu': 'temu',
+  // Arabic source names (as returned by SerpAPI)
+  'أمازون': 'amazon',
+  'نون': 'noon',
+  'علي اكسبريس': 'aliexpress', 'علي إكسبريس': 'aliexpress', 'علي‌اكسبريس': 'aliexpress',
+  'شي ان': 'shein', 'شيان': 'shein', 'شي إن': 'shein',
+  'تيمو': 'temu',
 };
 
 const DELIVERY = {
@@ -86,6 +93,24 @@ function groupByPlatform(items = []) {
 }
 
 /* ═══════════════════════════════════════
+   DEBUG — raw SerpAPI results (remove in prod)
+═══════════════════════════════════════ */
+app.get('/api/debug-search', async (req, res) => {
+  const q = (req.query.q || 'iphone').trim();
+  if (!process.env.SERP_API_KEY) return res.status(503).json({ error: 'no key' });
+  try {
+    const { data } = await axios.get('https://serpapi.com/search.json', {
+      params: { engine: 'google_shopping', q, gl: 'sa', hl: 'ar', num: 10, api_key: process.env.SERP_API_KEY },
+      timeout: 20000,
+    });
+    const sample = (data.shopping_results || []).slice(0, 10).map(i => ({
+      source: i.source, link: i.link, price: i.price, title: i.title?.slice(0, 40),
+    }));
+    res.json({ total: (data.shopping_results || []).length, sample });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* ═══════════════════════════════════════
    IMAGE PROXY  (bypass CORS for thumbnails)
 ═══════════════════════════════════════ */
 app.get('/api/img', async (req, res) => {
@@ -128,20 +153,26 @@ app.get('/api/search', async (req, res) => {
     return res.status(503).json({ error: 'SERP_API_KEY not configured', fallback: true });
 
   try {
-    const { data } = await axios.get('https://serpapi.com/search.json', {
-      params: {
-        engine:  'google_shopping',
-        q,
-        gl:      'sa',
-        hl:      'ar',
-        num:     60,
-        api_key: process.env.SERP_API_KEY,
-      },
-      timeout: 20000,
-    });
+    const searchParams = { engine: 'google_shopping', q, gl: 'sa', hl: 'ar', num: 60, api_key: process.env.SERP_API_KEY };
 
-    const results = groupByPlatform(data.shopping_results || []);
-    res.json({ results, query: q });
+    let { data } = await axios.get('https://serpapi.com/search.json', { params: searchParams, timeout: 20000 });
+    let results = groupByPlatform(data.shopping_results || []);
+
+    // If Saudi search yields fewer than 2 platforms, try global search
+    if (results.length < 2) {
+      const { data: globalData } = await axios.get('https://serpapi.com/search.json', {
+        params: { ...searchParams, gl: 'us', hl: 'en' },
+        timeout: 20000,
+      });
+      const globalResults = groupByPlatform(globalData.shopping_results || []);
+      if (globalResults.length > results.length) results = globalResults;
+    }
+
+    // Log raw sources for debugging
+    console.log('Platforms found:', results.map(r => r.platform));
+    console.log('Raw sources sample:', (data.shopping_results || []).slice(0, 5).map(i => i.source));
+
+    res.json({ results, query: q, fallback: results.length === 0 });
   } catch (err) {
     console.error('Text search error:', err.response?.data || err.message);
     res.status(500).json({ error: 'Search failed', fallback: true });
