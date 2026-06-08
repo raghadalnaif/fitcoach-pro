@@ -172,51 +172,50 @@ app.get('/api/config', (_req, res) => {
 
 /* ═══════════════════════════════════════
    GOOGLE CSE SEARCH  (مجاني 100/يوم)
+   طلبان فقط: SA + Global يغطيان كل المنصات
 ═══════════════════════════════════════ */
-const CSE_SITES = {
-  amazon:     'site:amazon.sa OR site:amazon.com',
-  noon:       'site:noon.com',
-  aliexpress: 'site:aliexpress.com',
-  shein:      'site:shein.com',
-  temu:       'site:temu.com',
-};
-
 function extractPriceFromText(text = '') {
-  // Match patterns: 199.99 SAR / SAR 199 / ر.س 199 / $29.99
-  const m = text.match(/[\$\£]?\s*(\d[\d,\.]+)\s*(sar|ر\.س|usd|\$)?/i)
-           || text.match(/(sar|ر\.س)\s*(\d[\d,\.]+)/i);
+  const normalized = text
+    .replace(/[٠-٩]/g, d => d.charCodeAt(0) - 0x0660)
+    .replace(/[۰-۹]/g, d => d.charCodeAt(0) - 0x06F0);
+  const m = normalized.match(/(?:sar|ر\.س|\$|usd)?\s*(\d[\d,\.]+)\s*(?:sar|ر\.س|\$)?/i);
   if (!m) return null;
-  const raw = (m[1] || m[2] || '').replace(/,/g, '');
-  const n = parseFloat(raw);
-  return isNaN(n) || n < 1 || n > 200000 ? null : n;
+  const n = parseFloat(m[1].replace(/,/g, ''));
+  return isNaN(n) || n < 0.5 || n > 500000 ? null : n;
 }
 
-async function cseSearchPlatform(q, plt, gKey, gCseId) {
-  const query = `${CSE_SITES[plt]} ${q}`;
+function cseItemToProduct(item) {
+  const link = item.link || '';
+  const plt  = detectPlatform('', link);
+  if (!plt) return null;
+
+  const pm       = item.pagemap || {};
+  const offer    = (pm.offer || pm.product || pm.aggregateoffer || [{}])[0] || {};
+  const img      = (pm.cse_image || pm.cse_thumbnail || [{}])[0]?.src || null;
+  const priceRaw = offer.price || offer.lowprice || offer.highprice || '';
+  const price    = parsePrice(priceRaw) || extractPriceFromText(item.snippet || item.title || '');
+
+  if (!price) return null;
+  return {
+    platform: plt,
+    name:     item.title.replace(/ - .*$/, '').replace(/ \| .*$/, ''),
+    price,
+    priceRaw: priceRaw ? `${price} ر.س` : `~${price} ر.س`,
+    image:    img ? `/api/img?url=${encodeURIComponent(img)}` : null,
+    link,
+    source:   plt,
+    rating:   offer.ratingvalue ? parseFloat(offer.ratingvalue) : null,
+    reviews:  offer.reviewcount ? parseInt(offer.reviewcount) : null,
+    delivery: DELIVERY[plt],
+  };
+}
+
+async function runCseQuery(q, gKey, gCx, extraParams = {}) {
   const { data } = await axios.get('https://www.googleapis.com/customsearch/v1', {
-    params: { key: gKey, cx: gCseId, q: query, num: 5, gl: 'sa', hl: 'ar' },
-    timeout: 10000,
+    params: { key: gKey, cx: gCx, q, num: 10, ...extraParams },
+    timeout: 12000,
   });
-  const items = data.items || [];
-  return items.map(item => {
-    const pm   = item.pagemap || {};
-    const offer = (pm.offer || pm.product || [{}])[0];
-    const img   = (pm.cse_image || pm.cse_thumbnail || [{}])[0]?.src || null;
-    const priceRaw = offer?.price || offer?.lowprice || '';
-    const price = parsePrice(priceRaw) || extractPriceFromText(item.snippet || '');
-    if (!price) return null;
-    return {
-      platform: plt,
-      name:     item.title,
-      price,
-      priceRaw: priceRaw || `~${price}`,
-      image:    img ? `/api/img?url=${encodeURIComponent(img)}` : null,
-      link:     item.link,
-      source:   plt,
-      rating:   null, reviews: null,
-      delivery: DELIVERY[plt],
-    };
-  }).filter(Boolean);
+  return (data.items || []).map(cseItemToProduct).filter(Boolean);
 }
 
 /* ═══════════════════════════════════════
@@ -226,23 +225,26 @@ app.get('/api/search', async (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) return res.status(400).json({ error: 'Query required' });
 
-  /* ── Google CSE (free) ── */
+  /* ── Google CSE (free — 2 requests per search) ── */
   if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_CSE_ID) {
     try {
       const gKey = process.env.GOOGLE_API_KEY;
       const gCx  = process.env.GOOGLE_CSE_ID;
-      const searches = Object.keys(CSE_SITES).map(plt =>
-        cseSearchPlatform(q, plt, gKey, gCx).catch(() => [])
-      );
-      const all     = (await Promise.all(searches)).flat();
-      // Keep cheapest 3 per platform
+
+      // Two parallel queries: Saudi Arabic + Global English
+      const [saItems, usItems] = await Promise.all([
+        runCseQuery(q, gKey, gCx, { gl: 'sa', hl: 'ar', cr: 'countrySA' }).catch(() => []),
+        runCseQuery(q, gKey, gCx, { gl: 'us', hl: 'en' }).catch(() => []),
+      ]);
+
+      // Merge — SA prices take priority, global fills missing platforms
       const buckets = {};
-      for (const p of all) {
+      for (const p of [...saItems, ...usItems]) {
         if (!buckets[p.platform]) buckets[p.platform] = [];
         if (buckets[p.platform].length < 3) buckets[p.platform].push(p);
       }
-      const results = Object.values(buckets).flat().sort((a,b) => a.price - b.price);
-      console.log('CSE platforms:', [...new Set(results.map(r => r.platform))]);
+      const results = Object.values(buckets).flat().sort((a, b) => a.price - b.price);
+      console.log('CSE platforms found:', [...new Set(results.map(r => r.platform))]);
       return res.json({ results, query: q, fallback: results.length === 0, engine: 'cse' });
     } catch (err) {
       console.error('CSE search error:', err.message);
