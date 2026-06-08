@@ -171,32 +171,100 @@ app.get('/api/config', (_req, res) => {
 });
 
 /* ═══════════════════════════════════════
-   TEXT SEARCH  →  Google Shopping
+   GOOGLE CSE SEARCH  (مجاني 100/يوم)
+═══════════════════════════════════════ */
+const CSE_SITES = {
+  amazon:     'site:amazon.sa OR site:amazon.com',
+  noon:       'site:noon.com',
+  aliexpress: 'site:aliexpress.com',
+  shein:      'site:shein.com',
+  temu:       'site:temu.com',
+};
+
+function extractPriceFromText(text = '') {
+  // Match patterns: 199.99 SAR / SAR 199 / ر.س 199 / $29.99
+  const m = text.match(/[\$\£]?\s*(\d[\d,\.]+)\s*(sar|ر\.س|usd|\$)?/i)
+           || text.match(/(sar|ر\.س)\s*(\d[\d,\.]+)/i);
+  if (!m) return null;
+  const raw = (m[1] || m[2] || '').replace(/,/g, '');
+  const n = parseFloat(raw);
+  return isNaN(n) || n < 1 || n > 200000 ? null : n;
+}
+
+async function cseSearchPlatform(q, plt, gKey, gCseId) {
+  const query = `${CSE_SITES[plt]} ${q}`;
+  const { data } = await axios.get('https://www.googleapis.com/customsearch/v1', {
+    params: { key: gKey, cx: gCseId, q: query, num: 5, gl: 'sa', hl: 'ar' },
+    timeout: 10000,
+  });
+  const items = data.items || [];
+  return items.map(item => {
+    const pm   = item.pagemap || {};
+    const offer = (pm.offer || pm.product || [{}])[0];
+    const img   = (pm.cse_image || pm.cse_thumbnail || [{}])[0]?.src || null;
+    const priceRaw = offer?.price || offer?.lowprice || '';
+    const price = parsePrice(priceRaw) || extractPriceFromText(item.snippet || '');
+    if (!price) return null;
+    return {
+      platform: plt,
+      name:     item.title,
+      price,
+      priceRaw: priceRaw || `~${price}`,
+      image:    img ? `/api/img?url=${encodeURIComponent(img)}` : null,
+      link:     item.link,
+      source:   plt,
+      rating:   null, reviews: null,
+      delivery: DELIVERY[plt],
+    };
+  }).filter(Boolean);
+}
+
+/* ═══════════════════════════════════════
+   TEXT SEARCH  →  SerpAPI OR Google CSE
 ═══════════════════════════════════════ */
 app.get('/api/search', async (req, res) => {
   const q = (req.query.q || '').trim();
   if (!q) return res.status(400).json({ error: 'Query required' });
 
+  /* ── Google CSE (free) ── */
+  if (process.env.GOOGLE_API_KEY && process.env.GOOGLE_CSE_ID) {
+    try {
+      const gKey = process.env.GOOGLE_API_KEY;
+      const gCx  = process.env.GOOGLE_CSE_ID;
+      const searches = Object.keys(CSE_SITES).map(plt =>
+        cseSearchPlatform(q, plt, gKey, gCx).catch(() => [])
+      );
+      const all     = (await Promise.all(searches)).flat();
+      // Keep cheapest 3 per platform
+      const buckets = {};
+      for (const p of all) {
+        if (!buckets[p.platform]) buckets[p.platform] = [];
+        if (buckets[p.platform].length < 3) buckets[p.platform].push(p);
+      }
+      const results = Object.values(buckets).flat().sort((a,b) => a.price - b.price);
+      console.log('CSE platforms:', [...new Set(results.map(r => r.platform))]);
+      return res.json({ results, query: q, fallback: results.length === 0, engine: 'cse' });
+    } catch (err) {
+      console.error('CSE search error:', err.message);
+    }
+  }
+
+  /* ── SerpAPI fallback ── */
   if (!process.env.SERP_API_KEY)
-    return res.status(503).json({ error: 'SERP_API_KEY not configured', fallback: true });
+    return res.status(503).json({ error: 'No search engine configured', fallback: true });
 
   try {
-    const key = process.env.SERP_API_KEY;
+    const key  = process.env.SERP_API_KEY;
     const base = { engine: 'google_shopping', q, num: 60, api_key: key };
-
-    // Run Saudi + Global searches in parallel
     const [saRes, usRes] = await Promise.allSettled([
       axios.get('https://serpapi.com/search.json', { params: { ...base, gl: 'sa', hl: 'ar' }, timeout: 20000 }),
       axios.get('https://serpapi.com/search.json', { params: { ...base, gl: 'us', hl: 'en' }, timeout: 20000 }),
     ]);
-
     const saItems = saRes.status === 'fulfilled' ? (saRes.value.data.shopping_results || []) : [];
     const usItems = usRes.status === 'fulfilled' ? (usRes.value.data.shopping_results || []) : [];
-
-    // Saudi first (accurate SAR prices), global fills missing platforms
     const results = groupByPlatform([...saItems, ...usItems], 3);
-    console.log('Platforms found:', [...new Set(results.map(r => r.platform))]);
-    res.json({ results, query: q, fallback: results.length === 0 });
+    console.log('SerpAPI platforms:', [...new Set(results.map(r => r.platform))]);
+    res.json({ results, query: q, fallback: results.length === 0, engine: 'serp' });
   } catch (err) {
     console.error('Text search error:', err.response?.data || err.message);
     res.status(500).json({ error: 'Search failed', fallback: true });
