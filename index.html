@@ -3,835 +3,634 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FitCoach Pro - نظام تتبع التمارين</title>
-
-<!-- Firebase Compat SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
-<!-- EmailJS -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
+<title>قارن | أفضل الأسعار من كل المتاجر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════
+   VARIABLES & RESET
+══════════════════════════════════════ */
 :root {
-  --bg: #0f0f13;
-  --surface: #1a1a24;
-  --surface2: #22222e;
-  --border: #2e2e3e;
-  --accent: #00e5a0;
-  --accent2: #6c63ff;
-  --danger: #ff4d6d;
-  --warn: #ffaa00;
-  --text: #f0f0f0;
-  --muted: #8888a0;
-  --radius: 14px;
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --bg:        #07070f;
+  --surface:   #0f0f1c;
+  --surface2:  #16162a;
+  --surface3:  #1e1e36;
+  --border:    #252540;
+  --border2:   #323258;
+
+  --primary:      #7c6bf0;
+  --primary-l:    #a395f7;
+  --primary-d:    #5a4ad0;
+  --secondary:    #00d4a8;
+  --secondary-d:  #00a882;
+
+  --gold:    #f4b942;
+  --gold-bg: rgba(244,185,66,.1);
+  --green:   #00d4a8;
+  --red:     #ff4757;
+  --orange:  #ff9f43;
+
+  --amazon:     #FF9900;
+  --noon:       #F7C131;
+  --aliexpress: #FF4747;
+  --shein:      #E94560;
+  --temu:       #FF6534;
+
+  --text:   #e8e8ff;
+  --muted:  #8080a8;
+  --subtle: #4a4a6a;
+
+  --r: 16px;
+  --r-sm: 10px;
+  --font: 'Tajawal', system-ui, sans-serif;
+  --shadow: 0 8px 32px rgba(0,0,0,.45);
+  --shadow-lg: 0 20px 80px rgba(0,0,0,.65);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   direction: rtl;
+  overflow-x: hidden;
 }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
 
-/* ─── SCREENS ─── */
-.screen { display: none; }
-.screen.active { display: block; }
-
-/* ─── SETUP SCREEN ─── */
-#setupScreen {
-  min-height: 100vh;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #0f0f13 0%, #1a1224 100%);
-}
-#setupScreen.active { display: flex; }
-
-.setup-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 32px;
-  max-width: 560px;
-  width: 100%;
-}
-
-.setup-logo {
-  font-size: 36px;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.setup-sub {
-  text-align: center;
-  color: var(--muted);
-  margin-bottom: 28px;
-  font-size: 14px;
-}
-
-.step-label {
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 20px 0 10px;
-}
-
-/* ─── LOGIN SCREEN ─── */
-#loginScreen {
-  min-height: 100vh;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: radial-gradient(ellipse at top, #1a2040 0%, var(--bg) 70%);
-}
-#loginScreen.active { display: flex; }
-
-.login-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 40px 32px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.brand {
-  text-align: center;
-  margin-bottom: 32px;
-}
-.brand-name {
-  font-size: 30px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
-}
-.brand-tagline {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* ─── FORM ELEMENTS ─── */
-.form-group {
-  margin-bottom: 16px;
-}
-.form-group label {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-input, select, textarea {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 14px;
-  color: var(--text);
-  font-size: 14px;
-  font-family: var(--font);
-  outline: none;
-  transition: border-color 0.2s;
-  direction: rtl;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--accent);
-}
-select option { background: var(--surface); }
-textarea { resize: vertical; min-height: 80px; }
-
-/* ─── BUTTONS ─── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  font-family: var(--font);
-  text-decoration: none;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), #00b87a);
-  color: #0a1a10;
-  width: 100%;
-  padding: 13px;
-  font-size: 15px;
-}
-.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-.btn-secondary {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--accent); }
-.btn-danger {
-  background: rgba(255,77,109,0.15);
-  color: var(--danger);
-  border: 1px solid rgba(255,77,109,0.3);
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--muted);
-  padding: 8px 12px;
-}
-.btn-ghost:hover { color: var(--text); }
-.btn-accent2 {
-  background: linear-gradient(135deg, var(--accent2), #9b93ff);
-  color: #fff;
-}
-.btn-sm { padding: 7px 14px; font-size: 13px; }
-.btn-full { width: 100%; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-/* ─── MAIN LAYOUT ─── */
-#appScreen {
-  display: none;
-  min-height: 100vh;
-}
-#appScreen.active { display: block; }
-
-.app-header {
-  background: var(--surface);
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 62px;
+  background: rgba(7,7,15,.82);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.header-brand {
-  font-size: 20px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; text-decoration: none;
 }
-.header-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex-shrink: 0;
 }
-.user-badge {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 700;
+.logo-name {
+  font-size: 24px; font-weight: 900; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary-l), var(--secondary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-.badge-coach { background: rgba(108,99,255,0.2); color: var(--accent2); border: 1px solid rgba(108,99,255,0.4); }
-.badge-client { background: rgba(0,229,160,0.15); color: var(--accent); border: 1px solid rgba(0,229,160,0.3); }
+.logo-tag {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff; letter-spacing: .5px;
+}
+.header-nav { display: flex; align-items: center; gap: 8px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--r-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.nav-btn:hover { border-color: var(--primary); color: var(--text); }
 
-.app-body {
-  display: flex;
-  min-height: calc(100vh - 60px);
-}
-
-/* ─── SIDEBAR ─── */
-.sidebar {
-  width: 230px;
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  padding: 20px 0;
-  flex-shrink: 0;
-}
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.15s;
-  border-right: 3px solid transparent;
-}
-.sidebar-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-.sidebar-item.active { color: var(--accent); border-right-color: var(--accent); background: rgba(0,229,160,0.05); }
-.sidebar-icon { font-size: 18px; width: 24px; text-align: center; }
-.sidebar-section {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 16px 20px 6px;
-}
-
-/* ─── MAIN CONTENT ─── */
-.main-content {
-  flex: 1;
-  padding: 28px;
-  overflow-y: auto;
-}
-
-.page { display: none; }
-.page.active { display: block; }
-
-/* ─── PAGE HEADER ─── */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.page-title {
-  font-size: 22px;
-  font-weight: 800;
-}
-.page-sub {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-/* ─── CARDS ─── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 16px;
-}
-.card-title {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ─── STAT CARDS ─── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-}
-.stat-num {
-  font-size: 32px;
-  font-weight: 900;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-.stat-label {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 600;
-}
-.stat-green .stat-num { color: var(--accent); }
-.stat-purple .stat-num { color: var(--accent2); }
-.stat-red .stat-num { color: var(--danger); }
-.stat-yellow .stat-num { color: var(--warn); }
-
-/* ─── CLIENT LIST ─── */
-.client-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-.client-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.client-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.client-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, var(--accent2), #9b93ff);
-  color: #fff;
-}
-.client-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.client-email { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-.client-meta {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.tag {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-.tag-green { background: rgba(0,229,160,0.12); color: var(--accent); }
-.tag-purple { background: rgba(108,99,255,0.15); color: var(--accent2); }
-.tag-red { background: rgba(255,77,109,0.12); color: var(--danger); }
-.tag-yellow { background: rgba(255,170,0,0.12); color: var(--warn); }
-.tag-gray { background: rgba(136,136,160,0.15); color: var(--muted); }
-
-/* ─── WORKOUT PLAN BUILDER ─── */
-.day-block {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-}
-.day-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.day-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-}
-.exercise-row {
-  display: grid;
-  grid-template-columns: 1fr 70px 70px 90px 36px;
-  gap: 8px;
-  margin-bottom: 8px;
-  align-items: center;
-}
-.exercise-row input {
-  padding: 8px 10px;
-  font-size: 13px;
-}
-.exercise-header {
-  display: grid;
-  grid-template-columns: 1fr 70px 70px 90px 36px;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* ─── WORKOUT LOG (CLIENT) ─── */
-.exercise-log-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-}
-.exercise-log-name {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.target-info {
-  font-size: 12px;
-  color: var(--muted);
-  background: var(--bg);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-.sets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
-}
-.set-input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  text-align: center;
-}
-.set-label {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-.set-inputs {
-  display: flex;
-  gap: 8px;
-}
-.set-inputs input {
-  text-align: center;
-  padding: 6px 8px;
-  font-size: 14px;
-  font-weight: 700;
-}
-.set-unit {
-  font-size: 10px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 4px;
-}
-
-/* ─── PROGRESS CHARTS ─── */
-.chart-container {
-  position: relative;
-  height: 200px;
-  margin-top: 12px;
-}
-
-/* ─── ALERTS ─── */
-.alert {
-  padding: 12px 16px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.alert-danger { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3); color: #ff8099; }
-.alert-warn { background: rgba(255,170,0,0.12); border: 1px solid rgba(255,170,0,0.3); color: var(--warn); }
-.alert-success { background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.3); color: var(--accent); }
-.alert-info { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.3); color: #9b93ff; }
-
-/* ─── MODAL ─── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 1000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-.modal-title { font-size: 18px; font-weight: 800; }
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 22px;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-.modal-close:hover { color: var(--text); }
-
-/* ─── TABLE ─── */
-.table { width: 100%; border-collapse: collapse; }
-.table th {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted);
-  text-align: right;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.table td {
-  padding: 12px 14px;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(46,46,62,0.5);
-  vertical-align: middle;
-}
-.table tr:last-child td { border-bottom: none; }
-.table tr:hover td { background: rgba(255,255,255,0.02); }
-
-/* ─── WEIGHT LOG ─── */
-.weight-log-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(46,46,62,0.5);
-  font-size: 14px;
-}
-.weight-val { font-size: 20px; font-weight: 800; color: var(--accent); }
-.weight-date { color: var(--muted); font-size: 13px; }
-.weight-change { font-size: 13px; font-weight: 700; }
-.change-up { color: var(--warn); }
-.change-down { color: var(--accent); }
-
-/* ─── TODAY WORKOUT ─── */
-.today-header {
-  background: linear-gradient(135deg, rgba(0,229,160,0.1), rgba(108,99,255,0.1));
-  border: 1px solid rgba(0,229,160,0.2);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.today-day-name { font-size: 18px; font-weight: 800; }
-.today-plan-name { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
-/* ─── DONE CHECK ─── */
-.done-check {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
-}
-.done-check.checked {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #0a1a10;
-}
-
-/* ─── PROGRESS BAR ─── */
-.progress-bar {
-  background: var(--border);
-  border-radius: 10px;
-  height: 8px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  border-radius: 10px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  transition: width 0.5s ease;
-}
-
-/* ─── TABS ─── */
-.tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--surface2);
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.tab {
-  flex: 1;
-  min-width: 80px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  color: var(--muted);
-  text-align: center;
-  transition: all 0.2s;
-  border: none;
-  background: none;
-  font-family: var(--font);
-}
-.tab.active { background: var(--surface); color: var(--accent); }
-.tab:hover:not(.active) { color: var(--text); }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main-content { padding: 16px; }
-  .exercise-row {
-    grid-template-columns: 1fr 60px 60px 80px 32px;
-    gap: 6px;
-  }
-  .exercise-header {
-    grid-template-columns: 1fr 60px 60px 80px 32px;
-  }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .page-header { flex-direction: column; align-items: flex-start; }
-}
-
-/* ─── MOBILE NAV ─── */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  z-index: 99;
-  justify-content: space-around;
-}
-@media (max-width: 768px) {
-  .mobile-nav { display: flex; }
-  .app-body { padding-bottom: 70px; }
-}
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 8px;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
-  transition: color 0.15s;
-}
-.mobile-nav-item.active { color: var(--accent); }
-.mobile-nav-icon { font-size: 20px; }
-
-/* ─── EMPTY STATE ─── */
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--muted);
-}
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
-.empty-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.empty-sub { font-size: 14px; }
-
-/* ─── LOADER ─── */
-.loader {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(0,229,160,0.3);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-screen {
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 90px 20px 60px;
+  position: relative; overflow: hidden;
 }
-.loading-screen .loader { width: 40px; height: 40px; border-width: 4px; }
-
-/* ─── REPORT PREVIEW ─── */
-.report-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
+.hero-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -5%, rgba(124,107,240,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 40%, rgba(0,212,168,.09) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 15% 65%, rgba(124,107,240,.07) 0%, transparent 60%);
 }
-.report-client { font-size: 15px; font-weight: 700; }
-.report-date { font-size: 12px; color: var(--muted); }
-.report-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
-.report-stat { font-size: 13px; }
-.report-stat strong { color: var(--accent); }
-
-/* ─── DIVIDER ─── */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 16px 0;
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37,37,64,.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,37,64,.35) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 70% at center, black, transparent);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at center, black, transparent);
 }
-
-/* ─── INPUT GROUP ─── */
-.input-group {
-  display: flex;
-  gap: 10px;
+.hero-content {
+  max-width: 820px; width: 100%;
+  text-align: center; position: relative; z-index: 1;
 }
-.input-group input { flex: 1; }
-
-/* ─── NOTIFICATION DOT ─── */
-.notif-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--danger);
-  border-radius: 50%;
-  margin-right: 4px;
-  vertical-align: middle;
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(124,107,240,.12); border: 1px solid rgba(124,107,240,.28);
+  color: var(--primary-l); padding: 6px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; margin-bottom: 28px;
+}
+.hero-title {
+  font-size: clamp(38px, 6.5vw, 76px);
+  font-weight: 900; line-height: 1.08; letter-spacing: -1.5px;
+  margin-bottom: 18px;
+}
+.hero-title .grad {
+  background: linear-gradient(135deg, var(--primary-l), var(--secondary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: var(--muted); margin-bottom: 52px; line-height: 1.65; font-weight: 400;
 }
 
-/* ─── TOAST ─── */
-#toast {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 9999;
-  transition: transform 0.3s ease;
-  min-width: 200px;
-  text-align: center;
+/* ══════════════════════════════════════
+   SEARCH BOX
+══════════════════════════════════════ */
+.search-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 22px;
+  padding: 22px;
+  max-width: 740px; margin: 0 auto; width: 100%;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(124,107,240,.12);
+}
+.search-tabs {
+  display: flex; gap: 6px; padding: 5px;
+  background: var(--surface2); border-radius: var(--r-sm);
+  margin-bottom: 18px;
+}
+.s-tab {
+  flex: 1; padding: 10px 14px; border-radius: 8px;
+  border: none; background: transparent;
+  color: var(--muted); font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.s-tab.active {
+  background: var(--surface3); color: var(--primary-l);
+  box-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Input */
+.input-wrap { position: relative; margin-bottom: 18px; }
+.s-input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px 14px 52px;
+  color: var(--text); font-family: var(--font); font-size: 16px; font-weight: 500;
+  outline: none; transition: all .25s; direction: rtl;
+}
+.s-input::placeholder { color: var(--subtle); }
+.s-input:focus {
+  border-color: var(--primary);
+  background: var(--surface3);
+  box-shadow: 0 0 0 3px rgba(124,107,240,.12);
+}
+.s-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--subtle); font-size: 20px; pointer-events: none;
+}
+.suggestions {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; overflow: hidden; z-index: 60;
+  box-shadow: var(--shadow); display: none;
+}
+.suggestions.open { display: block; }
+.sugg-item {
+  padding: 11px 16px; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; gap: 10px;
+  transition: background .15s; color: var(--muted);
+}
+.sugg-item:hover { background: var(--surface2); color: var(--text); }
+
+/* Image Drop */
+.drop-zone {
+  border: 2px dashed var(--border2); border-radius: 14px;
+  padding: 30px 20px; text-align: center; cursor: pointer;
+  transition: all .25s; margin-bottom: 18px; position: relative; overflow: hidden;
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--primary); background: rgba(124,107,240,.04);
+}
+.drop-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  width: 100%; height: 100%;
+}
+.drop-icon { font-size: 42px; margin-bottom: 10px; }
+.drop-label { font-size: 15px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.drop-hint { font-size: 12px; color: var(--subtle); }
+.img-preview { display: none; }
+.img-preview-inner {
+  display: flex; align-items: center; gap: 14px; padding: 6px 0;
+}
+.img-preview-inner img {
+  width: 80px; height: 80px; object-fit: cover;
+  border-radius: 10px; border: 2px solid var(--primary);
+}
+.img-preview-meta { text-align: right; }
+.img-preview-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.img-preview-ok { font-size: 12px; color: var(--secondary); }
+.img-remove {
+  margin-top: 8px; padding: 4px 12px; background: rgba(255,71,71,.12);
+  border: 1px solid rgba(255,71,71,.25); color: var(--red);
+  border-radius: 8px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: var(--font); transition: all .2s;
+}
+.img-remove:hover { background: rgba(255,71,71,.2); }
+
+/* Platform chips */
+.chips-label {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .7px; margin-bottom: 10px;
+}
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface2);
+  cursor: pointer; font-size: 13px; font-weight: 700;
+  transition: all .2s; color: var(--muted); user-select: none;
+}
+.chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+.chip[data-p="amazon"] .chip-dot  { background: var(--amazon); }
+.chip[data-p="noon"] .chip-dot   { background: var(--noon); }
+.chip[data-p="aliexpress"] .chip-dot { background: var(--aliexpress); }
+.chip[data-p="shein"] .chip-dot  { background: var(--shein); }
+.chip[data-p="temu"] .chip-dot   { background: var(--temu); }
+.chip.on[data-p="amazon"]     { border-color: var(--amazon); color: var(--amazon); background: rgba(255,153,0,.07); }
+.chip.on[data-p="noon"]      { border-color: var(--noon); color: var(--noon); background: rgba(247,193,49,.07); }
+.chip.on[data-p="aliexpress"] { border-color: var(--aliexpress); color: var(--aliexpress); background: rgba(255,71,71,.07); }
+.chip.on[data-p="shein"]     { border-color: var(--shein); color: var(--shein); background: rgba(233,69,96,.07); }
+.chip.on[data-p="temu"]      { border-color: var(--temu); color: var(--temu); background: rgba(255,101,52,.07); }
+
+/* Search button */
+.btn-search {
+  width: 100%; padding: 17px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-d));
+  color: #fff; border: none; border-radius: 12px;
+  font-family: var(--font); font-size: 17px; font-weight: 800;
+  cursor: pointer; transition: all .25s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden;
+}
+.btn-search::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
   pointer-events: none;
 }
-#toast.show { transform: translateX(-50%) translateY(0); }
-#toast.success { border-color: rgba(0,229,160,0.5); color: var(--accent); }
-#toast.error { border-color: rgba(255,77,109,0.5); color: var(--danger); }
+.btn-search:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(124,107,240,.45); }
+.btn-search:active { transform: translateY(0); }
+.btn-search:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+/* Platform row */
+.platform-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; flex-wrap: wrap; margin-top: 36px;
+}
+.plt-pill {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface2); border: 1px solid var(--border);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+
+/* ══════════════════════════════════════
+   POPULAR SEARCHES
+══════════════════════════════════════ */
+.popular-section {
+  padding: 0 20px 60px; max-width: 760px; margin: 0 auto;
+  display: none;
+}
+.popular-title {
+  font-size: 14px; font-weight: 700; color: var(--muted);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.popular-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.popular-chip {
+  padding: 7px 14px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 20px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.popular-chip:hover { border-color: var(--primary); color: var(--text); }
+
+/* ══════════════════════════════════════
+   LOADING
+══════════════════════════════════════ */
+#loadingSection {
+  display: none; padding: 60px 20px;
+  max-width: 900px; margin: 0 auto; text-align: center;
+}
+.loading-head {
+  font-size: 19px; font-weight: 700; color: var(--muted);
+  margin-bottom: 8px;
+}
+.loading-query-text { color: var(--primary-l); }
+.loading-sub {
+  font-size: 13px; color: var(--subtle); margin-bottom: 36px;
+}
+.loading-platforms {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+}
+.lp-card {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 20px 24px; min-width: 110px;
+  transition: all .35s;
+}
+.lp-card.searching {
+  border-color: var(--primary);
+  box-shadow: 0 0 24px rgba(124,107,240,.22);
+}
+.lp-card.done {
+  border-color: var(--secondary);
+  box-shadow: 0 0 24px rgba(0,212,168,.18);
+}
+.lp-card.unavailable { opacity: .45; }
+.lp-name { font-size: 12px; font-weight: 700; color: var(--muted); }
+.spinner {
+  width: 28px; height: 28px;
+  border: 3px solid var(--border2); border-top-color: var(--primary);
+  border-radius: 50%; animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.lp-check { font-size: 26px; }
+
+/* ══════════════════════════════════════
+   RESULTS
+══════════════════════════════════════ */
+#resultsSection {
+  display: none; padding: 44px 20px 100px;
+  max-width: 1220px; margin: 0 auto;
+}
+.results-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+}
+.results-title { font-size: 21px; font-weight: 800; }
+.results-q { color: var(--primary-l); }
+.results-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.sort-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sort-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+.sort-btn {
+  padding: 7px 14px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--font); transition: all .2s;
+}
+.sort-btn.active { border-color: var(--primary); color: var(--primary-l); background: rgba(124,107,240,.1); }
+
+/* Best Deal */
+.best-deal {
+  background: linear-gradient(130deg, rgba(244,185,66,.07) 0%, rgba(124,107,240,.07) 100%);
+  border: 1px solid rgba(244,185,66,.28);
+  border-radius: 22px; padding: 26px 30px;
+  margin-bottom: 30px;
+  display: flex; align-items: center; gap: 24px;
+  position: relative; overflow: hidden;
+  animation: fadeUp .5s ease;
+}
+.best-deal::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(244,185,66,.12), transparent 70%);
+  pointer-events: none;
+}
+.bd-crown { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+.bd-crown-icon { font-size: 40px; }
+.bd-crown-label {
+  font-size: 10px; font-weight: 800; color: var(--gold);
+  text-transform: uppercase; letter-spacing: .6px; white-space: nowrap;
+}
+.bd-info { flex: 1; }
+.bd-name { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+.bd-platform {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 14px;
+}
+.bd-prices { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.bd-price { font-size: 34px; font-weight: 900; color: var(--gold); }
+.bd-original { font-size: 16px; color: var(--subtle); text-decoration: line-through; }
+.bd-save {
+  background: rgba(0,212,168,.13); color: var(--secondary);
+  border: 1px solid rgba(0,212,168,.28);
+  padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+.bd-meta {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 14px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+}
+.bd-actions { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.btn-buy {
+  padding: 13px 26px;
+  background: linear-gradient(135deg, var(--gold), #da9e25);
+  color: #1a0e00; border: none; border-radius: var(--r-sm);
+  font-family: var(--font); font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.btn-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(244,185,66,.4); }
+.btn-share {
+  padding: 10px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); border-radius: var(--r-sm);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-share:hover { border-color: var(--primary); color: var(--text); }
+
+/* Results Grid */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.pcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  transition: all .25s; cursor: pointer;
+  animation: fadeUp .5s ease both;
+}
+.pcard:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: var(--shadow); }
+.pcard.top-deal { border-color: rgba(244,185,66,.28); box-shadow: 0 0 0 1px rgba(244,185,66,.08); }
+.pcard.na { opacity: .5; pointer-events: none; }
+.pbar { height: 4px; }
+.pbar.amazon     { background: var(--amazon); }
+.pbar.noon       { background: var(--noon); }
+.pbar.aliexpress { background: var(--aliexpress); }
+.pbar.shein      { background: var(--shein); }
+.pbar.temu       { background: var(--temu); }
+.pcbody { padding: 16px; }
+.pcard-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.ptag {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700;
+}
+.pdot { width: 9px; height: 9px; border-radius: 50%; }
+.ptag.amazon .pdot     { background: var(--amazon); }
+.ptag.noon .pdot       { background: var(--noon); }
+.ptag.aliexpress .pdot { background: var(--aliexpress); }
+.ptag.shein .pdot      { background: var(--shein); }
+.ptag.temu .pdot       { background: var(--temu); }
+.pbadge {
+  font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px;
+}
+.badge-best  { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(244,185,66,.3); }
+.badge-fast  { background: rgba(0,212,168,.1); color: var(--secondary); border: 1px solid rgba(0,212,168,.3); }
+.badge-cheap { background: rgba(255,71,71,.1); color: var(--red); border: 1px solid rgba(255,71,71,.28); }
+.pimg {
+  width: 100%; height: 115px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 54px; margin-bottom: 12px;
+}
+.pname {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  margin-bottom: 12px; line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pprice-row {
+  display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.pprice { font-size: 21px; font-weight: 900; }
+.poriginal { font-size: 12px; color: var(--subtle); text-decoration: line-through; }
+.pdiscount { font-size: 11px; font-weight: 700; color: var(--secondary); }
+.prating { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+.stars { color: var(--gold); font-size: 12px; }
+.rnum { font-size: 13px; font-weight: 700; }
+.rcnt { font-size: 11px; color: var(--subtle); }
+.pmeta {
+  display: flex; gap: 10px; font-size: 12px;
+  color: var(--muted); margin-bottom: 14px; flex-wrap: wrap;
+}
+.btn-pcard {
+  width: 100%; padding: 11px; border-radius: var(--r-sm);
+  border: 1px solid; font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.btn-pcard.amazon     { background: rgba(255,153,0,.1); color: var(--amazon); border-color: rgba(255,153,0,.25); }
+.btn-pcard.noon       { background: rgba(247,193,49,.1); color: var(--noon);  border-color: rgba(247,193,49,.25); }
+.btn-pcard.aliexpress { background: rgba(255,71,71,.1); color: var(--aliexpress); border-color: rgba(255,71,71,.25); }
+.btn-pcard.shein      { background: rgba(233,69,96,.1); color: var(--shein); border-color: rgba(233,69,96,.25); }
+.btn-pcard.temu       { background: rgba(255,101,52,.1); color: var(--temu); border-color: rgba(255,101,52,.25); }
+.btn-pcard:hover { filter: brightness(1.25); transform: translateY(-1px); }
+
+/* Comparison table */
+.comp-wrap {
+  margin-top: 36px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.comp-head {
+  padding: 16px 22px; font-size: 15px; font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.comp-table { width: 100%; border-collapse: collapse; }
+.comp-table th {
+  padding: 12px 20px; text-align: right;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--border);
+}
+.comp-table td {
+  padding: 14px 20px; font-size: 14px;
+  border-bottom: 1px solid rgba(37,37,64,.5);
+  vertical-align: middle;
+}
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: rgba(255,255,255,.015); }
+.comp-table tr.best-row td { background: rgba(244,185,66,.035); }
+.tplatform { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.tdot { width: 10px; height: 10px; border-radius: 50%; }
+.tprice { font-weight: 900; font-size: 16px; }
+
+/* New search CTA */
+.new-search-wrap { text-align: center; margin-top: 48px; }
+.btn-new-search {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 40px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); border-radius: 14px;
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+}
+.btn-new-search:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,107,240,.2); }
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 12px 26px;
+  font-size: 14px; font-weight: 600; z-index: 9999;
+  transition: transform .32s cubic-bezier(.34,1.56,.64,1);
+  min-width: 180px; text-align: center; pointer-events: none;
+  box-shadow: var(--shadow);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.success { border-color: rgba(0,212,168,.4); color: var(--secondary); }
+#toast.error   { border-color: rgba(255,71,71,.4);  color: var(--red); }
+#toast.info    { border-color: rgba(124,107,240,.4); color: var(--primary-l); }
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer {
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 22px 28px; text-align: center;
+  color: var(--subtle); font-size: 13px;
+}
+footer span { color: var(--primary-l); }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+  .header { padding: 0 16px; }
+  .nav-btn .nav-txt { display: none; }
+  .hero { padding: 84px 14px 40px; }
+  .search-box { padding: 16px; }
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .best-deal { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .bd-actions { flex-direction: row; width: 100%; }
+  .btn-buy, .btn-share { flex: 1; }
+  .results-top { flex-direction: column; }
+  .sort-bar { flex-wrap: wrap; }
+  .comp-table th, .comp-table td { padding: 10px 12px; font-size: 13px; }
+}
+@media (max-width: 420px) {
+  .results-grid { grid-template-columns: 1fr 1fr; }
+  .chips { gap: 6px; }
+  .chip { padding: 6px 10px; font-size: 12px; }
+}
 </style>
 </head>
 <body>
@@ -839,1667 +638,812 @@ textarea { resize: vertical; min-height: 80px; }
 <!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ===== SETUP SCREEN ===== -->
-<div id="setupScreen" class="screen">
-  <div class="setup-card">
-    <div class="setup-logo">💪 FitCoach Pro</div>
-    <div class="setup-sub">إعداد التطبيق — مرة واحدة فقط</div>
-
-    <div class="step-label">الخطوة 1 — Firebase Config</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
-      1. افتح <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">Firebase Console</a> وأنشئ مشروع جديد<br>
-      2. فعّل <strong>Authentication → Email/Password</strong><br>
-      3. أنشئ <strong>Firestore Database</strong> وابدأ في وضع Test<br>
-      4. اذهب لـ Project Settings وانسخ Config أدناه
-    </div>
-    <div class="form-group">
-      <label>Firebase Config (JSON)</label>
-      <textarea id="firebaseConfigInput" placeholder='{
-  "apiKey": "...",
-  "authDomain": "...",
-  "projectId": "...",
-  "storageBucket": "...",
-  "messagingSenderId": "...",
-  "appId": "..."
-}' style="min-height:130px;font-family:monospace;font-size:12px;direction:ltr;"></textarea>
-    </div>
-
-    <div class="step-label">الخطوة 2 — EmailJS (اختياري للإشعارات)</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;">
-      سجّل مجانًا في <a href="https://www.emailjs.com" target="_blank" style="color:var(--accent)">emailjs.com</a>، ربط Gmail، وأنشئ Template بمتغيرات: <code style="color:var(--accent2)">to_email, subject, message</code>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-      <div class="form-group" style="margin:0">
-        <label>Public Key</label>
-        <input id="ejsPublicKey" placeholder="xxxxxxxx" style="direction:ltr">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label>Service ID</label>
-        <input id="ejsServiceId" placeholder="service_xxx" style="direction:ltr">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label>Template ID</label>
-        <input id="ejsTemplateId" placeholder="template_xxx" style="direction:ltr">
-      </div>
-    </div>
-
-    <div class="step-label">الخطوة 3 — بياناتك كمدرب</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="form-group" style="margin:0">
-        <label>اسمك</label>
-        <input id="coachName" placeholder="أحمد المدرب">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label>إيميلك</label>
-        <input id="coachEmail" placeholder="coach@gmail.com" style="direction:ltr">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
-      <div class="form-group" style="margin:0">
-        <label>كلمة المرور</label>
-        <input id="coachPassword" type="password" placeholder="••••••••">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label>تأكيد كلمة المرور</label>
-        <input id="coachPasswordConfirm" type="password" placeholder="••••••••">
-      </div>
-    </div>
-
-    <br>
-    <button class="btn btn-primary" onclick="handleSetup()">حفظ وإنشاء حساب المدرب ✓</button>
-    <div id="setupError" style="margin-top:12px;font-size:13px;color:var(--danger);display:none;"></div>
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <div class="logo" onclick="scrollTop()">
+    <div class="logo-icon">🔍</div>
+    <span class="logo-name">قارن</span>
+    <span class="logo-tag">BETA</span>
   </div>
-</div>
-
-<!-- ===== LOGIN SCREEN ===== -->
-<div id="loginScreen" class="screen">
-  <div class="login-card">
-    <div class="brand">
-      <div class="brand-name">💪 FitCoach Pro</div>
-      <div class="brand-tagline">تتبع تدريبك — حقق أهدافك</div>
-    </div>
-    <div class="form-group">
-      <label>البريد الإلكتروني</label>
-      <input id="loginEmail" type="email" placeholder="example@gmail.com" style="direction:ltr">
-    </div>
-    <div class="form-group">
-      <label>كلمة المرور</label>
-      <input id="loginPassword" type="password" placeholder="••••••••">
-    </div>
-    <div id="loginError" style="margin-bottom:12px;font-size:13px;color:var(--danger);display:none;"></div>
-    <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">دخول</button>
-    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted);">
-      للمساعدة تواصل مع مدربك
-    </div>
-  </div>
-</div>
-
-<!-- ===== MAIN APP ===== -->
-<div id="appScreen" class="screen">
-  <header class="app-header">
-    <div class="header-brand">💪 FitCoach Pro</div>
-    <div class="header-user">
-      <span id="headerUserName" style="font-size:14px;font-weight:600;"></span>
-      <span id="headerBadge" class="user-badge"></span>
-      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">خروج</button>
-    </div>
-  </header>
-
-  <div class="app-body">
-    <!-- COACH SIDEBAR -->
-    <nav class="sidebar" id="coachSidebar" style="display:none">
-      <div class="sidebar-section">الرئيسية</div>
-      <div class="sidebar-item active" data-page="coachDashboard" onclick="showPage('coachDashboard', this)">
-        <span class="sidebar-icon">📊</span> لوحة التحكم
-      </div>
-      <div class="sidebar-section">إدارة</div>
-      <div class="sidebar-item" data-page="coachClients" onclick="showPage('coachClients', this)">
-        <span class="sidebar-icon">👥</span> عملائي
-      </div>
-      <div class="sidebar-item" data-page="coachPlans" onclick="showPage('coachPlans', this)">
-        <span class="sidebar-icon">📋</span> جداول التمارين
-      </div>
-      <div class="sidebar-section">التقارير</div>
-      <div class="sidebar-item" data-page="coachReports" onclick="showPage('coachReports', this)">
-        <span class="sidebar-icon">📈</span> التقارير
-      </div>
-      <div class="sidebar-item" data-page="coachAlerts" onclick="showPage('coachAlerts', this)">
-        <span class="sidebar-icon">🔔</span> التنبيهات <span id="alertBadge" style="display:none" class="tag tag-red" style="margin-right:4px">!</span>
-      </div>
-    </nav>
-
-    <!-- CLIENT SIDEBAR -->
-    <nav class="sidebar" id="clientSidebar" style="display:none">
-      <div class="sidebar-section">تمريني</div>
-      <div class="sidebar-item active" data-page="clientToday" onclick="showPage('clientToday', this)">
-        <span class="sidebar-icon">🏋️</span> تمرين اليوم
-      </div>
-      <div class="sidebar-item" data-page="clientHistory" onclick="showPage('clientHistory', this)">
-        <span class="sidebar-icon">📅</span> سجل التمارين
-      </div>
-      <div class="sidebar-section">جسمي</div>
-      <div class="sidebar-item" data-page="clientWeight" onclick="showPage('clientWeight', this)">
-        <span class="sidebar-icon">⚖️</span> وزني
-      </div>
-      <div class="sidebar-item" data-page="clientProgress" onclick="showPage('clientProgress', this)">
-        <span class="sidebar-icon">📊</span> تطوري
-      </div>
-    </nav>
-
-    <main class="main-content">
-
-      <!-- ══════ COACH PAGES ══════ -->
-
-      <!-- COACH DASHBOARD -->
-      <div id="coachDashboard" class="page active">
-        <div class="page-header">
-          <div>
-            <div class="page-title">مرحباً <span id="dashCoachName"></span> 👋</div>
-            <div class="page-sub" id="dashDate"></div>
-          </div>
-        </div>
-        <div class="stats-grid" id="coachStats">
-          <div class="stat-card stat-green"><div class="stat-num" id="statClients">-</div><div class="stat-label">العملاء</div></div>
-          <div class="stat-card stat-purple"><div class="stat-num" id="statPlans">-</div><div class="stat-label">الجداول</div></div>
-          <div class="stat-card stat-yellow"><div class="stat-num" id="statToday">-</div><div class="stat-label">مارسوا اليوم</div></div>
-          <div class="stat-card stat-red"><div class="stat-num" id="statMissed">-</div><div class="stat-label">غيابات</div></div>
-        </div>
-
-        <!-- Recent activity -->
-        <div class="card">
-          <div class="card-title">🕐 آخر النشاطات</div>
-          <div id="recentActivity">
-            <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">لا يوجد نشاط بعد</div></div>
-          </div>
-        </div>
-
-        <!-- Missed clients -->
-        <div class="card" id="missedCard" style="display:none">
-          <div class="card-title">⚠️ عملاء غابوا (آخر 3 أيام)</div>
-          <div id="missedList"></div>
-        </div>
-      </div>
-
-      <!-- COACH CLIENTS -->
-      <div id="coachClients" class="page">
-        <div class="page-header">
-          <div>
-            <div class="page-title">👥 عملائي</div>
-            <div class="page-sub">إدارة وإضافة عملاء</div>
-          </div>
-          <button class="btn btn-primary" style="width:auto" onclick="openAddClient()">+ إضافة عميل</button>
-        </div>
-        <div id="clientsGrid" class="client-grid">
-          <div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">لا يوجد عملاء بعد</div><div class="empty-sub">أضف عميلك الأول الآن</div></div>
-        </div>
-      </div>
-
-      <!-- COACH PLANS -->
-      <div id="coachPlans" class="page">
-        <div class="page-header">
-          <div>
-            <div class="page-title">📋 جداول التمارين</div>
-            <div class="page-sub">إنشاء وإسناد برامج تدريبية</div>
-          </div>
-          <button class="btn btn-primary" style="width:auto" onclick="openNewPlan()">+ جدول جديد</button>
-        </div>
-        <div id="plansList"></div>
-      </div>
-
-      <!-- COACH REPORTS -->
-      <div id="coachReports" class="page">
-        <div class="page-header">
-          <div>
-            <div class="page-title">📈 تقارير الأداء</div>
-            <div class="page-sub">متابعة أداء العملاء</div>
-          </div>
-          <select id="reportClientFilter" onchange="loadReports()" style="width:auto;min-width:160px">
-            <option value="">كل العملاء</option>
-          </select>
-        </div>
-        <div id="reportsList"></div>
-      </div>
-
-      <!-- COACH ALERTS -->
-      <div id="coachAlerts" class="page">
-        <div class="page-header">
-          <div>
-            <div class="page-title">🔔 التنبيهات</div>
-            <div class="page-sub">غيابات وأداء منخفض</div>
-          </div>
-        </div>
-        <div id="alertsList"></div>
-      </div>
-
-      <!-- ══════ CLIENT PAGES ══════ -->
-
-      <!-- CLIENT TODAY -->
-      <div id="clientToday" class="page">
-        <div id="todayContent"></div>
-      </div>
-
-      <!-- CLIENT HISTORY -->
-      <div id="clientHistory" class="page">
-        <div class="page-header">
-          <div class="page-title">📅 سجل تماريني</div>
-        </div>
-        <div id="historyList"></div>
-      </div>
-
-      <!-- CLIENT WEIGHT -->
-      <div id="clientWeight" class="page">
-        <div class="page-header">
-          <div class="page-title">⚖️ سجل وزني</div>
-        </div>
-        <div class="card">
-          <div class="card-title">تسجيل الوزن اليوم</div>
-          <div class="input-group">
-            <input id="newWeightInput" type="number" step="0.1" placeholder="الوزن بالكيلو" min="30" max="300">
-            <button class="btn btn-primary" style="width:auto;white-space:nowrap" onclick="logWeight()">تسجيل ⚖️</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">منحنى الوزن</div>
-          <div class="chart-container"><canvas id="weightChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">السجل</div>
-          <div id="weightLogList"></div>
-        </div>
-      </div>
-
-      <!-- CLIENT PROGRESS -->
-      <div id="clientProgress" class="page">
-        <div class="page-header">
-          <div class="page-title">📊 تطوري</div>
-        </div>
-        <div class="card">
-          <div class="card-title">الأوزان المرفوعة - آخر 30 يوم</div>
-          <div style="margin-bottom:12px">
-            <select id="progressExerciseSelect" onchange="updateProgressChart()" style="width:auto;min-width:200px">
-              <option value="">اختر تمرين</option>
-            </select>
-          </div>
-          <div class="chart-container"><canvas id="progressChart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">إحصائيات عامة</div>
-          <div id="progressStats" class="stats-grid"></div>
-        </div>
-      </div>
-
-    </main>
-  </div>
-
-  <!-- MOBILE NAV -->
-  <nav class="mobile-nav" id="coachMobileNav" style="display:none">
-    <div class="mobile-nav-item active" onclick="showPage('coachDashboard', this, true)">
-      <span class="mobile-nav-icon">📊</span>الرئيسية
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('coachClients', this, true)">
-      <span class="mobile-nav-icon">👥</span>العملاء
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('coachPlans', this, true)">
-      <span class="mobile-nav-icon">📋</span>الجداول
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('coachReports', this, true)">
-      <span class="mobile-nav-icon">📈</span>التقارير
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('coachAlerts', this, true)">
-      <span class="mobile-nav-icon">🔔</span>التنبيهات
-    </div>
+  <nav class="header-nav">
+    <button class="nav-btn" onclick="goSearch()">
+      <span>🔍</span><span class="nav-txt">بحث جديد</span>
+    </button>
+    <button class="nav-btn" onclick="showHistory()">
+      <span>🕐</span><span class="nav-txt">السجل</span>
+    </button>
   </nav>
-  <nav class="mobile-nav" id="clientMobileNav" style="display:none">
-    <div class="mobile-nav-item active" onclick="showPage('clientToday', this, true)">
-      <span class="mobile-nav-icon">🏋️</span>اليوم
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('clientHistory', this, true)">
-      <span class="mobile-nav-icon">📅</span>السجل
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('clientWeight', this, true)">
-      <span class="mobile-nav-icon">⚖️</span>الوزن
-    </div>
-    <div class="mobile-nav-item" onclick="showPage('clientProgress', this, true)">
-      <span class="mobile-nav-icon">📊</span>التطور
-    </div>
-  </nav>
-</div>
+</header>
 
-<!-- ===== MODALS ===== -->
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero" id="heroSection">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
 
-<!-- Add Client Modal -->
-<div id="addClientModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">إضافة عميل جديد</div>
-      <button class="modal-close" onclick="closeModal('addClientModal')">✕</button>
-    </div>
-    <div class="form-group"><label>اسم العميل</label><input id="newClientName" placeholder="محمد علي"></div>
-    <div class="form-group"><label>البريد الإلكتروني</label><input id="newClientEmail" type="email" placeholder="client@gmail.com" style="direction:ltr"></div>
-    <div class="form-group"><label>كلمة المرور (مؤقتة)</label><input id="newClientPassword" type="password" placeholder="••••••••"></div>
-    <div id="addClientError" style="margin-bottom:12px;font-size:13px;color:var(--danger);display:none;"></div>
-    <button class="btn btn-primary" onclick="addClient()">إنشاء حساب العميل ✓</button>
-  </div>
-</div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✨ مقارنة أسعار فورية من 5 متاجر عالمية</div>
 
-<!-- New Plan Modal -->
-<div id="newPlanModal" class="modal-overlay">
-  <div class="modal" style="max-width:700px">
-    <div class="modal-header">
-      <div class="modal-title">إنشاء جدول تمارين</div>
-      <button class="modal-close" onclick="closeModal('newPlanModal')">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <div class="form-group" style="margin:0">
-        <label>اسم الجدول</label>
-        <input id="planName" placeholder="برنامج القوة - محمد">
+    <h1 class="hero-title">
+      اشترِ بـ<span class="grad">أفضل سعر</span><br>
+      من أي متجر تريده
+    </h1>
+
+    <p class="hero-sub">
+      ابحث عن أي منتج بالاسم أو الصورة<br>
+      وسنقارن الأسعار فوراً من أمازون، نون، علي إكسبريس، شي ان، وتيمو
+    </p>
+
+    <!-- ─── SEARCH BOX ─── -->
+    <div class="search-box" id="searchBox">
+
+      <!-- Tabs -->
+      <div class="search-tabs">
+        <button class="s-tab active" id="tabName" onclick="switchTab('name',this)">🔤 بحث بالاسم</button>
+        <button class="s-tab" id="tabImage" onclick="switchTab('image',this)">📷 بحث بالصورة</button>
       </div>
-      <div class="form-group" style="margin:0">
-        <label>العميل</label>
-        <select id="planClientSelect"></select>
-      </div>
-    </div>
-    <div id="planDays"></div>
-    <button class="btn btn-secondary btn-sm" style="margin-bottom:16px" onclick="addDayToPlan()">+ إضافة يوم</button>
-    <button class="btn btn-primary" onclick="savePlan()">حفظ الجدول ✓</button>
-  </div>
-</div>
 
-<!-- Client Detail Modal -->
-<div id="clientDetailModal" class="modal-overlay">
-  <div class="modal" style="max-width:680px">
-    <div class="modal-header">
-      <div class="modal-title" id="clientDetailName"></div>
-      <button class="modal-close" onclick="closeModal('clientDetailModal')">✕</button>
-    </div>
-    <div id="clientDetailContent"></div>
-  </div>
-</div>
-
-<!-- Workout Log Detail Modal -->
-<div id="logDetailModal" class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">تفاصيل التمرين</div>
-      <button class="modal-close" onclick="closeModal('logDetailModal')">✕</button>
-    </div>
-    <div id="logDetailContent"></div>
-  </div>
-</div>
-
-<script>
-// ════════════════════════════════
-// CONFIG & GLOBALS
-// ════════════════════════════════
-const CONFIG_KEY = 'fitcoach_config';
-let app, auth, db;
-
-// ── PRE-SAVED FIREBASE CONFIG ──
-const PRESET_FIREBASE = {
-  apiKey: "AIzaSyB-CbdlNUo04oK554sUpkXPLyDbZoOl8eI",
-  authDomain: "vllogsraye.firebaseapp.com",
-  projectId: "vllogsraye",
-  storageBucket: "vllogsraye.firebasestorage.app",
-  messagingSenderId: "548345528371",
-  appId: "1:548345528371:web:54ca2e654a18a9223ce346",
-  measurementId: "G-2Z65M0K5T8"
-};
-let currentUser = null;
-let currentUserData = null;
-let weightChartInst = null;
-let progressChartInst = null;
-
-// ════════════════════════════════
-// INIT
-// ════════════════════════════════
-window.onload = async function() {
-  // Show login by default so page is never blank
-  showScreen('loginScreen');
-
-  // Auto-save preset config if nothing stored yet
-  let cfg = loadConfig();
-  if (!cfg) {
-    cfg = { firebase: PRESET_FIREBASE, ejs: {}, coachEmail: '' };
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-  }
-
-  try {
-    initFirebase(cfg);
-  } catch(e) {
-    console.error('Firebase init error:', e);
-    showScreen('setupScreen');
-    return;
-  }
-
-  if (cfg.ejs?.publicKey) {
-    try { emailjs.init(cfg.ejs.publicKey); } catch {}
-  }
-
-  // Timeout fallback: if auth doesn't respond in 8s, show login
-  const fallback = setTimeout(() => showScreen('loginScreen'), 8000);
-
-  auth.onAuthStateChanged(async user => {
-    clearTimeout(fallback);
-    if (user) {
-      try {
-        currentUser = user;
-        const snap = await db.collection('users').doc(user.uid).get();
-        if (snap.exists) {
-          currentUserData = snap.data();
-          startApp();
-        } else {
-          await auth.signOut();
-          showScreen('loginScreen');
-        }
-      } catch(e) {
-        console.error('Auth state error:', e);
-        showScreen('loginScreen');
-      }
-    } else {
-      showScreen('loginScreen');
-    }
-  });
-};
-
-function loadConfig() {
-  try {
-    return JSON.parse(localStorage.getItem(CONFIG_KEY));
-  } catch { return null; }
-}
-
-function initFirebase(cfg) {
-  if (firebase.apps.length) return;
-  app = firebase.initializeApp(cfg.firebase);
-  auth = firebase.auth();
-  db = firebase.firestore();
-}
-
-// ════════════════════════════════
-// SETUP
-// ════════════════════════════════
-async function handleSetup() {
-  const cfgRaw = document.getElementById('firebaseConfigInput').value.trim();
-  const name = document.getElementById('coachName').value.trim();
-  const email = document.getElementById('coachEmail').value.trim();
-  const pass = document.getElementById('coachPassword').value;
-  const pass2 = document.getElementById('coachPasswordConfirm').value;
-  const errEl = document.getElementById('setupError');
-  errEl.style.display = 'none';
-
-  if (!cfgRaw || !name || !email || !pass) { showSetupError('يرجى ملء جميع الحقول'); return; }
-  if (pass !== pass2) { showSetupError('كلمات المرور غير متطابقة'); return; }
-  if (pass.length < 6) { showSetupError('كلمة المرور 6 أحرف على الأقل'); return; }
-
-  let fbCfg;
-  try { fbCfg = cfgRaw ? JSON.parse(cfgRaw) : PRESET_FIREBASE; } catch { showSetupError('Firebase Config غير صحيح — تأكد أنه JSON'); return; }
-
-  const ejsCfg = {
-    publicKey: document.getElementById('ejsPublicKey').value.trim(),
-    serviceId: document.getElementById('ejsServiceId').value.trim(),
-    templateId: document.getElementById('ejsTemplateId').value.trim(),
-  };
-
-  try {
-    initFirebase({ firebase: fbCfg });
-    let cred;
-    try {
-      cred = await auth.createUserWithEmailAndPassword(email, pass);
-      await db.collection('users').doc(cred.user.uid).set({
-        name, email, role: 'coach', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    } catch(e) {
-      if (e.code === 'auth/email-already-in-use') {
-        // Account already created — just sign in
-        cred = await auth.signInWithEmailAndPassword(email, pass);
-        // Update name if doc exists
-        const snap = await db.collection('users').doc(cred.user.uid).get();
-        if (!snap.exists) {
-          await db.collection('users').doc(cred.user.uid).set({
-            name, email, role: 'coach', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
-      } else { throw e; }
-    }
-    const config = { firebase: fbCfg, ejs: ejsCfg, coachEmail: email };
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-    if (ejsCfg.publicKey) emailjs.init(ejsCfg.publicKey);
-    showToast('تم الإعداد بنجاح! 🎉', 'success');
-    currentUser = cred.user;
-    const userSnap = await db.collection('users').doc(cred.user.uid).get();
-    currentUserData = userSnap.data();
-    startApp();
-  } catch(e) {
-    showSetupError('خطأ: ' + (e.message || e));
-    try { firebase.apps.forEach(a => a.delete()); } catch {}
-    app = auth = db = null;
-  }
-}
-
-function showSetupError(msg) {
-  const el = document.getElementById('setupError');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-// ════════════════════════════════
-// LOGIN
-// ════════════════════════════════
-async function handleLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
-  errEl.style.display = 'none';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loader"></span>';
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch(e) {
-    errEl.textContent = 'بيانات الدخول غير صحيحة';
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'دخول';
-  }
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('loginScreen').classList.contains('active')) handleLogin();
-});
-
-async function handleLogout() {
-  await auth.signOut();
-  currentUser = null;
-  currentUserData = null;
-  showScreen('loginScreen');
-}
-
-// ════════════════════════════════
-// APP START
-// ════════════════════════════════
-function startApp() {
-  document.getElementById('headerUserName').textContent = currentUserData.name;
-  const badge = document.getElementById('headerBadge');
-  if (currentUserData.role === 'coach') {
-    badge.textContent = 'مدرب';
-    badge.className = 'user-badge badge-coach';
-    document.getElementById('coachSidebar').style.display = 'block';
-    document.getElementById('coachMobileNav').style.display = 'flex';
-    loadCoachDashboard();
-  } else {
-    badge.textContent = 'عميل';
-    badge.className = 'user-badge badge-client';
-    document.getElementById('clientSidebar').style.display = 'block';
-    document.getElementById('clientMobileNav').style.display = 'flex';
-    loadClientToday();
-    loadClientProgress();
-  }
-  showScreen('appScreen');
-  const dashDateEl = document.getElementById('dashDate');
-  if (dashDateEl) dashDateEl.textContent = new Date().toLocaleDateString('ar-SA', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-}
-
-// ════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════
-function showPage(pageId, el, isMobile = false) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-
-  if (isMobile) {
-    document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
-  } else {
-    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  }
-  if (el) el.classList.add('active');
-
-  // Lazy load
-  if (pageId === 'coachDashboard') loadCoachDashboard();
-  if (pageId === 'coachClients') loadClients();
-  if (pageId === 'coachPlans') loadPlans();
-  if (pageId === 'coachReports') loadReports();
-  if (pageId === 'coachAlerts') loadAlerts();
-  if (pageId === 'clientToday') loadClientToday();
-  if (pageId === 'clientHistory') loadClientHistory();
-  if (pageId === 'clientWeight') loadWeightLog();
-  if (pageId === 'clientProgress') loadClientProgress();
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen, #appScreen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-
-// ════════════════════════════════
-// COACH: DASHBOARD
-// ════════════════════════════════
-async function loadCoachDashboard() {
-  if (!currentUserData || currentUserData.role !== 'coach') return;
-  document.getElementById('dashCoachName').textContent = currentUserData.name;
-
-  const [clientsSnap, plansSnap, logsSnap] = await Promise.all([
-    db.collection('users').where('coachId','==',currentUser.uid).where('role','==','client').get(),
-    db.collection('plans').where('coachId','==',currentUser.uid).get(),
-    db.collection('workoutLogs').where('coachId','==',currentUser.uid)
-      .orderBy('loggedAt','desc').limit(30).get()
-  ]);
-
-  const clients = clientsSnap.docs.map(d => ({id:d.id,...d.data()}));
-  const today = todayStr();
-
-  // Stats
-  document.getElementById('statClients').textContent = clients.length;
-  document.getElementById('statPlans').textContent = plansSnap.size;
-
-  const todayLogs = logsSnap.docs.filter(d => d.data().date === today);
-  const uniqueToday = new Set(todayLogs.map(d => d.data().clientId)).size;
-  document.getElementById('statToday').textContent = uniqueToday;
-
-  // Missed (no log in 3 days)
-  const threeDaysAgo = new Date(); threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-  const recentClientIds = new Set(logsSnap.docs
-    .filter(d => d.data().loggedAt?.toDate && d.data().loggedAt.toDate() >= threeDaysAgo)
-    .map(d => d.data().clientId));
-  const missed = clients.filter(c => !recentClientIds.has(c.id));
-  document.getElementById('statMissed').textContent = missed.length;
-
-  // Missed card
-  const missedCard = document.getElementById('missedCard');
-  if (missed.length > 0) {
-    missedCard.style.display = 'block';
-    document.getElementById('missedList').innerHTML = missed.map(c => `
-      <div class="alert alert-warn">
-        ⚠️ <strong>${c.name}</strong> لم يتدرب منذ 3+ أيام
-        <button class="btn btn-sm btn-secondary" style="margin-right:auto" onclick="sendMissedEmail('${c.email}','${c.name}')">إرسال تذكير</button>
-      </div>
-    `).join('');
-    document.getElementById('alertBadge').style.display = 'inline-flex';
-  } else {
-    missedCard.style.display = 'none';
-  }
-
-  // Recent activity
-  const actEl = document.getElementById('recentActivity');
-  if (logsSnap.empty) {
-    actEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">لا يوجد نشاط بعد</div></div>';
-  } else {
-    const clientMap = {};
-    clients.forEach(c => clientMap[c.id] = c.name);
-    actEl.innerHTML = `<table class="table">
-      <thead><tr><th>العميل</th><th>التاريخ</th><th>التمارين</th><th>الحالة</th></tr></thead>
-      <tbody>
-        ${logsSnap.docs.slice(0,10).map(d => {
-          const log = d.data();
-          const date = log.loggedAt?.toDate ? log.loggedAt.toDate().toLocaleDateString('ar-SA') : log.date;
-          const pct = log.completionPct || 0;
-          const statusTag = pct >= 80 ? `<span class="tag tag-green">✓ ${pct}%</span>` :
-                            pct >= 50 ? `<span class="tag tag-yellow">⚡ ${pct}%</span>` :
-                            `<span class="tag tag-red">✗ ${pct}%</span>`;
-          return `<tr>
-            <td>${clientMap[log.clientId] || 'عميل'}</td>
-            <td>${date}</td>
-            <td>${log.exerciseCount || 0} تمرين</td>
-            <td>${statusTag}</td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>`;
-  }
-}
-
-// ════════════════════════════════
-// COACH: CLIENTS
-// ════════════════════════════════
-async function loadClients() {
-  const snap = await db.collection('users')
-    .where('coachId','==',currentUser.uid)
-    .where('role','==','client').get();
-  const clients = snap.docs.map(d => ({id:d.id,...d.data()}));
-  const grid = document.getElementById('clientsGrid');
-
-  if (clients.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">لا يوجد عملاء بعد</div><div class="empty-sub">أضف عميلك الأول الآن</div></div>';
-    return;
-  }
-
-  // Get last log for each client
-  const logsSnap = await db.collection('workoutLogs')
-    .where('coachId','==',currentUser.uid).orderBy('loggedAt','desc').limit(100).get();
-  const lastLog = {};
-  logsSnap.docs.forEach(d => {
-    const cid = d.data().clientId;
-    if (!lastLog[cid]) lastLog[cid] = d.data();
-  });
-
-  grid.innerHTML = clients.map(c => {
-    const last = lastLog[c.id];
-    const lastDate = last?.loggedAt?.toDate ? last.loggedAt.toDate().toLocaleDateString('ar-SA') : 'لم يتدرب';
-    const isActive = last?.loggedAt?.toDate && (new Date() - last.loggedAt.toDate()) < 3*24*3600*1000;
-    const statusTag = isActive ? `<span class="tag tag-green">● نشط</span>` : `<span class="tag tag-red">● غائب</span>`;
-    return `<div class="client-card" onclick="openClientDetail('${c.id}')">
-      <div class="client-avatar">${c.name[0]}</div>
-      <div class="client-name">${c.name}</div>
-      <div class="client-email">${c.email}</div>
-      <div class="client-meta">
-        ${statusTag}
-        <span class="tag tag-gray">آخر تمرين: ${lastDate}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openAddClient() {
-  document.getElementById('newClientName').value = '';
-  document.getElementById('newClientEmail').value = '';
-  document.getElementById('newClientPassword').value = '';
-  document.getElementById('addClientError').style.display = 'none';
-  openModal('addClientModal');
-}
-
-async function addClient() {
-  const name = document.getElementById('newClientName').value.trim();
-  const email = document.getElementById('newClientEmail').value.trim();
-  const pass = document.getElementById('newClientPassword').value;
-  const errEl = document.getElementById('addClientError');
-  errEl.style.display = 'none';
-  if (!name||!email||!pass) { errEl.textContent='يرجى ملء جميع الحقول'; errEl.style.display='block'; return; }
-  if (pass.length < 6) { errEl.textContent='كلمة المرور 6 أحرف على الأقل'; errEl.style.display='block'; return; }
-
-  try {
-    // Create secondary auth (workaround: sign out and back)
-    const mainUser = auth.currentUser;
-    const cfg = loadConfig();
-
-    // Use a secondary app instance for client creation
-    let secondApp;
-    try {
-      secondApp = firebase.app('client-creator');
-    } catch {
-      secondApp = firebase.initializeApp(cfg.firebase, 'client-creator');
-    }
-    const secondAuth = secondApp.auth();
-    const cred = await secondAuth.createUserWithEmailAndPassword(email, pass);
-    await db.collection('users').doc(cred.user.uid).set({
-      name, email, role: 'client',
-      coachId: currentUser.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await secondAuth.signOut();
-    closeModal('addClientModal');
-    showToast(`تم إضافة ${name} ✓`, 'success');
-    loadClients();
-  } catch(e) {
-    errEl.textContent = 'خطأ: ' + (e.message||e);
-    errEl.style.display = 'block';
-  }
-}
-
-async function openClientDetail(clientId) {
-  const snap = await db.collection('users').doc(clientId).get();
-  const client = snap.data();
-  document.getElementById('clientDetailName').textContent = `👤 ${client.name}`;
-
-  // Load logs + weight
-  const [logsSnap, weightSnap, plansSnap] = await Promise.all([
-    db.collection('workoutLogs').where('clientId','==',clientId).orderBy('loggedAt','desc').limit(20).get(),
-    db.collection('weightLogs').where('clientId','==',clientId).orderBy('loggedAt','desc').limit(10).get(),
-    db.collection('plans').where('clientId','==',clientId).get()
-  ]);
-
-  const planNames = {}; plansSnap.docs.forEach(d => planNames[d.id] = d.data().name);
-  const weights = weightSnap.docs.map(d => d.data());
-
-  let html = `
-    <div class="tabs">
-      <button class="tab active" onclick="switchDetailTab('logs', this)">سجل التمارين</button>
-      <button class="tab" onclick="switchDetailTab('weight', this)">الوزن</button>
-      <button class="tab" onclick="switchDetailTab('send', this)">إرسال تقرير</button>
-    </div>
-
-    <div id="detailLogs">
-      ${logsSnap.empty ? '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">لا توجد تمارين مسجلة</div></div>' :
-        `<table class="table"><thead><tr><th>التاريخ</th><th>الجدول</th><th>التمارين</th><th>الأداء</th></tr></thead><tbody>
-        ${logsSnap.docs.map(d => {
-          const l = d.data();
-          const dt = l.loggedAt?.toDate ? l.loggedAt.toDate().toLocaleDateString('ar-SA') : l.date;
-          const pct = l.completionPct||0;
-          const tag = pct>=80?'tag-green':pct>=50?'tag-yellow':'tag-red';
-          return `<tr onclick="openLogDetail('${d.id}')" style="cursor:pointer">
-            <td>${dt}</td><td>${planNames[l.planId]||'—'}</td><td>${l.exerciseCount||0}</td>
-            <td><span class="tag ${tag}">${pct}%</span></td>
-          </tr>`;
-        }).join('')}</tbody></table>`
-      }
-    </div>
-
-    <div id="detailWeight" style="display:none">
-      ${weights.length === 0 ? '<div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">لا توجد أوزان مسجلة</div></div>' :
-        weights.map((w,i) => {
-          const diff = i < weights.length-1 ? (w.weight - weights[i+1].weight).toFixed(1) : null;
-          const dt = w.loggedAt?.toDate ? w.loggedAt.toDate().toLocaleDateString('ar-SA') : w.date;
-          return `<div class="weight-log-row">
-            <span class="weight-date">${dt}</span>
-            <span class="weight-val">${w.weight} kg</span>
-            ${diff !== null ? `<span class="weight-change ${diff>0?'change-up':'change-down'}">${diff>0?'+':''}${diff} kg</span>` : '<span></span>'}
-          </div>`;
-        }).join('')
-      }
-    </div>
-
-    <div id="detailSend" style="display:none">
-      <div class="alert alert-info" style="margin-bottom:16px">
-        📧 إرسال تقرير الأداء لإيميل المدرب
-      </div>
-      <button class="btn btn-accent2 btn-full" onclick="sendReportEmail('${clientId}','${client.name}','${client.email}')">
-        📧 إرسال تقرير كامل
-      </button>
-      <br><br>
-      <button class="btn btn-danger btn-full" onclick="sendMissedEmail('${client.email}','${client.name}')">
-        ⚠️ إرسال تذكير للعميل
-      </button>
-    </div>
-  `;
-  document.getElementById('clientDetailContent').innerHTML = html;
-  openModal('clientDetailModal');
-}
-
-function switchDetailTab(tab, el) {
-  document.querySelectorAll('#clientDetailContent .tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('detailLogs').style.display = tab==='logs'?'block':'none';
-  document.getElementById('detailWeight').style.display = tab==='weight'?'block':'none';
-  document.getElementById('detailSend').style.display = tab==='send'?'block':'none';
-}
-
-async function openLogDetail(logId) {
-  const snap = await db.collection('workoutLogs').doc(logId).get();
-  const log = snap.data();
-  const dt = log.loggedAt?.toDate ? log.loggedAt.toDate().toLocaleDateString('ar-SA', {weekday:'long',year:'numeric',month:'long',day:'numeric'}) : log.date;
-  let html = `<div class="alert alert-info" style="margin-bottom:16px">📅 ${dt}</div>`;
-  (log.exercises||[]).forEach(ex => {
-    html += `<div class="exercise-log-card">
-      <div class="exercise-log-name">${ex.name}</div>
-      <table class="table"><thead><tr><th>الست</th><th>الرابات</th><th>الوزن</th></tr></thead><tbody>
-      ${(ex.sets||[]).map((s,i) => `<tr><td>الست ${i+1}</td><td>${s.reps||'—'}</td><td>${s.weight||'—'} kg</td></tr>`).join('')}
-      </tbody></table>
-    </div>`;
-  });
-  document.getElementById('logDetailContent').innerHTML = html;
-  openModal('logDetailModal');
-}
-
-// ════════════════════════════════
-// COACH: PLANS
-// ════════════════════════════════
-async function loadPlans() {
-  const [plansSnap, clientsSnap] = await Promise.all([
-    db.collection('plans').where('coachId','==',currentUser.uid).orderBy('createdAt','desc').get(),
-    db.collection('users').where('coachId','==',currentUser.uid).where('role','==','client').get()
-  ]);
-  const clients = {}; clientsSnap.docs.forEach(d => clients[d.id] = d.data().name);
-  const el = document.getElementById('plansList');
-
-  if (plansSnap.empty) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا توجد جداول بعد</div><div class="empty-sub">أنشئ أول جدول تمارين</div></div>';
-    return;
-  }
-
-  el.innerHTML = plansSnap.docs.map(d => {
-    const p = d.data();
-    const dayCount = p.days?.length || 0;
-    const exCount = (p.days||[]).reduce((a,day) => a + (day.exercises?.length||0), 0);
-    return `<div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
-        <div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:4px">${p.name}</div>
-          <div style="font-size:13px;color:var(--muted)">للعميل: ${clients[p.clientId]||'—'}</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <span class="tag tag-purple">${dayCount} أيام</span>
-          <span class="tag tag-green">${exCount} تمرين</span>
-          <button class="btn btn-ghost btn-sm" onclick="editPlan('${d.id}')">✏️ تعديل</button>
-          <button class="btn btn-danger btn-sm" onclick="deletePlan('${d.id}')">حذف</button>
+      <!-- Name Panel -->
+      <div class="tab-panel active" id="namePanel">
+        <div class="input-wrap">
+          <input class="s-input" id="searchInput" type="text"
+            placeholder="مثال: iPhone 15 Pro، سماعة JBL، حذاء نايك..."
+            autocomplete="off"
+            oninput="onInput(this.value)"
+            onkeydown="onKey(event)">
+          <span class="s-icon">🔍</span>
+          <div class="suggestions" id="suggestions"></div>
         </div>
       </div>
-      <hr class="divider">
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${(p.days||[]).map(day => `<span class="tag tag-gray">📅 ${day.name}</span>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
-}
 
-async function openNewPlan(planId = null) {
-  // Load clients into select
-  const clientsSnap = await db.collection('users')
-    .where('coachId','==',currentUser.uid).where('role','==','client').get();
-  const sel = document.getElementById('planClientSelect');
-  sel.innerHTML = clientsSnap.docs.map(d => `<option value="${d.id}">${d.data().name}</option>`).join('');
-
-  document.getElementById('planName').value = '';
-  document.getElementById('planDays').innerHTML = '';
-  document.getElementById('newPlanModal').dataset.editId = '';
-
-  if (planId) {
-    const snap = await db.collection('plans').doc(planId).get();
-    const plan = snap.data();
-    document.getElementById('planName').value = plan.name;
-    document.getElementById('planClientSelect').value = plan.clientId;
-    document.getElementById('newPlanModal').dataset.editId = planId;
-    (plan.days||[]).forEach(day => addDayToPlan(day));
-  } else {
-    addDayToPlan({ name: 'الأحد', exercises: [{ name:'', sets:3, reps:10, targetWeight:'' }] });
-  }
-  openModal('newPlanModal');
-}
-
-function editPlan(planId) { openNewPlan(planId); }
-
-let dayCounter = 0;
-function addDayToPlan(dayData = null) {
-  dayCounter++;
-  const id = 'day_' + dayCounter;
-  const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','راحة'];
-  const container = document.getElementById('planDays');
-  const div = document.createElement('div');
-  div.className = 'day-block';
-  div.id = id;
-  const dname = dayData?.name || DAYS[(dayCounter-1) % DAYS.length];
-  div.innerHTML = `
-    <div class="day-header">
-      <select class="day-name-sel" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--accent);font-weight:700;width:auto">
-        ${DAYS.map(d => `<option value="${d}" ${d===dname?'selected':''}>${d}</option>`).join('')}
-      </select>
-      <button class="btn btn-ghost btn-sm" onclick="removeDay('${id}')">✕ حذف اليوم</button>
-    </div>
-    <div class="exercise-header">
-      <span>التمرين</span><span>سيتات</span><span>رابات</span><span>الوزن (kg)</span><span></span>
-    </div>
-    <div class="exercises-list"></div>
-    <button class="btn btn-ghost btn-sm" onclick="addExerciseToDay('${id}')">+ تمرين</button>
-  `;
-  container.appendChild(div);
-  const exList = div.querySelector('.exercises-list');
-  (dayData?.exercises || [{ name:'', sets:3, reps:10, targetWeight:'' }]).forEach(ex => addExRow(exList, ex));
-}
-
-function addExerciseToDay(dayId) {
-  const exList = document.querySelector(`#${dayId} .exercises-list`);
-  addExRow(exList, { name:'', sets:3, reps:10, targetWeight:'' });
-}
-
-function addExRow(container, ex) {
-  const div = document.createElement('div');
-  div.className = 'exercise-row';
-  div.innerHTML = `
-    <input type="text" placeholder="اسم التمرين" value="${ex.name||''}">
-    <input type="number" placeholder="3" min="1" max="20" value="${ex.sets||3}">
-    <input type="number" placeholder="10" min="1" max="100" value="${ex.reps||10}">
-    <input type="number" placeholder="0" min="0" step="2.5" value="${ex.targetWeight||''}">
-    <button class="btn btn-ghost btn-sm" onclick="this.parentElement.remove()" style="padding:4px 8px">✕</button>
-  `;
-  container.appendChild(div);
-}
-
-function removeDay(id) { document.getElementById(id)?.remove(); }
-
-async function savePlan() {
-  const name = document.getElementById('planName').value.trim();
-  const clientId = document.getElementById('planClientSelect').value;
-  if (!name) { showToast('أدخل اسم الجدول', 'error'); return; }
-
-  const days = [];
-  document.querySelectorAll('.day-block').forEach(dayEl => {
-    const dayName = dayEl.querySelector('.day-name-sel').value;
-    const exercises = [];
-    dayEl.querySelectorAll('.exercise-row').forEach(row => {
-      const inputs = row.querySelectorAll('input');
-      const exName = inputs[0].value.trim();
-      if (exName) exercises.push({
-        name: exName,
-        sets: parseInt(inputs[1].value)||3,
-        reps: parseInt(inputs[2].value)||10,
-        targetWeight: parseFloat(inputs[3].value)||0
-      });
-    });
-    if (exercises.length > 0) days.push({ name: dayName, exercises });
-  });
-
-  if (days.length === 0) { showToast('أضف تمارين للجدول', 'error'); return; }
-
-  const planData = {
-    name, clientId, coachId: currentUser.uid, days,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  const editId = document.getElementById('newPlanModal').dataset.editId;
-  if (editId) {
-    await db.collection('plans').doc(editId).update(planData);
-    showToast('تم تحديث الجدول ✓', 'success');
-  } else {
-    planData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-    await db.collection('plans').add(planData);
-    showToast('تم حفظ الجدول ✓', 'success');
-  }
-  closeModal('newPlanModal');
-  loadPlans();
-}
-
-async function deletePlan(planId) {
-  if (!confirm('حذف الجدول؟')) return;
-  await db.collection('plans').doc(planId).delete();
-  showToast('تم الحذف', 'success');
-  loadPlans();
-}
-
-// ════════════════════════════════
-// COACH: REPORTS
-// ════════════════════════════════
-async function loadReports() {
-  const filterEl = document.getElementById('reportClientFilter');
-
-  // Load clients into filter
-  const clientsSnap = await db.collection('users')
-    .where('coachId','==',currentUser.uid).where('role','==','client').get();
-  const clients = {}; clientsSnap.docs.forEach(d => clients[d.id] = d.data().name);
-
-  if (filterEl.options.length <= 1) {
-    clientsSnap.docs.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id; opt.textContent = d.data().name;
-      filterEl.appendChild(opt);
-    });
-  }
-
-  let q = db.collection('workoutLogs').where('coachId','==',currentUser.uid).orderBy('loggedAt','desc').limit(50);
-  if (filterEl.value) q = q.where('clientId','==',filterEl.value);
-  const logsSnap = await q.get();
-  const el = document.getElementById('reportsList');
-
-  if (logsSnap.empty) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">لا توجد تقارير بعد</div></div>';
-    return;
-  }
-
-  const plansSnap = await db.collection('plans').where('coachId','==',currentUser.uid).get();
-  const planNames = {}; plansSnap.docs.forEach(d => planNames[d.id] = d.data().name);
-
-  el.innerHTML = logsSnap.docs.map(d => {
-    const l = d.data();
-    const dt = l.loggedAt?.toDate ? l.loggedAt.toDate().toLocaleDateString('ar-SA',{weekday:'short',year:'numeric',month:'short',day:'numeric'}) : l.date;
-    const pct = l.completionPct||0;
-    const tag = pct>=80?'tag-green':pct>=50?'tag-yellow':'tag-red';
-    return `<div class="report-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
-        <div>
-          <div class="report-client">${clients[l.clientId]||'—'}</div>
-          <div class="report-date">${dt} • ${planNames[l.planId]||'—'}</div>
-        </div>
-        <span class="tag ${tag} " style="font-size:14px;padding:5px 12px">${pct}% منجز</span>
-      </div>
-      <div class="report-stats">
-        <div class="report-stat">تمارين: <strong>${l.exerciseCount||0}</strong></div>
-        <div class="report-stat">سيتات: <strong>${l.totalSets||0}</strong></div>
-        ${l.avgWeight ? `<div class="report-stat">متوسط الوزن: <strong>${l.avgWeight} kg</strong></div>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ════════════════════════════════
-// COACH: ALERTS
-// ════════════════════════════════
-async function loadAlerts() {
-  const [clientsSnap, logsSnap] = await Promise.all([
-    db.collection('users').where('coachId','==',currentUser.uid).where('role','==','client').get(),
-    db.collection('workoutLogs').where('coachId','==',currentUser.uid).orderBy('loggedAt','desc').limit(200).get()
-  ]);
-  const clients = clientsSnap.docs.map(d => ({id:d.id,...d.data()}));
-  const el = document.getElementById('alertsList');
-  const alerts = [];
-
-  clients.forEach(c => {
-    const clientLogs = logsSnap.docs.filter(d => d.data().clientId === c.id);
-    const lastLog = clientLogs[0];
-    const lastDate = lastLog?.data().loggedAt?.toDate ? lastLog.data().loggedAt.toDate() : null;
-    const daysSince = lastDate ? Math.floor((new Date()-lastDate)/86400000) : 999;
-
-    if (daysSince >= 3) {
-      alerts.push({
-        type: daysSince >= 7 ? 'danger' : 'warn',
-        icon: daysSince >= 7 ? '🚨' : '⚠️',
-        msg: `<strong>${c.name}</strong> — غائب منذ <strong>${daysSince}</strong> يوم${daysSince===1?'':''}`,
-        email: c.email, name: c.name
-      });
-    }
-
-    // Low performance
-    const recentLogs = clientLogs.slice(0,5);
-    if (recentLogs.length >= 3) {
-      const avgPct = recentLogs.reduce((a,d) => a+(d.data().completionPct||0),0) / recentLogs.length;
-      if (avgPct < 60) {
-        alerts.push({
-          type: 'warn', icon: '📉',
-          msg: `<strong>${c.name}</strong> — متوسط أداء منخفض (${Math.round(avgPct)}%)`,
-          email: c.email, name: c.name
-        });
-      }
-    }
-  });
-
-  if (alerts.length === 0) {
-    el.innerHTML = '<div class="alert alert-success">✅ كل العملاء على المسار الصحيح! لا توجد تنبيهات.</div>';
-    return;
-  }
-
-  el.innerHTML = alerts.map(a => `
-    <div class="alert alert-${a.type}" style="justify-content:space-between">
-      <span>${a.icon} ${a.msg}</span>
-      <button class="btn btn-sm btn-secondary" onclick="sendMissedEmail('${a.email}','${a.name}')">إرسال تذكير</button>
-    </div>
-  `).join('');
-}
-
-// ════════════════════════════════
-// EMAIL FUNCTIONS
-// ════════════════════════════════
-async function sendMissedEmail(email, name) {
-  const cfg = loadConfig();
-  if (!cfg?.ejs?.serviceId) {
-    showToast('EmailJS غير مُعدّ — افتح الإعدادات', 'error');
-    return;
-  }
-  try {
-    await emailjs.send(cfg.ejs.serviceId, cfg.ejs.templateId, {
-      to_email: email,
-      subject: `تذكير تمرين — ${name}`,
-      message: `مرحباً ${name}،\n\nلاحظنا أنك لم تتدرب منذ فترة. لا تفقد الزخم — تمرين قصير أفضل من لا شيء!\n\nمدربك بانتظارك 💪`
-    });
-    showToast(`تم إرسال التذكير لـ ${name} ✓`, 'success');
-  } catch(e) {
-    showToast('فشل الإرسال: ' + (e.text||e.message||e), 'error');
-  }
-}
-
-async function sendReportEmail(clientId, clientName, clientEmail) {
-  const cfg = loadConfig();
-  const coachEmail = cfg?.coachEmail || currentUserData?.email;
-  if (!cfg?.ejs?.serviceId) {
-    showToast('EmailJS غير مُعدّ', 'error');
-    return;
-  }
-
-  const logsSnap = await db.collection('workoutLogs')
-    .where('clientId','==',clientId).orderBy('loggedAt','desc').limit(7).get();
-  const logs = logsSnap.docs.map(d => d.data());
-  const avgPct = logs.length ? Math.round(logs.reduce((a,l) => a+(l.completionPct||0),0)/logs.length) : 0;
-
-  const weightSnap = await db.collection('weightLogs')
-    .where('clientId','==',clientId).orderBy('loggedAt','desc').limit(3).get();
-  const weights = weightSnap.docs.map(d => d.data().weight);
-
-  const msg = `تقرير أداء: ${clientName}
-─────────────────
-عدد التمارين (آخر أسبوع): ${logs.length}
-متوسط الأداء: ${avgPct}%
-آخر وزن مسجل: ${weights[0] ? weights[0]+' kg' : 'لم يسجّل'}
-${weights.length >= 2 ? `التغير في الوزن: ${(weights[0]-weights[weights.length-1]).toFixed(1)} kg` : ''}
-─────────────────
-آخر تمارين:
-${logs.map(l => `• ${l.date} — ${l.completionPct||0}% (${l.exerciseCount||0} تمارين)`).join('\n')}`;
-
-  try {
-    await emailjs.send(cfg.ejs.serviceId, cfg.ejs.templateId, {
-      to_email: coachEmail,
-      subject: `تقرير ${clientName} — FitCoach Pro`,
-      message: msg
-    });
-    showToast('تم إرسال التقرير لإيميلك ✓', 'success');
-  } catch(e) {
-    showToast('فشل الإرسال: ' + (e.text||e.message||e), 'error');
-  }
-}
-
-// ════════════════════════════════
-// CLIENT: TODAY'S WORKOUT
-// ════════════════════════════════
-async function loadClientToday() {
-  if (!currentUserData || currentUserData.role !== 'client') return;
-  const el = document.getElementById('todayContent');
-  el.innerHTML = '<div class="loading-screen" style="height:200px"><div class="loader"></div></div>';
-
-  // Find active plan for client
-  const plansSnap = await db.collection('plans').where('clientId','==',currentUser.uid).get();
-  if (plansSnap.empty) {
-    el.innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">لا يوجد جدول تمارين</div><div class="empty-sub">سيضيف مدربك جدولك قريباً</div></div></div>';
-    return;
-  }
-
-  const plan = { id: plansSnap.docs[0].id, ...plansSnap.docs[0].data() };
-  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-  const todayName = days[new Date().getDay()];
-  const todayWorkout = plan.days?.find(d => d.name === todayName);
-
-  // Check if already logged today
-  const todayLog = await db.collection('workoutLogs')
-    .where('clientId','==',currentUser.uid)
-    .where('date','==',todayStr())
-    .limit(1).get();
-
-  if (!todayWorkout || todayWorkout.name === 'راحة') {
-    el.innerHTML = `
-      <div class="today-header">
-        <div>
-          <div class="today-day-name">🌿 يوم راحة</div>
-          <div class="today-plan-name">استرح واستشفَ لتمرين غدٍ أقوى</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">📋 جدول هذا الأسبوع</div>
-        ${plan.days?.map(d => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-            <span style="font-weight:600;${d.name===todayName?'color:var(--accent)':''}">${d.name===todayName?'● ':''} ${d.name}</span>
-            <span class="tag tag-gray">${d.exercises?.length||0} تمرين</span>
+      <!-- Image Panel -->
+      <div class="tab-panel" id="imagePanel">
+        <div class="drop-zone" id="dropZone"
+          ondragover="doDragOver(event)"
+          ondragleave="doDragLeave()"
+          ondrop="doDrop(event)">
+          <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
+          <div id="dropContent">
+            <div class="drop-icon">🖼️</div>
+            <div class="drop-label">اسحب صورة المنتج هنا</div>
+            <div class="drop-hint">أو انقر لاختيار صورة • PNG، JPG، WEBP</div>
           </div>
-        `).join('')}
-      </div>`;
-    return;
-  }
-
-  if (!todayLog.empty) {
-    // Already logged today
-    const log = todayLog.docs[0].data();
-    el.innerHTML = `
-      <div class="today-header">
-        <div>
-          <div class="today-day-name">✅ أنجزت تمرين اليوم!</div>
-          <div class="today-plan-name">${plan.name}</div>
-        </div>
-        <div style="font-size:32px;font-weight:900;color:var(--accent)">${log.completionPct||0}%</div>
-      </div>
-      <div class="alert alert-success">💪 عمل ممتاز! تمرينك اليوم مسجّل. تابع الغد!</div>
-      ${buildWorkoutSummary(log)}
-    `;
-    return;
-  }
-
-  // Build workout form
-  window._currentPlan = plan;
-  window._currentWorkout = todayWorkout;
-  renderWorkoutForm(el, plan, todayWorkout);
-}
-
-function renderWorkoutForm(el, plan, workout) {
-  const exForms = workout.exercises.map((ex, i) => `
-    <div class="exercise-log-card">
-      <div class="exercise-log-name">
-        ${ex.name}
-        ${ex.targetWeight ? `<span class="target-info">هدف: ${ex.targetWeight}kg × ${ex.reps} × ${ex.sets}</span>` : `<span class="target-info">${ex.sets}×${ex.reps}</span>`}
-      </div>
-      <div class="sets-grid">
-        ${Array.from({length:ex.sets}, (_,si) => `
-          <div class="set-input">
-            <div class="set-label">الست ${si+1}</div>
-            <div class="set-inputs">
-              <div style="flex:1">
-                <input type="number" id="reps_${i}_${si}" placeholder="${ex.reps}" min="0" max="100" style="text-align:center">
-                <div class="set-unit">رابات</div>
-              </div>
-              <div style="flex:1">
-                <input type="number" id="wt_${i}_${si}" placeholder="${ex.targetWeight||'0'}" min="0" step="2.5" style="text-align:center">
-                <div class="set-unit">كيلو</div>
+          <div class="img-preview" id="imgPreview">
+            <div class="img-preview-inner">
+              <img id="previewImg" src="" alt="preview">
+              <div class="img-preview-meta">
+                <div class="img-preview-name" id="imgName">—</div>
+                <div class="img-preview-ok">✓ جاهز للبحث</div>
+                <button class="img-remove" onclick="removeImg()">✕ إزالة</button>
               </div>
             </div>
           </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
-
-  el.innerHTML = `
-    <div class="today-header">
-      <div>
-        <div class="today-day-name">🏋️ ${workout.name}</div>
-        <div class="today-plan-name">${plan.name} • ${workout.exercises.length} تمارين</div>
-      </div>
-      <span class="tag tag-purple">${workout.exercises.length} تمارين</span>
-    </div>
-    ${exForms}
-    <div class="card" style="margin-top:8px">
-      <div class="form-group">
-        <label>ملاحظات (اختياري)</label>
-        <textarea id="workoutNotes" placeholder="كيف كان التمرين؟ إصابات؟ شعرت بقوة/تعب؟"></textarea>
-      </div>
-      <button class="btn btn-primary" onclick="submitWorkout()">💾 تسجيل التمرين</button>
-    </div>
-  `;
-}
-
-function buildWorkoutSummary(log) {
-  if (!log.exercises?.length) return '';
-  return `<div class="card"><div class="card-title">ملخص التمرين</div>
-    ${log.exercises.map(ex => `
-      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="font-weight:700;margin-bottom:6px">${ex.name}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${(ex.sets||[]).map((s,i) => `<span class="tag tag-gray">الست ${i+1}: ${s.reps}×${s.weight}kg</span>`).join('')}
         </div>
       </div>
-    `).join('')}
-  </div>`;
-}
 
-async function submitWorkout() {
-  const plan = window._currentPlan;
-  const workout = window._currentWorkout;
-  if (!plan||!workout) return;
-
-  const exercises = workout.exercises.map((ex, i) => {
-    const sets = Array.from({length:ex.sets}, (_,si) => ({
-      reps: parseInt(document.getElementById(`reps_${i}_${si}`)?.value) || ex.reps,
-      weight: parseFloat(document.getElementById(`wt_${i}_${si}`)?.value) || ex.targetWeight || 0
-    }));
-    return { name: ex.name, sets };
-  });
-
-  // Calc stats
-  const totalSets = exercises.reduce((a,e) => a + e.sets.length, 0);
-  const filledSets = exercises.reduce((a,e) => a + e.sets.filter(s => s.reps>0).length, 0);
-  const completionPct = Math.round(filledSets / totalSets * 100);
-  const allWeights = exercises.flatMap(e => e.sets.map(s => s.weight)).filter(w => w > 0);
-  const avgWeight = allWeights.length ? (allWeights.reduce((a,b)=>a+b,0)/allWeights.length).toFixed(1) : 0;
-
-  const logData = {
-    clientId: currentUser.uid,
-    coachId: currentUserData.coachId,
-    planId: plan.id,
-    date: todayStr(),
-    loggedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    exercises, totalSets,
-    exerciseCount: exercises.length,
-    completionPct,
-    avgWeight: parseFloat(avgWeight),
-    notes: document.getElementById('workoutNotes')?.value || ''
-  };
-
-  await db.collection('workoutLogs').add(logData);
-
-  // Auto email report to coach
-  autoEmailReport(logData, plan.name);
-
-  showToast('تم تسجيل تمرينك! 🎉', 'success');
-  loadClientToday();
-}
-
-async function autoEmailReport(logData, planName) {
-  const cfg = loadConfig();
-  if (!cfg?.ejs?.serviceId || !cfg?.coachEmail) return;
-
-  const coachSnap = await db.collection('users').doc(logData.coachId).get();
-  const coachEmail = coachSnap.data()?.email || cfg.coachEmail;
-
-  const msg = `العميل: ${currentUserData.name}
-التاريخ: ${logData.date}
-الجدول: ${planName}
-الأداء: ${logData.completionPct}%
-التمارين: ${logData.exerciseCount}
-السيتات الكلية: ${logData.totalSets}
-متوسط الوزن: ${logData.avgWeight} kg
-${logData.notes ? '\nملاحظات: ' + logData.notes : ''}`;
-
-  try {
-    await emailjs.send(cfg.ejs.serviceId, cfg.ejs.templateId, {
-      to_email: coachEmail,
-      subject: `✅ ${currentUserData.name} أنجز تمرين ${logData.date} — ${logData.completionPct}%`,
-      message: msg
-    });
-  } catch(e) { console.log('Email error:', e); }
-}
-
-// ════════════════════════════════
-// CLIENT: HISTORY
-// ════════════════════════════════
-async function loadClientHistory() {
-  const snap = await db.collection('workoutLogs')
-    .where('clientId','==',currentUser.uid)
-    .orderBy('loggedAt','desc').limit(30).get();
-  const el = document.getElementById('historyList');
-
-  if (snap.empty) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">لا توجد تمارين مسجلة بعد</div></div>';
-    return;
-  }
-
-  const plansSnap = await db.collection('plans').where('clientId','==',currentUser.uid).get();
-  const planNames = {}; plansSnap.docs.forEach(d => planNames[d.id] = d.data().name);
-
-  el.innerHTML = snap.docs.map(d => {
-    const l = d.data();
-    const dt = l.loggedAt?.toDate ? l.loggedAt.toDate().toLocaleDateString('ar-SA',{weekday:'long',month:'short',day:'numeric'}) : l.date;
-    const pct = l.completionPct||0;
-    const tag = pct>=80?'tag-green':pct>=50?'tag-yellow':'tag-red';
-    return `<div class="card" style="cursor:pointer" onclick="openLogDetail('${d.id}')">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <div>
-          <div style="font-weight:700">${dt}</div>
-          <div style="font-size:13px;color:var(--muted)">${planNames[l.planId]||'—'} • ${l.exerciseCount||0} تمارين</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:24px;font-weight:900;color:${pct>=80?'var(--accent)':pct>=50?'var(--warn)':'var(--danger)'}">${pct}%</div>
-          <div style="font-size:11px;color:var(--muted)">أداء</div>
-        </div>
+      <!-- Platforms -->
+      <div class="chips-label">ابحث في هذه المتاجر</div>
+      <div class="chips" id="chips">
+        <div class="chip on" data-p="amazon"     onclick="toggleChip(this)"><span class="chip-dot"></span> أمازون</div>
+        <div class="chip on" data-p="noon"       onclick="toggleChip(this)"><span class="chip-dot"></span> نون</div>
+        <div class="chip on" data-p="aliexpress" onclick="toggleChip(this)"><span class="chip-dot"></span> علي إكسبريس</div>
+        <div class="chip on" data-p="shein"      onclick="toggleChip(this)"><span class="chip-dot"></span> شي ان</div>
+        <div class="chip on" data-p="temu"       onclick="toggleChip(this)"><span class="chip-dot"></span> تيمو</div>
       </div>
-      <div style="margin-top:10px">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-      </div>
-    </div>`;
-  }).join('');
+
+      <button class="btn-search" id="searchBtn" onclick="doSearch()">
+        🚀 قارن الأسعار الآن
+      </button>
+    </div>
+
+    <!-- Platform badges -->
+    <div class="platform-row">
+      <div class="plt-pill"><span>🟠</span> أمازون</div>
+      <div class="plt-pill"><span>🟡</span> نون</div>
+      <div class="plt-pill"><span>🔴</span> علي إكسبريس</div>
+      <div class="plt-pill"><span>💗</span> شي ان</div>
+      <div class="plt-pill"><span>🟠</span> تيمو</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ HISTORY ═══════════════ -->
+<div class="popular-section" id="popularSection">
+  <div class="popular-title">🕐 عمليات البحث الأخيرة</div>
+  <div class="popular-chips" id="popularChips"></div>
+</div>
+
+<!-- ═══════════════ LOADING ═══════════════ -->
+<div id="loadingSection">
+  <div class="loading-head">
+    🔍 جارٍ البحث عن "<span class="loading-query-text" id="lqText"></span>"
+  </div>
+  <div class="loading-sub">نبحث في جميع المتاجر المحددة للعثور على أفضل سعر لك...</div>
+  <div class="loading-platforms" id="lPlatforms"></div>
+</div>
+
+<!-- ═══════════════ RESULTS ═══════════════ -->
+<section id="resultsSection">
+
+  <div class="results-top">
+    <div>
+      <div class="results-title">نتائج البحث: "<span class="results-q" id="rQuery"></span>"</div>
+      <div class="results-sub" id="rSub"></div>
+    </div>
+    <div class="sort-bar">
+      <span class="sort-label">ترتيب:</span>
+      <button class="sort-btn active" onclick="doSort('price',this)">💰 الأرخص</button>
+      <button class="sort-btn" onclick="doSort('delivery',this)">⚡ الأسرع توصيلاً</button>
+      <button class="sort-btn" onclick="doSort('rating',this)">⭐ الأعلى تقييماً</button>
+    </div>
+  </div>
+
+  <div id="bestDeal"></div>
+  <div class="results-grid" id="resultsGrid"></div>
+  <div id="compTable"></div>
+
+  <div class="new-search-wrap">
+    <button class="btn-new-search" onclick="goSearch()">🔄 ابحث عن منتج آخر</button>
+  </div>
+
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <span>قارن</span> — مقارنة أسعار ذكية من أكبر 5 متاجر عالمية | نسخة تجريبية
+</footer>
+
+<script>
+/* ─────────────────────────────────────
+   PLATFORMS
+───────────────────────────────────── */
+const PLT = {
+  amazon:     { name:'أمازون',        color:'#FF9900', emoji:'🟠', url:'https://www.amazon.sa' },
+  noon:       { name:'نون',           color:'#F7C131', emoji:'🟡', url:'https://www.noon.com/saudi-ar' },
+  aliexpress: { name:'علي إكسبريس',  color:'#FF4747', emoji:'🔴', url:'https://ar.aliexpress.com' },
+  shein:      { name:'شي ان',         color:'#E94560', emoji:'💗', url:'https://ar.shein.com' },
+  temu:       { name:'تيمو',          color:'#FF6534', emoji:'🟠', url:'https://www.temu.com' },
+};
+
+/* ─────────────────────────────────────
+   PRODUCT DATABASE
+───────────────────────────────────── */
+const DB = [
+  {
+    kw:['iphone','ايفون','apple','ابل','ios','15 pro','آيفون'],
+    name:'Apple iPhone 15 Pro Max 256GB', emoji:'📱',
+    bg:'linear-gradient(135deg,#1c1c2e,#2d2d4e)', cat:'هواتف',
+    p:{
+      amazon:    {price:4799,orig:5299,del:'2-4 أيام',rat:4.8,rev:14523},
+      noon:      {price:4999,orig:5299,del:'3-5 أيام',rat:4.7,rev:9871},
+      aliexpress:{price:3699,orig:4100,del:'15-25 يوم',rat:4.3,rev:52341},
+      shein:     null,
+      temu:      {price:3450,orig:3900,del:'12-22 يوم',rat:4.0,rev:18932},
+    }
+  },
+  {
+    kw:['samsung','سامسونج','galaxy','جالكسي','s24','اندرويد','android'],
+    name:'Samsung Galaxy S24 Ultra 256GB', emoji:'📱',
+    bg:'linear-gradient(135deg,#0d3b66,#1a5f9e)', cat:'هواتف',
+    p:{
+      amazon:    {price:4299,orig:4799,del:'1-3 أيام',rat:4.7,rev:23412},
+      noon:      {price:4399,orig:4799,del:'2-4 أيام',rat:4.6,rev:15234},
+      aliexpress:{price:3299,orig:3700,del:'18-28 يوم',rat:4.2,rev:67234},
+      shein:     null,
+      temu:      {price:3150,orig:3600,del:'15-25 يوم',rat:3.9,rev:24123},
+    }
+  },
+  {
+    kw:['airpods','ايربودز','سماعة ابل','apple earbuds'],
+    name:'Apple AirPods Pro الجيل الثاني', emoji:'🎧',
+    bg:'linear-gradient(135deg,#2d2d2d,#4a4a4a)', cat:'سماعات',
+    p:{
+      amazon:    {price:799, orig:899, del:'1-3 أيام', rat:4.9,rev:34521},
+      noon:      {price:849, orig:899, del:'2-4 أيام', rat:4.8,rev:21345},
+      aliexpress:{price:549, orig:620, del:'20-30 يوم',rat:4.1,rev:89231},
+      shein:     {price:499, orig:580, del:'14-20 يوم',rat:3.8,rev:12543},
+      temu:      {price:479, orig:550, del:'15-22 يوم',rat:3.7,rev:31234},
+    }
+  },
+  {
+    kw:['سماعة','headphone','headphones','سماعات','jbl','sony','سوني','بلوتوث'],
+    name:'Sony WH-1000XM5 سماعات لاسلكية', emoji:'🎧',
+    bg:'linear-gradient(135deg,#1a1a2e,#16213e)', cat:'سماعات',
+    p:{
+      amazon:    {price:1299,orig:1499,del:'2-4 أيام', rat:4.8,rev:18234},
+      noon:      {price:1349,orig:1499,del:'3-5 أيام', rat:4.7,rev:9823},
+      aliexpress:{price:899, orig:1100,del:'18-28 يوم',rat:4.2,rev:43210},
+      shein:     {price:799, orig:950, del:'14-21 يوم',rat:3.9,rev:8932},
+      temu:      {price:749, orig:900, del:'15-23 يوم',rat:3.8,rev:19821},
+    }
+  },
+  {
+    kw:['ساعة','watch','smartwatch','ساعة ذكية','apple watch','ساعة ابل'],
+    name:'Apple Watch Series 9 GPS 45mm', emoji:'⌚',
+    bg:'linear-gradient(135deg,#0f3460,#16213e)', cat:'ساعات',
+    p:{
+      amazon:    {price:1799,orig:1999,del:'2-3 أيام', rat:4.8,rev:25341},
+      noon:      {price:1849,orig:1999,del:'3-5 أيام', rat:4.7,rev:14523},
+      aliexpress:{price:1299,orig:1500,del:'20-30 يوم',rat:4.1,rev:56231},
+      shein:     null,
+      temu:      {price:1199,orig:1400,del:'18-25 يوم',rat:3.9,rev:23142},
+    }
+  },
+  {
+    kw:['laptop','لابتوب','macbook','ماك بوك','macbook air','ماك بوك اير'],
+    name:'MacBook Air M3 16GB / 512GB', emoji:'💻',
+    bg:'linear-gradient(135deg,#1c1c1e,#2c2c2e)', cat:'أجهزة',
+    p:{
+      amazon:    {price:5499,orig:5999,del:'2-4 أيام', rat:4.9,rev:12341},
+      noon:      {price:5699,orig:5999,del:'3-6 أيام', rat:4.8,rev:7823},
+      aliexpress:{price:4299,orig:4800,del:'18-28 يوم',rat:4.0,rev:32145},
+      shein:     null,
+      temu:      null,
+    }
+  },
+  {
+    kw:['حذاء','shoes','shoe','نايك','nike','adidas','اديداس','sneakers','سنيكر','رياضي'],
+    name:'Nike Air Max 270 - أبيض/أسود', emoji:'👟',
+    bg:'linear-gradient(135deg,#2d1b69,#11998e)', cat:'أحذية',
+    p:{
+      amazon:    {price:449,orig:549,del:'2-4 أيام', rat:4.6,rev:43251},
+      noon:      {price:479,orig:549,del:'3-5 أيام', rat:4.5,rev:28341},
+      aliexpress:{price:189,orig:250,del:'20-35 يوم',rat:3.8,rev:123421},
+      shein:     {price:159,orig:220,del:'14-21 يوم',rat:3.7,rev:56721},
+      temu:      {price:149,orig:210,del:'15-25 يوم',rat:3.6,rev:78921},
+    }
+  },
+  {
+    kw:['شنطة','bag','حقيبة','backpack','حقيبة ظهر','handbag','كيس'],
+    name:'حقيبة ظهر كلاسيكية متعددة الجيوب 30L', emoji:'🎒',
+    bg:'linear-gradient(135deg,#4a2040,#2d1b4e)', cat:'حقائب',
+    p:{
+      amazon:    {price:199,orig:249,del:'2-4 أيام', rat:4.5,rev:18234},
+      noon:      {price:219,orig:249,del:'3-5 أيام', rat:4.4,rev:12341},
+      aliexpress:{price:89, orig:130,del:'18-28 يوم',rat:4.0,rev:87231},
+      shein:     {price:79, orig:110,del:'12-18 يوم',rat:3.9,rev:34521},
+      temu:      {price:69, orig:100,del:'15-22 يوم',rat:3.8,rev:52341},
+    }
+  },
+  {
+    kw:['عطر','perfume','cologne','fragrance','عطور','بخاخ','dior','chanel'],
+    name:"Dior Sauvage عطر رجالي 100ml EDP", emoji:'🧴',
+    bg:'linear-gradient(135deg,#1a0a2e,#2d1654)', cat:'عطور',
+    p:{
+      amazon:    {price:599,orig:699,del:'2-4 أيام', rat:4.7,rev:23412},
+      noon:      {price:649,orig:699,del:'3-5 أيام', rat:4.6,rev:15231},
+      aliexpress:{price:299,orig:380,del:'20-30 يوم',rat:3.9,rev:78231},
+      shein:     {price:259,orig:320,del:'14-22 يوم',rat:3.7,rev:23141},
+      temu:      {price:249,orig:310,del:'16-24 يوم',rat:3.6,rev:34521},
+    }
+  },
+  {
+    kw:['air fryer','فريار','قلاية','مقلاة','قلاية هوائية','philips'],
+    name:'Philips Air Fryer XXL 6.2 لتر', emoji:'🍳',
+    bg:'linear-gradient(135deg,#1a2a1a,#2d4a2d)', cat:'مطبخ',
+    p:{
+      amazon:    {price:699,orig:849,del:'2-4 أيام', rat:4.6,rev:34521},
+      noon:      {price:729,orig:849,del:'3-5 أيام', rat:4.5,rev:21341},
+      aliexpress:{price:399,orig:520,del:'20-30 يوم',rat:4.0,rev:56231},
+      shein:     null,
+      temu:      {price:349,orig:480,del:'18-28 يوم',rat:3.8,rev:28341},
+    }
+  },
+  {
+    kw:['coffee','قهوة','coffeemaker','ماكينة قهوة','espresso','اسبريسو','نسبريسو','nespresso'],
+    name:"De'Longhi Dedica ماكينة إسبريسو", emoji:'☕',
+    bg:'linear-gradient(135deg,#2a1500,#4a2800)', cat:'مطبخ',
+    p:{
+      amazon:    {price:999, orig:1199,del:'2-5 أيام', rat:4.7,rev:18234},
+      noon:      {price:1049,orig:1199,del:'3-6 أيام', rat:4.6,rev:11234},
+      aliexpress:{price:699, orig:850, del:'22-32 يوم',rat:3.9,rev:34521},
+      shein:     null,
+      temu:      {price:649, orig:800, del:'18-28 يوم',rat:3.7,rev:19821},
+    }
+  },
+  {
+    kw:['tablet','تابلت','ipad','ايباد','لوحي','آيباد'],
+    name:'iPad Air M2 11 بوصة 256GB WiFi', emoji:'📲',
+    bg:'linear-gradient(135deg,#0a1628,#1a2a40)', cat:'أجهزة لوحية',
+    p:{
+      amazon:    {price:2599,orig:2899,del:'1-3 أيام', rat:4.8,rev:19234},
+      noon:      {price:2699,orig:2899,del:'2-4 أيام', rat:4.7,rev:12341},
+      aliexpress:{price:1999,orig:2300,del:'18-28 يوم',rat:4.1,rev:45231},
+      shein:     null,
+      temu:      null,
+    }
+  },
+  {
+    kw:['ps5','playstation','xbox','gaming','جيمنج','controller','يد تحكم','بلايستيشن'],
+    name:'PlayStation 5 DualSense يد تحكم', emoji:'🎮',
+    bg:'linear-gradient(135deg,#00439c,#0070d1)', cat:'ألعاب',
+    p:{
+      amazon:    {price:299,orig:349,del:'1-3 أيام', rat:4.8,rev:56231},
+      noon:      {price:319,orig:349,del:'2-4 أيام', rat:4.7,rev:34521},
+      aliexpress:{price:179,orig:230,del:'20-30 يوم',rat:4.0,rev:123421},
+      shein:     null,
+      temu:      {price:159,orig:210,del:'18-26 يوم',rat:3.8,rev:45231},
+    }
+  },
+  {
+    kw:['camera','كاميرا','canon','sony camera','nikon','dslr','mirrorless'],
+    name:'Sony Alpha ZV-E10 كاميرا بدون مرآة', emoji:'📷',
+    bg:'linear-gradient(135deg,#1a1a1a,#2d2d2d)', cat:'كاميرات',
+    p:{
+      amazon:    {price:1999,orig:2299,del:'2-4 أيام', rat:4.7,rev:23412},
+      noon:      {price:2099,orig:2299,del:'3-5 أيام', rat:4.6,rev:15234},
+      aliexpress:{price:1499,orig:1800,del:'18-28 يوم',rat:4.1,rev:67231},
+      shein:     null,
+      temu:      null,
+    }
+  },
+  {
+    kw:['قميص','shirt','تيشيرت','t-shirt','hoodie','هودي','ملابس','clothes','بلوزة'],
+    name:'هودي كلاسيكي قطن 100% - أسود', emoji:'👕',
+    bg:'linear-gradient(135deg,#1e3a2f,#2d5a4a)', cat:'ملابس',
+    p:{
+      amazon:    {price:129,orig:169,del:'2-4 أيام', rat:4.3,rev:23412},
+      noon:      {price:139,orig:169,del:'3-5 أيام', rat:4.2,rev:14523},
+      aliexpress:{price:49, orig:75, del:'15-25 يوم',rat:3.9,rev:234512},
+      shein:     {price:39, orig:60, del:'12-18 يوم',rat:3.8,rev:89231},
+      temu:      {price:35, orig:55, del:'14-22 يوم',rat:3.7,rev:123421},
+    }
+  },
+  {
+    kw:['مكنسة','vacuum','dyson','دايسون','robot vacuum','روبوت'],
+    name:'Dyson V15 Detect مكنسة لاسلكية', emoji:'🌀',
+    bg:'linear-gradient(135deg,#8a2be2,#4b0082)', cat:'منزل',
+    p:{
+      amazon:    {price:2299,orig:2699,del:'2-4 أيام', rat:4.7,rev:18234},
+      noon:      {price:2399,orig:2699,del:'3-5 أيام', rat:4.6,rev:11234},
+      aliexpress:{price:1599,orig:2000,del:'20-30 يوم',rat:3.9,rev:45231},
+      shein:     null,
+      temu:      {price:1499,orig:1900,del:'18-28 يوم',rat:3.8,rev:23412},
+    }
+  },
+  {
+    kw:['xiaomi','شاومي','redmi','poco'],
+    name:'Xiaomi 14 Pro 5G 512GB', emoji:'📱',
+    bg:'linear-gradient(135deg,#f97316,#dc2626)', cat:'هواتف',
+    p:{
+      amazon:    {price:2799,orig:3199,del:'2-4 أيام', rat:4.6,rev:18934},
+      noon:      {price:2899,orig:3199,del:'3-5 أيام', rat:4.5,rev:12341},
+      aliexpress:{price:2199,orig:2600,del:'15-25 يوم',rat:4.3,rev:89231},
+      shein:     null,
+      temu:      {price:2099,orig:2500,del:'14-22 يوم',rat:4.0,rev:34521},
+    }
+  },
+];
+
+const SUGG_LIST = [
+  {ic:'📱',t:'iPhone 15 Pro Max'},
+  {ic:'📱',t:'Samsung Galaxy S24 Ultra'},
+  {ic:'🎧',t:'سماعة سوني WH-1000XM5'},
+  {ic:'🎧',t:'AirPods Pro الجيل الثاني'},
+  {ic:'⌚',t:'Apple Watch Series 9'},
+  {ic:'💻',t:'MacBook Air M3'},
+  {ic:'👟',t:'Nike Air Max 270'},
+  {ic:'🎮',t:'PS5 DualSense يد تحكم'},
+  {ic:'🧴',t:'عطر Dior Sauvage'},
+  {ic:'👕',t:'هودي قطن كلاسيكي'},
+  {ic:'🍳',t:'Philips Air Fryer قلاية'},
+  {ic:'📷',t:'Sony Alpha كاميرا'},
+  {ic:'📲',t:'iPad Air M2 تابلت'},
+  {ic:'☕',t:'ماكينة قهوة ديلونجي'},
+  {ic:'📱',t:'Xiaomi 14 Pro'},
+];
+
+/* ─────────────────────────────────────
+   STATE
+───────────────────────────────────── */
+const S = {
+  tab: 'name',
+  platforms: ['amazon','noon','aliexpress','shein','temu'],
+  image: null,
+  results: [],
+  history: JSON.parse(localStorage.getItem('q_hist')||'[]'),
+};
+
+/* ─────────────────────────────────────
+   TABS & CHIPS
+───────────────────────────────────── */
+function switchTab(tab, el) {
+  S.tab = tab;
+  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tab+'Panel').classList.add('active');
 }
 
-// ════════════════════════════════
-// CLIENT: WEIGHT LOG
-// ════════════════════════════════
-async function loadWeightLog() {
-  const snap = await db.collection('weightLogs')
-    .where('clientId','==',currentUser.uid)
-    .orderBy('loggedAt','desc').limit(30).get();
-  const data = snap.docs.map(d => ({id:d.id,...d.data()})).reverse();
-
-  // Chart
-  if (weightChartInst) { weightChartInst.destroy(); weightChartInst = null; }
-  if (data.length >= 2) {
-    const ctx = document.getElementById('weightChart').getContext('2d');
-    weightChartInst = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: data.map(d => d.date),
-        datasets: [{
-          label: 'الوزن (kg)',
-          data: data.map(d => d.weight),
-          borderColor: '#00e5a0',
-          backgroundColor: 'rgba(0,229,160,0.1)',
-          tension: 0.4, fill: true,
-          pointBackgroundColor: '#00e5a0',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: '#8888a0', maxTicksLimit: 7 }, grid: { color: '#2e2e3e' } },
-          y: { ticks: { color: '#8888a0' }, grid: { color: '#2e2e3e' } }
-        }
-      }
-    });
-  }
-
-  // List
-  const el = document.getElementById('weightLogList');
-  if (data.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">لم تسجل وزنك بعد</div></div>';
-    return;
-  }
-  const rev = [...data].reverse();
-  el.innerHTML = rev.map((w,i) => {
-    const prev = rev[i+1];
-    const diff = prev ? (w.weight - prev.weight).toFixed(1) : null;
-    return `<div class="weight-log-row">
-      <span class="weight-date">${w.date}</span>
-      <span class="weight-val">${w.weight} kg</span>
-      ${diff !== null ? `<span class="weight-change ${diff>0?'change-up':'change-down'}">${diff>0?'+':''}${diff} kg</span>` : '<span></span>'}
-    </div>`;
-  }).join('');
-}
-
-async function logWeight() {
-  const val = parseFloat(document.getElementById('newWeightInput').value);
-  if (!val || val < 20 || val > 400) { showToast('أدخل وزن صحيح', 'error'); return; }
-
-  // Check if already logged today
-  const existing = await db.collection('weightLogs')
-    .where('clientId','==',currentUser.uid)
-    .where('date','==',todayStr()).limit(1).get();
-
-  if (!existing.empty) {
-    await db.collection('weightLogs').doc(existing.docs[0].id).update({ weight: val });
+function toggleChip(el) {
+  const p = el.dataset.p;
+  if (el.classList.contains('on')) {
+    if (S.platforms.length <= 1) { toast('يجب اختيار متجر واحد على الأقل','error'); return; }
+    el.classList.remove('on');
+    S.platforms = S.platforms.filter(x => x !== p);
   } else {
-    await db.collection('weightLogs').add({
-      clientId: currentUser.uid,
-      coachId: currentUserData.coachId,
-      weight: val,
-      date: todayStr(),
-      loggedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    el.classList.add('on');
+    S.platforms.push(p);
   }
-  document.getElementById('newWeightInput').value = '';
-  showToast(`وزنك ${val} kg مسجّل ✓`, 'success');
-  loadWeightLog();
 }
 
-// ════════════════════════════════
-// CLIENT: PROGRESS
-// ════════════════════════════════
-async function loadClientProgress() {
-  if (!currentUserData || currentUserData.role !== 'client') return;
-  const snap = await db.collection('workoutLogs')
-    .where('clientId','==',currentUser.uid)
-    .orderBy('loggedAt','desc').limit(60).get();
-  const logs = snap.docs.map(d => ({id:d.id,...d.data()}));
-
-  // Stats
-  const totalSessions = logs.length;
-  const avgPct = totalSessions ? Math.round(logs.reduce((a,l) => a+(l.completionPct||0),0)/totalSessions) : 0;
-  const thisWeek = logs.filter(l => {
-    const d = l.loggedAt?.toDate ? l.loggedAt.toDate() : new Date(l.date);
-    return (new Date()-d) < 7*86400000;
-  }).length;
-
-  document.getElementById('progressStats').innerHTML = `
-    <div class="stat-card stat-purple"><div class="stat-num">${totalSessions}</div><div class="stat-label">إجمالي التمارين</div></div>
-    <div class="stat-card stat-green"><div class="stat-num">${avgPct}%</div><div class="stat-label">متوسط الأداء</div></div>
-    <div class="stat-card stat-yellow"><div class="stat-num">${thisWeek}</div><div class="stat-label">هذا الأسبوع</div></div>
-  `;
-
-  // Build exercise list for dropdown
-  const exNames = new Set();
-  logs.forEach(l => (l.exercises||[]).forEach(e => exNames.add(e.name)));
-  const sel = document.getElementById('progressExerciseSelect');
-  sel.innerHTML = '<option value="">اختر تمرين</option>' +
-    [...exNames].map(n => `<option value="${n}">${n}</option>`).join('');
-
-  window._progressLogs = logs;
+/* ─────────────────────────────────────
+   AUTOCOMPLETE
+───────────────────────────────────── */
+function onInput(val) {
+  const box = document.getElementById('suggestions');
+  if (val.length < 2) { box.classList.remove('open'); return; }
+  const v = val.toLowerCase();
+  const hits = SUGG_LIST
+    .filter(s => s.t.toLowerCase().includes(v) || v.includes(s.t.toLowerCase().split(' ')[0]))
+    .slice(0,5);
+  if (!hits.length) { box.classList.remove('open'); return; }
+  box.innerHTML = hits.map(s =>
+    `<div class="sugg-item" onclick="pickSugg('${s.t}')"><span>${s.ic}</span>${s.t}</div>`
+  ).join('');
+  box.classList.add('open');
 }
-
-function updateProgressChart() {
-  const name = document.getElementById('progressExerciseSelect').value;
-  if (!name) return;
-  const logs = window._progressLogs || [];
-
-  const points = [];
-  logs.forEach(l => {
-    const ex = (l.exercises||[]).find(e => e.name === name);
-    if (ex) {
-      const maxW = Math.max(...(ex.sets||[]).map(s => s.weight||0));
-      if (maxW > 0) points.push({ date: l.date, weight: maxW });
-    }
-  });
-  points.reverse();
-
-  if (progressChartInst) { progressChartInst.destroy(); progressChartInst = null; }
-  const ctx = document.getElementById('progressChart').getContext('2d');
-  progressChartInst = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: points.map(p => p.date),
-      datasets: [{
-        label: `أقصى وزن — ${name}`,
-        data: points.map(p => p.weight),
-        borderColor: '#6c63ff',
-        backgroundColor: 'rgba(108,99,255,0.1)',
-        tension: 0.4, fill: true,
-        pointBackgroundColor: '#6c63ff',
-        pointRadius: 5
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#f0f0f0' } } },
-      scales: {
-        x: { ticks: { color: '#8888a0' }, grid: { color: '#2e2e3e' } },
-        y: { ticks: { color: '#8888a0', callback: v => v+' kg' }, grid: { color: '#2e2e3e' } }
-      }
-    }
-  });
+function pickSugg(t) {
+  document.getElementById('searchInput').value = t;
+  document.getElementById('suggestions').classList.remove('open');
 }
-
-// ════════════════════════════════
-// UTILITIES
-// ════════════════════════════════
-function todayStr() {
-  return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+function onKey(e) {
+  if (e.key === 'Enter') { document.getElementById('suggestions').classList.remove('open'); doSearch(); }
+  if (e.key === 'Escape') document.getElementById('suggestions').classList.remove('open');
 }
-
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+document.addEventListener('click', e => {
+  if (!e.target.closest('.input-wrap')) document.getElementById('suggestions').classList.remove('open');
 });
 
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show ' + type;
-  setTimeout(() => t.classList.remove('show'), 2800);
+/* ─────────────────────────────────────
+   IMAGE UPLOAD
+───────────────────────────────────── */
+function doDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('over'); }
+function doDragLeave()  { document.getElementById('dropZone').classList.remove('over'); }
+function doDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadImg(f);
+  else toast('يرجى رفع صورة صالحة','error');
+}
+function onFileSelect(e) { if (e.target.files[0]) loadImg(e.target.files[0]); }
+function loadImg(file) {
+  S.image = file;
+  const r = new FileReader();
+  r.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('imgName').textContent = file.name;
+    document.getElementById('dropContent').style.display = 'none';
+    document.getElementById('imgPreview').style.display = 'block';
+  };
+  r.readAsDataURL(file);
+  toast('تم رفع الصورة بنجاح ✓','success');
+}
+function removeImg() {
+  S.image = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('dropContent').style.display = 'block';
+  document.getElementById('imgPreview').style.display = 'none';
 }
 
-// Firestore rules reminder
-// In Firebase Console → Firestore → Rules:
-/*
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth.uid == userId;
-      allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach'
-                  && resource.data.coachId == request.auth.uid;
-    }
-    match /plans/{planId} {
-      allow read, write: if request.auth != null &&
-        (resource == null || resource.data.coachId == request.auth.uid || resource.data.clientId == request.auth.uid);
-    }
-    match /workoutLogs/{logId} {
-      allow read, write: if request.auth != null &&
-        (resource == null || resource.data.clientId == request.auth.uid || resource.data.coachId == request.auth.uid);
-    }
-    match /weightLogs/{logId} {
-      allow read, write: if request.auth != null &&
-        (resource == null || resource.data.clientId == request.auth.uid || resource.data.coachId == request.auth.uid);
-    }
+/* ─────────────────────────────────────
+   MAIN SEARCH
+───────────────────────────────────── */
+async function doSearch() {
+  const q = S.tab === 'name'
+    ? document.getElementById('searchInput').value.trim()
+    : S.image ? S.image.name.replace(/\.[^.]+$/,'') : '';
+
+  if (!q && !S.image) {
+    toast('يرجى إدخال اسم المنتج أو رفع صورة','error');
+    document.getElementById('searchInput').focus();
+    return;
+  }
+  if (!S.platforms.length) { toast('اختر متجراً واحداً على الأقل','error'); return; }
+
+  if (q) saveHistory(q);
+
+  showLoading(q || '📷 الصورة المرفوعة');
+  await runSearch();
+
+  const prod = matchProduct(q);
+  const res  = buildResults(prod, S.platforms);
+  S.results  = sortArr(res, 'price');
+  renderResults(q, S.results);
+}
+
+function matchProduct(q) {
+  if (!q) return DB[Math.floor(Math.random() * DB.length)];
+  const s = q.toLowerCase();
+  for (const p of DB) if (p.kw.some(k => s.includes(k) || k.includes(s.split(' ')[0]))) return p;
+  for (const p of DB) for (const w of s.split(' '))
+    if (w.length > 2 && p.kw.some(k => k.includes(w))) return p;
+  return { ...DB[Math.floor(Math.random() * DB.length)], name: q };
+}
+
+function buildResults(prod, platforms) {
+  return platforms.map(plt => {
+    const d = prod.p[plt];
+    if (!d) return { plt, ok:false };
+    const v = 1 + (Math.random()-.5) * 0.04;
+    return {
+      plt, ok:true,
+      name: prod.name, emoji: prod.emoji, bg: prod.bg, cat: prod.cat,
+      price: Math.round(d.price * v),
+      orig: d.orig, del: d.del, rat: d.rat, rev: d.rev,
+      disc: Math.round((1 - d.price/d.orig)*100),
+    };
+  });
+}
+
+function sortArr(res, by) {
+  const ok  = res.filter(r => r.ok);
+  const nok = res.filter(r => !r.ok);
+  ok.sort((a,b) => {
+    if (by==='price')    return a.price - b.price;
+    if (by==='delivery') return parseInt(a.del) - parseInt(b.del);
+    if (by==='rating')   return b.rat - a.rat;
+    return 0;
+  });
+  return [...ok,...nok];
+}
+
+/* ─────────────────────────────────────
+   LOADING
+───────────────────────────────────── */
+function showLoading(q) {
+  document.getElementById('lqText').textContent = q;
+  document.getElementById('loadingSection').style.display = 'block';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('popularSection').style.display = 'none';
+
+  document.getElementById('lPlatforms').innerHTML = S.platforms.map(p =>
+    `<div class="lp-card" id="lp_${p}">
+       <div class="spinner" id="sp_${p}"></div>
+       <div class="lp-name">${PLT[p].name}</div>
+     </div>`
+  ).join('');
+
+  document.getElementById('loadingSection')
+    .scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+async function runSearch() {
+  const delays = [500,750,1000,1300,1600];
+  await Promise.all(S.platforms.map((p,i) =>
+    new Promise(res => setTimeout(() => {
+      document.getElementById(`lp_${p}`)?.classList.add('done');
+      const sp = document.getElementById(`sp_${p}`);
+      if (sp) sp.outerHTML = '<div class="lp-check">✅</div>';
+      res();
+    }, delays[i]||800+i*300))
+  ));
+  await new Promise(r => setTimeout(r,380));
+  document.getElementById('loadingSection').style.display = 'none';
+}
+
+/* ─────────────────────────────────────
+   RENDER
+───────────────────────────────────── */
+function renderResults(q, res) {
+  const sec = document.getElementById('resultsSection');
+  sec.style.display = 'block';
+  document.getElementById('rQuery').textContent = q || '📷 الصورة المرفوعة';
+  const ok = res.filter(r => r.ok);
+  document.getElementById('rSub').textContent =
+    `وجدنا ${ok.length} عرض في ${ok.length} متجر مختلف`;
+  renderBD(res[0]);
+  renderGrid(res);
+  renderTable(res);
+  setTimeout(() => sec.scrollIntoView({behavior:'smooth',block:'start'}), 80);
+}
+
+function renderBD(r) {
+  const el = document.getElementById('bestDeal');
+  if (!r||!r.ok) { el.innerHTML=''; return; }
+  const plt  = PLT[r.plt];
+  const save = r.orig - r.price;
+  el.innerHTML = `
+    <div class="best-deal">
+      <div class="bd-crown">
+        <div class="bd-crown-icon">👑</div>
+        <div class="bd-crown-label">أفضل سعر</div>
+      </div>
+      <div class="bd-info">
+        <div class="bd-name">${r.name}</div>
+        <div class="bd-platform">
+          <span style="color:${plt.color}">${plt.emoji}</span> ${plt.name}
+        </div>
+        <div class="bd-prices">
+          <span class="bd-price">${r.price.toLocaleString()} ر.س</span>
+          <span class="bd-original">${r.orig.toLocaleString()} ر.س</span>
+          <span class="bd-save">وفّر ${save.toLocaleString()} ر.س (-${r.disc}%)</span>
+        </div>
+        <div class="bd-meta">
+          <span>⚡ التوصيل: <strong>${r.del}</strong></span>
+          <span>⭐ <strong>${r.rat}/5</strong></span>
+          <span style="color:var(--subtle)">(${r.rev.toLocaleString()} تقييم)</span>
+        </div>
+      </div>
+      <div class="bd-actions">
+        <button class="btn-buy" onclick="openStore('${r.plt}')">🛒 اشترِ من ${plt.name}</button>
+        <button class="btn-share" onclick="shareNow()">📤 مشاركة</button>
+      </div>
+    </div>`;
+}
+
+function renderGrid(res) {
+  document.getElementById('resultsGrid').innerHTML = res.map((r,i) => {
+    if (!r.ok) return `
+      <div class="pcard na" style="animation-delay:${i*.08}s">
+        <div class="pbar ${r.plt}"></div>
+        <div class="pcbody">
+          <div class="pcard-head"><div class="ptag ${r.plt}"><div class="pdot"></div>${PLT[r.plt].name}</div></div>
+          <div style="text-align:center;padding:30px 0;color:var(--subtle)">
+            <div style="font-size:36px;margin-bottom:8px">🚫</div>
+            <div style="font-size:13px">غير متوفر في هذا المتجر</div>
+          </div>
+        </div>
+      </div>`;
+    const plt   = PLT[r.plt];
+    const best  = i === 0;
+    const fast  = parseInt(r.del) <= 3;
+    const cheap = r.disc >= 30 && !best;
+    return `
+      <div class="pcard ${best?'top-deal':''}" style="animation-delay:${i*.08}s">
+        <div class="pbar ${r.plt}"></div>
+        <div class="pcbody">
+          <div class="pcard-head">
+            <div class="ptag ${r.plt}"><div class="pdot"></div>${plt.name}</div>
+            ${best  ? '<span class="pbadge badge-best">👑 الأرخص</span>'  : ''}
+            ${fast  ? '<span class="pbadge badge-fast">⚡ سريع</span>'    : ''}
+            ${cheap ? '<span class="pbadge badge-cheap">🔥 خصم كبير</span>' : ''}
+          </div>
+          <div class="pimg" style="background:${r.bg}">${r.emoji}</div>
+          <div class="pname">${r.name}</div>
+          <div class="pprice-row">
+            <span class="pprice" style="color:${plt.color}">${r.price.toLocaleString()} ر.س</span>
+            <span class="poriginal">${r.orig.toLocaleString()}</span>
+            <span class="pdiscount">-${r.disc}%</span>
+          </div>
+          <div class="prating">
+            <span class="stars">${mkStars(r.rat)}</span>
+            <span class="rnum">${r.rat}</span>
+            <span class="rcnt">(${r.rev.toLocaleString()})</span>
+          </div>
+          <div class="pmeta">
+            <span>⚡ ${r.del}</span>
+            <span>📦 ${r.cat}</span>
+          </div>
+          <button class="btn-pcard ${r.plt}" onclick="openStore('${r.plt}')">
+            🛒 اشترِ من ${plt.name}
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderTable(res) {
+  const ok = res.filter(r => r.ok);
+  if (!ok.length) { document.getElementById('compTable').innerHTML=''; return; }
+  const minP = Math.min(...ok.map(r => r.price));
+  document.getElementById('compTable').innerHTML = `
+    <div class="comp-wrap">
+      <div class="comp-head">📊 جدول مقارنة شامل</div>
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>المتجر</th><th>السعر</th><th>السعر الأصلي</th>
+            <th>التوفير</th><th>مدة التوصيل</th><th>التقييم</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ok.map(r => {
+            const plt  = PLT[r.plt];
+            const best = r.price === minP;
+            const save = r.orig - r.price;
+            return `<tr class="${best?'best-row':''}">
+              <td><div class="tplatform">
+                <div class="tdot" style="background:${plt.color}"></div>
+                ${best?'👑 ':''}${plt.name}
+              </div></td>
+              <td class="tprice" style="color:${plt.color}">${r.price.toLocaleString()} ر.س</td>
+              <td style="color:var(--subtle);text-decoration:line-through">${r.orig.toLocaleString()} ر.س</td>
+              <td style="color:var(--secondary)">${save.toLocaleString()} ر.س (-${r.disc}%)</td>
+              <td>${r.del}</td>
+              <td>⭐ ${r.rat} <span style="color:var(--subtle);font-size:12px">(${r.rev.toLocaleString()})</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function mkStars(n) {
+  return '★'.repeat(Math.floor(n)) + (n%1>=.5?'⭑':'') + '☆'.repeat(5-Math.floor(n)-(n%1>=.5?1:0));
+}
+
+/* ─────────────────────────────────────
+   SORT
+───────────────────────────────────── */
+function doSort(by, el) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  S.results = sortArr(S.results, by);
+  renderBD(S.results[0]);
+  renderGrid(S.results);
+  renderTable(S.results);
+  const lbl = {price:'الأرخص', delivery:'الأسرع توصيلاً', rating:'الأعلى تقييماً'};
+  toast(`تم الترتيب: ${lbl[by]}`, 'info');
+}
+
+/* ─────────────────────────────────────
+   HISTORY
+───────────────────────────────────── */
+function saveHistory(q) {
+  S.history = [q, ...S.history.filter(h=>h!==q)].slice(0,12);
+  localStorage.setItem('q_hist', JSON.stringify(S.history));
+}
+
+function showHistory() {
+  if (!S.history.length) { toast('لا يوجد سجل بحث بعد','info'); return; }
+  const sec = document.getElementById('popularSection');
+  sec.style.display = 'block';
+  document.getElementById('popularChips').innerHTML =
+    S.history.map(q =>
+      `<div class="popular-chip" onclick="histSearch('${q.replace(/'/g,"\\'")}')">🔍 ${q}</div>`
+    ).join('');
+  sec.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function histSearch(q) {
+  document.getElementById('searchInput').value = q;
+  S.tab = 'name';
+  document.getElementById('tabName').click();
+  goSearch();
+  setTimeout(doSearch, 300);
+}
+
+/* ─────────────────────────────────────
+   ACTIONS
+───────────────────────────────────── */
+function openStore(plt) {
+  toast(`جارٍ فتح ${PLT[plt].name}...`,'info');
+  setTimeout(() => window.open(PLT[plt].url,'_blank'), 450);
+}
+
+function shareNow() {
+  if (navigator.share) {
+    navigator.share({title:'قارن — أفضل سعر', url:location.href}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(location.href)
+      .then(() => toast('تم نسخ الرابط ✓','success'));
   }
 }
-*/
+
+function goSearch() {
+  document.getElementById('searchBox').scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(() => document.getElementById('searchInput').focus(), 500);
+}
+
+function scrollTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ─────────────────────────────────────
+   TOAST
+───────────────────────────────────── */
+let _tt;
+function toast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ─────────────────────────────────────
+   INIT
+───────────────────────────────────── */
+if (S.history.length) showHistory();
 </script>
 </body>
 </html>
