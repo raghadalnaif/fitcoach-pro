@@ -261,13 +261,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .rcnt{font-size:11px;color:var(--subtle)}
 .pmeta{display:flex;gap:10px;font-size:12px;color:var(--muted);margin-bottom:14px;flex-wrap:wrap}
 .btn-pcard{width:100%;padding:11px;border-radius:var(--r-sm);border:1px solid;
-  font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+  font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;
+  text-decoration:none;display:block;text-align:center}
 .btn-pcard.amazon{background:rgba(255,153,0,.1);color:var(--amazon);border-color:rgba(255,153,0,.25)}
 .btn-pcard.noon{background:rgba(247,193,49,.1);color:var(--noon);border-color:rgba(247,193,49,.25)}
 .btn-pcard.aliexpress{background:rgba(255,71,71,.1);color:var(--aliexpress);border-color:rgba(255,71,71,.25)}
 .btn-pcard.shein{background:rgba(233,69,96,.1);color:var(--shein);border-color:rgba(233,69,96,.25)}
 .btn-pcard.temu{background:rgba(255,101,52,.1);color:var(--temu);border-color:rgba(255,101,52,.25)}
 .btn-pcard:hover{filter:brightness(1.25);transform:translateY(-1px)}
+/* Extra options */
+.extras-wrap{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.extra-option{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);text-decoration:none;
+  transition:background .15s;font-size:12px}
+.extra-option:hover{background:var(--surface3)}
+.extra-name{flex:1;color:var(--text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.extra-price{font-weight:800;white-space:nowrap}
+.extra-arrow{color:var(--subtle);font-size:14px}
 
 /* COMPARISON TABLE */
 .comp-wrap{margin-top:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
@@ -1077,45 +1087,64 @@ function renderBD(r) {
 }
 
 function renderGrid(res) {
-  document.getElementById('resultsGrid').innerHTML = res.map((r,i) => {
-    const plt  = PLT[r.platform];
-    const best = i===0;
-    const fast = parseInt(r.delivery||'99')<=3;
-    const fkey = favKey(r);
+  // Group by platform, keep order of first appearance
+  const groups = {};
+  const order = [];
+  for (const r of res) {
+    if (!groups[r.platform]) { groups[r.platform] = []; order.push(r.platform); }
+    groups[r.platform].push(r);
+  }
+  const cheapest = res.reduce((m,r) => (!m||r.price<m.price)?r:m, null);
+
+  document.getElementById('resultsGrid').innerHTML = order.map((plt, gi) => {
+    const items = groups[plt];
+    const best  = items[0];
+    const info  = PLT[plt];
+    const fast  = parseInt(best.delivery||'99') <= 3;
+    const isCheapest = cheapest && best.platform === cheapest.platform && best.price === cheapest.price;
+    const fkey  = favKey(best);
     const saved = !!S.favs[fkey];
-    const emoji = r._emoji||PLT_EMOJI[r.platform]||'📦';
-    const imgHtml = r.image
-      ? `<img src="${r.image}" alt="${r.name}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="pimg-emoji" style="display:none">${emoji}</span>`
+    const emoji = best._emoji || PLT_EMOJI[plt] || '📦';
+    const imgHtml = best.image
+      ? `<img src="${best.image}" alt="${best.name}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="pimg-emoji" style="display:none">${emoji}</span>`
       : `<span class="pimg-emoji">${emoji}</span>`;
-    const bgStyle = r.image ? '' : `background:${r._bg||'var(--surface3)'}`;
+    const bgStyle = best.image ? '' : `background:${best._bg||'var(--surface3)'}`;
+
+    // Extra options (2nd, 3rd results for same platform)
+    const extras = items.slice(1).map((r,ei) => `
+      <a class="extra-option" href="${r.link||'#'}" target="_blank" rel="noopener">
+        <span class="extra-name">${r.name.length>55?r.name.slice(0,55)+'…':r.name}</span>
+        <span class="extra-price" style="color:${info.color}">${r.price.toLocaleString()} ر.س</span>
+        <span class="extra-arrow">←</span>
+      </a>`).join('');
+
     return `
-      <div class="pcard ${best?'top-deal':''}" style="animation-delay:${i*.08}s">
-        <div class="pbar ${r.platform}"></div>
+      <div class="pcard ${isCheapest?'top-deal':''}" style="animation-delay:${gi*.1}s">
+        <div class="pbar ${plt}"></div>
         <button class="heart-btn ${saved?'saved':''}"
-          onclick="toggleFav(${JSON.stringify(JSON.stringify(r)).slice(1,-1)},this)"
+          onclick="toggleFav(${JSON.stringify(JSON.stringify(best)).slice(1,-1)},this)"
           title="${saved?'إزالة من المفضلة':'إضافة للمفضلة'}">
           ${saved?'❤️':'🤍'}
         </button>
         <div class="pcbody">
           <div class="pcard-head">
-            <div class="ptag ${r.platform}"><div class="pdot"></div>${plt.name}</div>
-            ${best?'<span class="pbadge badge-best">👑 الأرخص</span>':''}
+            <div class="ptag ${plt}"><div class="pdot"></div>${info.name}</div>
+            ${isCheapest?'<span class="pbadge badge-best">👑 الأرخص</span>':''}
             ${fast?'<span class="pbadge badge-fast">⚡ سريع</span>':''}
           </div>
           <div class="pimg-wrap" style="${bgStyle}">${imgHtml}</div>
-          <div class="pname">${r.name}</div>
+          <div class="pname">${best.name}</div>
           <div class="pprice-row">
-            <span class="pprice" style="color:${plt.color}">${r.price.toLocaleString()} ر.س</span>
-            ${r.orig ? `<span class="poriginal">${r.orig.toLocaleString()}</span>` : ''}
-            ${r.disc ? `<span class="pdiscount">-${r.disc}%</span>` : ''}
+            <span class="pprice" style="color:${info.color}">${best.price.toLocaleString()} ر.س</span>
+            ${best.orig ? `<span class="poriginal">${best.orig.toLocaleString()}</span>` : ''}
+            ${best.disc ? `<span class="pdiscount">-${best.disc}%</span>` : ''}
           </div>
-          ${r.rating ? `<div class="prating"><span class="stars">${mkStars(r.rating)}</span><span class="rnum">${r.rating}</span>${r.reviews?`<span class="rcnt">(${Number(r.reviews).toLocaleString()})</span>`:''}</div>` : ''}
-          <div class="pmeta">
-            <span>⚡ ${r.delivery||'—'}</span>
-          </div>
-          <button class="btn-pcard ${r.platform}" onclick="window.open('${r.link||'#'}','_blank')">
-            🛒 اشترِ من ${plt.name}
-          </button>
+          ${best.rating ? `<div class="prating"><span class="stars">${mkStars(best.rating)}</span><span class="rnum">${best.rating}</span>${best.reviews?`<span class="rcnt">(${Number(best.reviews).toLocaleString()})</span>`:''}</div>` : ''}
+          <div class="pmeta"><span>⚡ ${best.delivery||'—'}</span></div>
+          <a class="btn-pcard ${plt}" href="${best.link||'#'}" target="_blank" rel="noopener">
+            🛒 اشترِ من ${info.name}
+          </a>
+          ${extras ? `<div class="extras-wrap">${extras}</div>` : ''}
         </div>
       </div>`;
   }).join('');

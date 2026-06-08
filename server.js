@@ -73,29 +73,35 @@ function parsePrice(raw) {
   return isNaN(n) ? null : n;
 }
 
-function groupByPlatform(items = []) {
-  const best = {};
+function toProduct(item, plt) {
+  const price = parsePrice(item.price ?? item.extracted_price);
+  if (!price) return null;
+  return {
+    platform: plt,
+    name: item.title,
+    price,
+    priceRaw: item.price ?? `${price} ر.س`,
+    image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
+    link: item.product_link || item.link || '',   // product_link = direct retailer URL
+    source: item.source || '',
+    rating: item.rating ?? null,
+    reviews: item.reviews ?? item.reviews_count ?? null,
+    delivery: DELIVERY[plt],
+  };
+}
+
+function groupByPlatform(items = [], perPlatform = 1) {
+  const buckets = {};
   for (const item of items) {
     const plt = detectPlatform(item.source, item.link);
     if (!plt) continue;
-    const price = parsePrice(item.price ?? item.extracted_price);
-    if (!price) continue;
-    if (!best[plt] || price < best[plt].price) {
-      best[plt] = {
-        platform: plt,
-        name: item.title,
-        price,
-        priceRaw: item.price ?? `${price} ر.س`,
-        image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
-        link: item.link || PLT_MAP[plt],
-        source: item.source || '',
-        rating: item.rating ?? null,
-        reviews: item.reviews ?? item.reviews_count ?? null,
-        delivery: DELIVERY[plt],
-      };
-    }
+    const p = toProduct(item, plt);
+    if (!p) continue;
+    if (!buckets[plt]) buckets[plt] = [];
+    if (buckets[plt].length < perPlatform) buckets[plt].push(p);
   }
-  return Object.values(best);
+  // Return flat list sorted cheapest-first within each platform
+  return Object.values(buckets).flat().sort((a, b) => a.price - b.price);
 }
 
 /* ═══════════════════════════════════════
@@ -171,31 +177,9 @@ app.get('/api/search', async (req, res) => {
     const saItems = saRes.status === 'fulfilled' ? (saRes.value.data.shopping_results || []) : [];
     const usItems = usRes.status === 'fulfilled' ? (usRes.value.data.shopping_results || []) : [];
 
-    // Merge: Saudi prices take priority (more accurate for SAR), global fills missing platforms
-    const merged = {};
-    for (const item of [...saItems, ...usItems]) {
-      const plt = detectPlatform(item.source, item.link);
-      if (!plt) continue;
-      const price = parsePrice(item.price ?? item.extracted_price);
-      if (!price) continue;
-      if (!merged[plt] || price < merged[plt].price) {
-        merged[plt] = {
-          platform: plt,
-          name: item.title,
-          price,
-          priceRaw: item.price ?? `${price} ر.س`,
-          image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
-          link: item.link || '',
-          source: item.source || '',
-          rating: item.rating ?? null,
-          reviews: item.reviews ?? item.reviews_count ?? null,
-          delivery: DELIVERY[plt],
-        };
-      }
-    }
-
-    const results = Object.values(merged);
-    console.log('Platforms found:', results.map(r => r.platform));
+    // Saudi first (accurate SAR prices), global fills missing platforms
+    const results = groupByPlatform([...saItems, ...usItems], 3);
+    console.log('Platforms found:', [...new Set(results.map(r => r.platform))]);
     res.json({ results, query: q, fallback: results.length === 0 });
   } catch (err) {
     console.error('Text search error:', err.response?.data || err.message);
@@ -248,10 +232,10 @@ app.post('/api/search-image', upload.single('image'), async (req, res) => {
         },
         timeout: 20000,
       });
-      results = groupByPlatform(shopRes.data.shopping_results || []);
+      results = groupByPlatform(shopRes.data.shopping_results || [], 3);
     } else {
       // Fallback: use visual matches directly
-      results = groupByPlatform(lensData.visual_matches || []);
+      results = groupByPlatform(lensData.visual_matches || [], 3);
     }
 
     res.json({ results, detectedName, imageUrl });
