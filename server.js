@@ -73,7 +73,7 @@ function groupByPlatform(items = []) {
         name: item.title,
         price,
         priceRaw: item.price ?? `${price} ر.س`,
-        image: item.thumbnail || null,
+        image: item.thumbnail ? `/api/img?url=${encodeURIComponent(item.thumbnail)}` : null,
         link: item.link || PLT_MAP[plt],
         source: item.source || '',
         rating: item.rating ?? null,
@@ -84,6 +84,24 @@ function groupByPlatform(items = []) {
   }
   return Object.values(best);
 }
+
+/* ═══════════════════════════════════════
+   IMAGE PROXY  (bypass CORS for thumbnails)
+═══════════════════════════════════════ */
+app.get('/api/img', async (req, res) => {
+  const url = req.query.url;
+  if (!url || !/^https?:\/\//.test(url)) return res.status(400).end();
+  try {
+    const r = await axios.get(url, {
+      responseType: 'arraybuffer',
+      timeout: 8000,
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.google.com' },
+    });
+    res.set('Content-Type', r.headers['content-type'] || 'image/jpeg');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(r.data);
+  } catch { res.status(404).end(); }
+});
 
 /* ═══════════════════════════════════════
    SERVE FIREBASE CONFIG (safe, public)
