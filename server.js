@@ -230,14 +230,10 @@ app.get('/api/search', async (req, res) => {
     try {
       const gKey = process.env.GOOGLE_API_KEY;
       const gCx  = process.env.GOOGLE_CSE_ID;
-
-      // Two parallel queries: Saudi Arabic + Global English
       const [saItems, usItems] = await Promise.all([
         runCseQuery(q, gKey, gCx, { gl: 'sa', hl: 'ar', cr: 'countrySA' }).catch(() => []),
         runCseQuery(q, gKey, gCx, { gl: 'us', hl: 'en' }).catch(() => []),
       ]);
-
-      // Merge — SA prices take priority, global fills missing platforms
       const buckets = {};
       for (const p of [...saItems, ...usItems]) {
         if (!buckets[p.platform]) buckets[p.platform] = [];
@@ -245,7 +241,12 @@ app.get('/api/search', async (req, res) => {
       }
       const results = Object.values(buckets).flat().sort((a, b) => a.price - b.price);
       console.log('CSE platforms found:', [...new Set(results.map(r => r.platform))]);
-      return res.json({ results, query: q, fallback: results.length === 0, engine: 'cse' });
+
+      // If CSE found results → return them; otherwise fall through to SerpAPI
+      if (results.length > 0)
+        return res.json({ results, query: q, fallback: false, engine: 'cse' });
+
+      console.log('CSE returned 0 priced results — trying SerpAPI fallback');
     } catch (err) {
       console.error('CSE search error:', err.message);
     }

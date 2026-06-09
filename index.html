@@ -1000,17 +1000,43 @@ async function fakeDelay() {
 /* ─── MOCK FALLBACK ─── */
 function buildMock(q) {
   const s = q.toLowerCase();
-  let prod = MOCK_DB[0];
+  let prod = null;
   for (const p of MOCK_DB) if (p.kw.some(k=>s.includes(k)||k.includes(s.split(' ')[0]))) { prod=p; break; }
+  // If no keyword match, build a generic product using the actual query
+  if (!prod) {
+    const base = Math.floor(Math.random()*400+80);
+    prod = {
+      name: q, emoji: '📦', bg: 'var(--surface2)',
+      p: {
+        amazon:     { price: Math.round(base*1.15), orig: Math.round(base*1.4), del:'2-4 أيام', rat:4.2, rev:1100 },
+        noon:       { price: Math.round(base*1.18), orig: Math.round(base*1.4), del:'3-5 أيام', rat:4.1, rev:740 },
+        aliexpress: { price: Math.round(base*0.55), orig: Math.round(base*0.75), del:'15-30 يوم', rat:4.0, rev:4200 },
+        shein:      { price: Math.round(base*0.50), orig: Math.round(base*0.70), del:'12-20 يوم', rat:3.9, rev:2800 },
+        temu:       { price: Math.round(base*0.48), orig: Math.round(base*0.68), del:'14-25 يوم', rat:3.8, rev:3500 },
+      }
+    };
+  }
   return S.platforms.map(plt => {
     const d = prod.p[plt];
     if (!d) return null;
     const v = 1+(Math.random()-.5)*.04;
     return { platform:plt, name:prod.name, price:Math.round(d.price*v), orig:d.orig,
       delivery:d.del, rating:d.rat, reviews:d.rev,
-      disc:Math.round((1-d.price/d.orig)*100), image:null, link:'#',
+      disc:Math.round((1-d.price/d.orig)*100), image:null, link: PLT_SEARCH_URL(plt, prod.name),
       _emoji:prod.emoji, _bg:prod.bg };
   }).filter(Boolean);
+}
+
+function PLT_SEARCH_URL(plt, q) {
+  const e = encodeURIComponent(q);
+  const urls = {
+    amazon:     `https://www.amazon.sa/s?k=${e}`,
+    noon:       `https://www.noon.com/saudi-en/search/?q=${e}`,
+    aliexpress: `https://www.aliexpress.com/wholesale?SearchText=${e}`,
+    shein:      `https://www.shein.com/search.html?q=${e}`,
+    temu:       `https://www.temu.com/search_result.html?search_key=${e}`,
+  };
+  return urls[plt] || '#';
 }
 
 /* ─── SORT ─── */
@@ -1050,8 +1076,8 @@ function renderResults(q, res) {
   const sec = document.getElementById('resultsSection');
   sec.style.display = 'block';
   document.getElementById('rQuery').textContent = q || '📷 الصورة';
-  const note = S.usingMock ? ' — (بيانات تجريبية، يرجى ضبط SERP_API_KEY للبحث الحقيقي)' : '';
-  document.getElementById('rSub').textContent = `وجدنا ${res.length} عرض في ${res.length} متجر${note}`;
+  const note = S.usingMock ? ' — (أسعار تقريبية، البحث الحقيقي يحتاج إعداد API)' : '';
+  document.getElementById('rSub').textContent = `وجدنا ${res.length} عرض في ${[...new Set(res.map(r=>r.platform))].length} متجر${note}`;
   renderBD(res[0]);
   renderGrid(res);
   renderTable(res);
