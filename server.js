@@ -193,14 +193,15 @@ function cseItemToProduct(item) {
   const offer    = (pm.offer || pm.product || pm.aggregateoffer || [{}])[0] || {};
   const img      = (pm.cse_image || pm.cse_thumbnail || [{}])[0]?.src || null;
   const priceRaw = offer.price || offer.lowprice || offer.highprice || '';
-  const price    = parsePrice(priceRaw) || extractPriceFromText(item.snippet || item.title || '');
+  const price    = parsePrice(priceRaw) || extractPriceFromText(item.snippet || '') || extractPriceFromText(item.title || '');
 
-  if (!price) return null;
+  // Include even without price — link is still valuable
   return {
     platform: plt,
-    name:     item.title.replace(/ - .*$/, '').replace(/ \| .*$/, ''),
-    price,
-    priceRaw: priceRaw ? `${price} ر.س` : `~${price} ر.س`,
+    name:     item.title.replace(/ - .*$/, '').replace(/ \| .*$/, '').replace(/ — .*$/, ''),
+    price:    price || 0,
+    priceRaw: price ? `${price} ر.س` : 'تحقق من السعر',
+    noPrice:  !price,
     image:    img ? `/api/img?url=${encodeURIComponent(img)}` : null,
     link,
     source:   plt,
@@ -237,16 +238,17 @@ app.get('/api/search', async (req, res) => {
       const buckets = {};
       for (const p of [...saItems, ...usItems]) {
         if (!buckets[p.platform]) buckets[p.platform] = [];
-        if (buckets[p.platform].length < 3) buckets[p.platform].push(p);
+        const slot = buckets[p.platform];
+        if (slot.length < 3 && (!p.noPrice || !slot.some(x => !x.noPrice))) slot.push(p);
       }
-      const results = Object.values(buckets).flat().sort((a, b) => a.price - b.price);
+      const results = Object.values(buckets).flat()
+        .sort((a, b) => (a.noPrice ? 1 : 0) - (b.noPrice ? 1 : 0) || a.price - b.price);
       console.log('CSE platforms found:', [...new Set(results.map(r => r.platform))]);
 
-      // If CSE found results → return them; otherwise fall through to SerpAPI
       if (results.length > 0)
         return res.json({ results, query: q, fallback: false, engine: 'cse' });
 
-      console.log('CSE returned 0 priced results — trying SerpAPI fallback');
+      console.log('CSE 0 results — trying SerpAPI');
     } catch (err) {
       console.error('CSE search error:', err.message);
     }
