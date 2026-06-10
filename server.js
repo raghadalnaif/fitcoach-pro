@@ -121,6 +121,39 @@ function groupByPlatform(items = [], perPlatform = 1) {
 }
 
 /* ═══════════════════════════════════════
+   DEBUG — CSE raw response
+═══════════════════════════════════════ */
+app.get('/api/debug-cse', async (req, res) => {
+  const q = (req.query.q || 'iphone').trim();
+  if (!process.env.GOOGLE_API_KEY || !process.env.GOOGLE_CSE_ID)
+    return res.status(503).json({ error: 'CSE not configured' });
+  try {
+    const { data } = await axios.get('https://www.googleapis.com/customsearch/v1', {
+      params: {
+        key: process.env.GOOGLE_API_KEY,
+        cx:  process.env.GOOGLE_CSE_ID,
+        q, num: 10, gl: 'sa', hl: 'ar',
+      },
+      timeout: 12000,
+    });
+    res.json({
+      totalResults: data.searchInformation?.totalResults,
+      itemCount: (data.items || []).length,
+      sample: (data.items || []).slice(0, 5).map(i => ({
+        title: i.title?.slice(0, 50),
+        link: i.link,
+        hasPagemap: !!i.pagemap,
+        hasOffer: !!(i.pagemap?.offer || i.pagemap?.product),
+        snippet: i.snippet?.slice(0, 80),
+      })),
+      error: data.error,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message, response: e.response?.data });
+  }
+});
+
+/* ═══════════════════════════════════════
    DEBUG — raw SerpAPI results (remove in prod)
 ═══════════════════════════════════════ */
 app.get('/api/debug-search', async (req, res) => {
