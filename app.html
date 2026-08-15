@@ -182,11 +182,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   background:var(--surface2);display:flex;align-items:center;justify-content:center;
   border:1px solid var(--border);cursor:pointer;position:relative}
 .ex-img{width:100%;height:100%;object-fit:cover;display:block}
+.ex-video-inline{width:100%;height:100%;object-fit:cover;display:block}
 .ex-img-placeholder{font-size:36px;color:var(--muted)}
-.ex-play{position:absolute;inset:0;background:rgba(0,0,0,.5);color:#fff;
-  display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;
-  font-size:24px}
-.ex-img-wrap:hover .ex-play{opacity:1}
+.ex-play{position:absolute;bottom:6px;right:6px;background:rgba(0,0,255,.9);color:#fff;
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;opacity:.9}
+.ex-img-wrap:hover .ex-play{opacity:1;background:var(--blue-d)}
+.btn-watch{width:100%;padding:9px 12px;background:var(--blue-bg);color:var(--blue);
+  border:1.5px solid var(--blue);border-radius:10px;font-family:var(--font);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-watch:hover{background:var(--blue);color:#fff}
 .ex-info{flex:1;min-width:0}
 .ex-name{font-size:15px;font-weight:800;margin-bottom:4px}
 .ex-name-en{font-size:12px;color:var(--muted);font-family:'Segoe UI',sans-serif;direction:ltr;text-align:right;margin-bottom:8px}
@@ -479,7 +486,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div class="video-modal" id="videoModal">
   <div class="video-frame">
     <button class="video-close" onclick="closeVideo()">✕ إغلاق</button>
-    <iframe id="videoFrame" src="" allow="autoplay" allowfullscreen></iframe>
+    <div id="videoTitle" style="position:absolute;top:-40px;right:0;color:#fff;font-weight:800;font-size:15px"></div>
+    <div id="videoFrame" style="width:100%;height:100%"></div>
   </div>
 </div>
 

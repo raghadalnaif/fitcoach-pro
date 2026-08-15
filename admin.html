@@ -34,6 +34,46 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   cursor:pointer;transition:all .2s}
 .btn-logout:hover{border-color:var(--red);color:var(--red)}
 
+/* Admin tabs */
+.tab-btn-admin{padding:12px 20px;background:none;border:none;border-bottom:3px solid transparent;
+  color:var(--muted);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;
+  transition:all .15s;margin-bottom:-1px}
+.tab-btn-admin:hover{color:var(--blue)}
+.tab-btn-admin.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Library */
+.library-info{background:#eef7ff;border:1px solid #b8dcff;color:#0c4a80;
+  padding:14px 18px;border-radius:var(--r);margin-bottom:20px}
+.ex-groups{display:flex;flex-direction:column;gap:22px}
+.ex-group-title{font-size:16px;font-weight:900;margin-bottom:10px;color:var(--text);
+  display:flex;align-items:center;gap:8px}
+.ex-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.ex-lib-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px;transition:all .2s}
+.ex-lib-card.has-video{border-color:var(--green)}
+.ex-lib-card:hover{box-shadow:var(--shadow)}
+.ex-preview{width:100%;height:130px;border-radius:8px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;position:relative}
+.ex-preview video{width:100%;height:100%;object-fit:cover}
+.ex-preview .ex-icon{font-size:44px;opacity:.4}
+.ex-status-badge{position:absolute;top:6px;left:6px;padding:3px 8px;border-radius:20px;
+  font-size:10px;font-weight:800;color:#fff}
+.ex-status-badge.ok{background:var(--green)}
+.ex-status-badge.no{background:var(--muted)}
+.ex-lib-name{font-size:13px;font-weight:800;margin-bottom:3px}
+.ex-lib-en{font-size:11px;color:var(--muted);direction:ltr;text-align:right;margin-bottom:8px;
+  font-family:'Segoe UI',sans-serif}
+.ex-lib-actions{display:flex;gap:6px}
+.ex-lib-btn{flex:1;padding:7px;font-family:var(--font);font-size:11px;font-weight:800;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.ex-lib-btn:hover{border-color:var(--blue);color:var(--blue)}
+.ex-lib-btn.delete:hover{border-color:var(--red);color:var(--red)}
+.ex-lib-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ex-lib-progress{height:3px;background:var(--surface2);border-radius:2px;margin-top:6px;overflow:hidden;display:none}
+.ex-lib-progress.on{display:block}
+.ex-lib-progress-bar{height:100%;background:var(--blue);width:0%;transition:width .2s}
+
 /* ── LOGIN GATE ── */
 .login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-box{background:var(--surface);border-radius:20px;padding:36px 30px;width:100%;max-width:380px;
@@ -206,6 +246,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 
   <div class="container">
+    <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border)">
+      <button class="tab-btn-admin on" data-tab="subs" onclick="switchAdminTab('subs')">👥 المشتركين</button>
+      <button class="tab-btn-admin" data-tab="library" onclick="switchAdminTab('library')">🎬 مكتبة التمارين</button>
+    </div>
+
+    <div id="tabSubs">
     <div class="page-title">المشتركين</div>
     <div class="page-sub">إدارة اشتراكات النادي</div>
 
@@ -222,6 +268,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
 
     <div id="subsContainer"></div>
+    </div><!-- /tabSubs -->
+
+    <div id="tabLibrary" style="display:none">
+      <div class="page-title">مكتبة التمارين</div>
+      <div class="page-sub">ارفعي فيديو لكل تمرين — يظهر للمشتركين عند التدريب</div>
+
+      <div class="library-info">
+        <div style="font-weight:800;margin-bottom:8px">📌 ملاحظات مهمة</div>
+        <ul style="padding-right:20px;line-height:1.9;font-size:13px">
+          <li>الفيديوهات المدعومة: <b>MP4, WebM, MOV</b> — الحد الأقصى <b>30 ميجا</b> لكل فيديو</li>
+          <li>يفضّل: فيديو قصير (10-30 ثانية) يعرض التمرين من زاوية واضحة</li>
+          <li>الفيديوهات محفوظة على السيرفر عندك (خارج قاعدة البيانات)</li>
+          <li>التمارين اللي بلا فيديو تظهر بأيقونة افتراضية</li>
+        </ul>
+      </div>
+
+      <div class="ex-groups" id="libraryContainer">جاري التحميل...</div>
+    </div>
   </div>
 </div>
 
@@ -341,6 +405,158 @@ const ADMIN_TOKEN_KEY = 'urpass_admin_token';
 
 let subscribers = [];
 let editingId = null;
+
+/* ═══════════════════ EXERCISE LIBRARY ═══════════════════ */
+const EX_LIB = {
+  chest: { name: '💪 صدر', items: {
+    bench_press:   { ar:'بنش برس', en:'Barbell Bench Press' },
+    db_bench:      { ar:'بنش دمبل', en:'Dumbbell Bench Press' },
+    incline_press: { ar:'بنش مائل', en:'Incline Dumbbell Press' },
+    pushup:        { ar:'ضغط أرضي', en:'Push Up' },
+  }},
+  back: { name: '🏋️ ظهر', items: {
+    pullup:       { ar:'العقلة', en:'Pull Up' },
+    lat_pulldown: { ar:'سحب علوي', en:'Lat Pulldown' },
+    bb_row:       { ar:'تجديف بار', en:'Barbell Row' },
+    db_row:       { ar:'تجديف دمبل', en:'Dumbbell Row' },
+    cable_row:    { ar:'تجديف كابل', en:'Cable Row' },
+    face_pull:    { ar:'شد وجه', en:'Face Pull' },
+  }},
+  shoulders: { name: '🤸 أكتاف', items: {
+    ohp:           { ar:'ضغط أكتاف', en:'Overhead Press' },
+    lateral_raise: { ar:'رفرفة جانبية', en:'Lateral Raise' },
+  }},
+  arms: { name: '💪 أذرع', items: {
+    bicep_curl:  { ar:'بايسبس دمبل', en:'Bicep Curl' },
+    hammer_curl: { ar:'هامر كيرل', en:'Hammer Curl' },
+    tricep_dip:  { ar:'ديبس', en:'Tricep Dips' },
+    tricep_ext:  { ar:'تمديد ترايسبس', en:'Tricep Extension' },
+  }},
+  legs: { name: '🦵 أرجل', items: {
+    squat:        { ar:'سكوات بار', en:'Barbell Squat' },
+    goblet_squat: { ar:'سكوات دمبل', en:'Goblet Squat' },
+    sumo_squat:   { ar:'سكوات سومو', en:'Sumo Squat' },
+    bulgarian:    { ar:'بلغاري سبليت', en:'Bulgarian Split Squat' },
+    lunges:       { ar:'اندفاع', en:'Walking Lunges' },
+    rdl:          { ar:'رومانيان ديدلفت', en:'Romanian Deadlift' },
+    deadlift:     { ar:'ديدلفت', en:'Deadlift' },
+    leg_press:    { ar:'ليج برس', en:'Leg Press' },
+    leg_curl:     { ar:'تجعيد أرجل', en:'Leg Curl' },
+    leg_ext:      { ar:'تمديد أرجل', en:'Leg Extension' },
+    calf_raise:   { ar:'رفع سمانة', en:'Calf Raise' },
+  }},
+  glutes: { name: '🍑 جلوت', items: {
+    hip_thrust:     { ar:'هيب ثراست', en:'Hip Thrust' },
+    glute_bridge:   { ar:'جلوت بريدج', en:'Glute Bridge' },
+    cable_kickback: { ar:'ركلة كابل', en:'Cable Glute Kickback' },
+  }},
+  core: { name: '🧘 كور', items: {
+    plank:         { ar:'بلانك', en:'Plank' },
+    russian_twist: { ar:'روسيان تويست', en:'Russian Twist' },
+    leg_raise:     { ar:'رفع أرجل', en:'Hanging Leg Raise' },
+  }},
+};
+let libraryVideos = {};
+
+function switchAdminTab(tab) {
+  document.querySelectorAll('.tab-btn-admin').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  document.getElementById('tabSubs').style.display    = tab === 'subs' ? 'block' : 'none';
+  document.getElementById('tabLibrary').style.display = tab === 'library' ? 'block' : 'none';
+  if (tab === 'library') loadLibrary();
+}
+
+async function loadLibrary() {
+  try {
+    const r = await fetch('/api/exercises/videos');
+    const data = await r.json();
+    libraryVideos = data.videos || {};
+    renderLibrary();
+  } catch (e) {
+    document.getElementById('libraryContainer').innerHTML = '<div style="color:var(--red)">فشل التحميل</div>';
+  }
+}
+
+function renderLibrary() {
+  const container = document.getElementById('libraryContainer');
+  container.innerHTML = Object.entries(EX_LIB).map(([groupKey, group]) => {
+    const items = Object.entries(group.items).map(([id, ex]) => {
+      const videoUrl = libraryVideos[id];
+      const hasVideo = !!videoUrl;
+      return `
+        <div class="ex-lib-card ${hasVideo ? 'has-video' : ''}">
+          <div class="ex-preview">
+            ${hasVideo
+              ? `<video src="${videoUrl}" muted loop playsinline autoplay></video>`
+              : `<div class="ex-icon">🎬</div>`}
+            <span class="ex-status-badge ${hasVideo ? 'ok' : 'no'}">${hasVideo ? '✓ مرفوع' : 'لا فيديو'}</span>
+          </div>
+          <div class="ex-lib-name">${ex.ar}</div>
+          <div class="ex-lib-en">${ex.en}</div>
+          <div class="ex-lib-actions">
+            <label class="ex-lib-btn">
+              <span>${hasVideo ? '🔄 استبدال' : '📤 رفع'}</span>
+              <input type="file" accept="video/mp4,video/webm,video/quicktime" onchange="uploadExVideo('${id}', this)">
+            </label>
+            ${hasVideo ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')">🗑️</button>` : ''}
+          </div>
+          <div class="ex-lib-progress" id="prog_${id}"><div class="ex-lib-progress-bar" id="progbar_${id}"></div></div>
+        </div>`;
+    }).join('');
+    return `
+      <div>
+        <div class="ex-group-title">${group.name}</div>
+        <div class="ex-cards">${items}</div>
+      </div>`;
+  }).join('');
+}
+
+async function uploadExVideo(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 30 * 1024 * 1024) {
+    toast('الفيديو أكبر من 30 ميجا', 'error');
+    input.value = '';
+    return;
+  }
+  const prog    = document.getElementById('prog_' + id);
+  const progBar = document.getElementById('progbar_' + id);
+  prog.classList.add('on');
+  const fd = new FormData();
+  fd.append('video', file);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `/api/admin/exercises/${id}/video`);
+  xhr.setRequestHeader('Authorization', `Bearer ${adminToken()}`);
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) progBar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+  };
+  xhr.onload = () => {
+    prog.classList.remove('on');
+    if (xhr.status >= 200 && xhr.status < 300) {
+      toast('تم رفع الفيديو ✓');
+      loadLibrary();
+    } else {
+      let err = 'فشل الرفع';
+      try { err = JSON.parse(xhr.responseText).error || err; } catch {}
+      toast(err, 'error');
+    }
+    input.value = '';
+  };
+  xhr.onerror = () => {
+    prog.classList.remove('on');
+    toast('خطأ في الاتصال', 'error');
+  };
+  xhr.send(fd);
+}
+
+async function deleteExVideo(id) {
+  if (!confirm('حذف الفيديو؟')) return;
+  try {
+    await api(`/api/admin/exercises/${id}/video`, { method: 'DELETE' });
+    toast('تم الحذف ✓');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
+}
 
 function isAdminLoggedIn() { return !!localStorage.getItem(ADMIN_TOKEN_KEY); }
 function adminToken() { return localStorage.getItem(ADMIN_TOKEN_KEY); }

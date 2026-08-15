@@ -12,6 +12,7 @@ const state = {
   selectedPlan: null,
   currentDay: 0,
   workoutProgress: {},
+  videos: {},
 };
 
 /* ═══════════════ AUTH ═══════════════ */
@@ -66,7 +67,11 @@ function switchTab(tab) {
 /* ═══════════════ INIT ═══════════════ */
 async function init() {
   try {
-    const me = await api('/api/me');
+    // Load user + exercise videos in parallel
+    const [me, vids] = await Promise.all([
+      api('/api/me'),
+      fetch('/api/exercises/videos').then(r => r.json()).catch(() => ({ videos: {} })),
+    ]);
     state.user = me;
     state.profile = me.profile;
     state.macros  = me.macros;
@@ -74,6 +79,7 @@ async function init() {
     state.locked  = me.locked;
     state.selectedPlan   = me.selectedPlan;
     state.workoutProgress = me.workoutProgress || {};
+    state.videos = vids.videos || {};
 
     // Header
     document.getElementById('daysLeftBadge').textContent = `${me.daysLeft} يوم`;
@@ -694,12 +700,15 @@ function renderDay(planKey, idx) {
     const e = EX[item.id];
     if (!e) return '';
     const last = state.workoutProgress[item.id]?.slice(-1)[0];
-    const searchQ = encodeURIComponent(e.en + ' proper form tutorial');
+    const videoUrl = state.videos[item.id];
+    const preview = videoUrl
+      ? `<video class="ex-video-inline" src="${videoUrl}" muted loop playsinline autoplay preload="metadata"></video>`
+      : `<div class="ex-img-placeholder">${e.ico}</div>`;
     return `
       <div class="ex-card">
-        <div class="ex-img-wrap" onclick="openVideo('${searchQ}')">
-          <div class="ex-img-placeholder">${e.ico}</div>
-          <div class="ex-play">▶ شرح</div>
+        <div class="ex-img-wrap" onclick="openExVideo('${item.id}')">
+          ${preview}
+          <div class="ex-play">▶</div>
         </div>
         <div class="ex-info">
           <div class="ex-name">${e.ar}</div>
@@ -709,6 +718,9 @@ function renderDay(planKey, idx) {
             <div>مجموعات: <b>${item.sets}</b></div>
             <div>تكرارات: <b>${item.reps}</b></div>
           </div>
+          <button class="btn-watch" onclick="openExVideo('${item.id}')">
+            ${videoUrl ? '▶ اضغطي هنا لمشاهدة التمرين' : '📷 لا يوجد فيديو بعد'}
+          </button>
           <div class="ex-progress">
             <input type="number" id="w_${item.id}" placeholder="الوزن" value="${last?.weight || ''}">
             <input type="number" id="r_${item.id}" placeholder="التكرار" value="${last?.reps || ''}">
@@ -736,12 +748,27 @@ async function saveExercise(exId) {
   } catch (e) { toast(e.message, 'error'); }
 }
 
-function openVideo(searchQ) {
-  window.open(`https://www.youtube.com/results?search_query=${searchQ}`, '_blank');
+function openExVideo(exId) {
+  const url = state.videos[exId];
+  const e   = EX[exId];
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoFrame');
+  const title = document.getElementById('videoTitle');
+  if (title) title.textContent = e ? e.ar : '';
+  if (!url) {
+    frame.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fff;text-align:center;padding:20px">
+      <div style="font-size:56px;margin-bottom:12px">🎬</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:6px">لم يتم رفع الفيديو بعد</div>
+      <div style="font-size:13px;opacity:.8">اتواصلي مع المدرب لرفع فيديو الشرح</div>
+    </div>`;
+  } else {
+    frame.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>`;
+  }
+  modal.classList.add('open');
 }
 
 function closeVideo() {
-  document.getElementById('videoFrame').src = '';
+  document.getElementById('videoFrame').innerHTML = '';
   document.getElementById('videoModal').classList.remove('open');
 }
 

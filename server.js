@@ -3,6 +3,7 @@ const express = require('express');
 const cors    = require('cors');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
+const multer  = require('multer');
 const Database = require('better-sqlite3');
 const path    = require('path');
 const fs      = require('fs');
@@ -12,6 +13,43 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(__dirname));
+
+/* ═══════════════════════════════════════
+   VIDEO STORAGE
+═══════════════════════════════════════ */
+const VIDEO_DIR = process.env.VIDEO_DIR || path.join(__dirname, 'data', 'videos');
+fs.mkdirSync(VIDEO_DIR, { recursive: true });
+app.use('/videos', express.static(VIDEO_DIR, { maxAge: '30d' }));
+
+const VALID_EXERCISES = new Set([
+  'bench_press','db_bench','incline_press','pushup',
+  'pullup','lat_pulldown','bb_row','db_row','cable_row','face_pull',
+  'ohp','lateral_raise',
+  'bicep_curl','hammer_curl','tricep_dip','tricep_ext',
+  'squat','goblet_squat','sumo_squat','bulgarian','lunges',
+  'rdl','deadlift','hip_thrust','glute_bridge','cable_kickback',
+  'leg_press','leg_curl','leg_ext','calf_raise',
+  'plank','russian_twist','leg_raise',
+]);
+
+const videoUpload = multer({
+  storage: multer.diskStorage({
+    destination: VIDEO_DIR,
+    filename: (req, file, cb) => {
+      const id = req.params.id;
+      if (!VALID_EXERCISES.has(id)) return cb(new Error('invalid exercise id'));
+      const ext = path.extname(file.originalname).toLowerCase();
+      const allowed = ['.mp4', '.webm', '.mov'];
+      if (!allowed.includes(ext)) return cb(new Error('only mp4/webm/mov allowed'));
+      cb(null, `${id}${ext}`);
+    },
+  }),
+  limits: { fileSize: 30 * 1024 * 1024 }, // 30MB per video
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('video/')) cb(null, true);
+    else cb(new Error('not a video'));
+  },
+});
 
 /* ═══════════════════════════════════════
    SQLite DATABASE
@@ -327,6 +365,57 @@ app.delete('/api/admin/subscribers/:id', auth, requireAdmin, (req, res) => {
   const result = stmts.delete.run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: 'not found' });
   res.json({ ok: true });
+});
+
+/* ═══════════════════════════════════════
+   EXERCISE VIDEOS — admin upload + public list
+═══════════════════════════════════════ */
+function findVideo(id) {
+  for (const ext of ['.mp4', '.webm', '.mov']) {
+    const p = path.join(VIDEO_DIR, `${id}${ext}`);
+    if (fs.existsSync(p)) return `/videos/${id}${ext}`;
+  }
+  return null;
+}
+
+// Public: list which exercises have videos
+app.get('/api/exercises/videos', (_req, res) => {
+  const videos = {};
+  for (const id of VALID_EXERCISES) {
+    const url = findVideo(id);
+    if (url) videos[id] = url;
+  }
+  res.json({ videos });
+});
+
+// Admin: upload video for one exercise
+app.post('/api/admin/exercises/:id/video', auth, requireAdmin, (req, res) => {
+  if (!VALID_EXERCISES.has(req.params.id))
+    return res.status(400).json({ error: 'invalid exercise id' });
+
+  // Remove any existing file for this id (any ext)
+  for (const ext of ['.mp4', '.webm', '.mov']) {
+    const p = path.join(VIDEO_DIR, `${req.params.id}${ext}`);
+    if (fs.existsSync(p)) fs.unlinkSync(p);
+  }
+
+  videoUpload.single('video')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    if (!req.file) return res.status(400).json({ error: 'no file uploaded' });
+    res.json({ ok: true, url: `/videos/${req.file.filename}` });
+  });
+});
+
+// Admin: delete video
+app.delete('/api/admin/exercises/:id/video', auth, requireAdmin, (req, res) => {
+  if (!VALID_EXERCISES.has(req.params.id))
+    return res.status(400).json({ error: 'invalid exercise id' });
+  let removed = false;
+  for (const ext of ['.mp4', '.webm', '.mov']) {
+    const p = path.join(VIDEO_DIR, `${req.params.id}${ext}`);
+    if (fs.existsSync(p)) { fs.unlinkSync(p); removed = true; }
+  }
+  res.json({ ok: removed });
 });
 
 /* ═══════════════════════════════════════
