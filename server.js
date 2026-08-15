@@ -3,8 +3,10 @@ const express = require('express');
 const cors    = require('cors');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
-const admin   = require('firebase-admin');
+const Database = require('better-sqlite3');
 const path    = require('path');
+const fs      = require('fs');
+const crypto  = require('crypto');
 
 const app = express();
 app.use(cors());
@@ -12,18 +14,34 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.static(__dirname));
 
 /* ═══════════════════════════════════════
-   FIREBASE
+   SQLite DATABASE
 ═══════════════════════════════════════ */
-let db = null;
-try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-    });
-    db = admin.firestore();
-    console.log('✅ Firebase connected');
-  } else console.warn('⚠️  FIREBASE_SERVICE_ACCOUNT not set');
-} catch (e) { console.error('Firebase init error:', e.message); }
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'urpass.db');
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS subscribers (
+    id TEXT PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    full_name TEXT NOT NULL,
+    gender TEXT NOT NULL DEFAULT 'female',
+    created_at INTEGER NOT NULL,
+    start_date INTEGER NOT NULL,
+    end_date INTEGER NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    profile_edits INTEGER NOT NULL DEFAULT 0,
+    profile TEXT,
+    macros TEXT,
+    selected_plan TEXT,
+    workout_progress TEXT DEFAULT '{}'
+  );
+  CREATE INDEX IF NOT EXISTS idx_username ON subscribers(username);
+`);
+console.log('✅ SQLite ready at', DB_PATH);
 
 const JWT_SECRET      = process.env.JWT_SECRET      || 'dev-secret-change-me';
 const ADMIN_PASSWORD  = process.env.ADMIN_PASSWORD  || 'admin';
@@ -56,41 +74,59 @@ function requireSubscriber(req, res, next) {
   next();
 }
 
-async function fetchSubscriber(id) {
-  if (!db) throw new Error('db not configured');
-  const snap = await db.collection('subscribers').doc(id).get();
-  if (!snap.exists) throw new Error('not found');
-  return { id: snap.id, ...snap.data() };
-}
-
 function subscriptionStatus(sub) {
   const now = Date.now();
-  const end = sub.endDate?.toMillis ? sub.endDate.toMillis() : (sub.endDate || 0);
-  const start = sub.startDate?.toMillis ? sub.startDate.toMillis() : (sub.startDate || 0);
-  const active = sub.active !== false && end > now;
+  const end = sub.end_date || 0;
+  const active = sub.active === 1 && end > now;
   const daysLeft = Math.max(0, Math.ceil((end - now) / 86400000));
-  return { active, daysLeft, startDate: start, endDate: end, expired: end <= now };
+  return { active, daysLeft, startDate: sub.start_date, endDate: end, expired: end <= now };
 }
+
+function parseJson(str, fallback) {
+  if (!str) return fallback;
+  try { return JSON.parse(str); } catch { return fallback; }
+}
+
+function newId() {
+  return crypto.randomBytes(9).toString('base64url');
+}
+
+/* ═══════════════════════════════════════
+   PREPARED STATEMENTS
+═══════════════════════════════════════ */
+const stmts = {
+  findByUsername: db.prepare('SELECT * FROM subscribers WHERE username = ?'),
+  findById:       db.prepare('SELECT * FROM subscribers WHERE id = ?'),
+  listAll:        db.prepare('SELECT * FROM subscribers ORDER BY created_at DESC'),
+  insert:         db.prepare(`INSERT INTO subscribers
+                    (id, username, password_hash, full_name, gender, created_at, start_date, end_date, active, profile_edits)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0)`),
+  updatePassword:    db.prepare('UPDATE subscribers SET password_hash = ? WHERE id = ?'),
+  updateFullName:    db.prepare('UPDATE subscribers SET full_name = ? WHERE id = ?'),
+  updateActive:      db.prepare('UPDATE subscribers SET active = ? WHERE id = ?'),
+  updateEndDate:     db.prepare('UPDATE subscribers SET end_date = ?, active = 1 WHERE id = ?'),
+  resetEdits:        db.prepare('UPDATE subscribers SET profile_edits = 0 WHERE id = ?'),
+  saveProfile:       db.prepare('UPDATE subscribers SET profile = ?, macros = ?, profile_edits = profile_edits + 1 WHERE id = ?'),
+  savePlan:          db.prepare('UPDATE subscribers SET selected_plan = ? WHERE id = ?'),
+  saveProgress:      db.prepare('UPDATE subscribers SET workout_progress = ? WHERE id = ?'),
+  delete:            db.prepare('DELETE FROM subscribers WHERE id = ?'),
+};
 
 /* ═══════════════════════════════════════
    PUBLIC — subscriber login
 ═══════════════════════════════════════ */
 app.post('/api/login', async (req, res) => {
-  if (!db) return res.status(503).json({ error: 'db not configured' });
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'يرجى إدخال اسم المستخدم وكلمة المرور' });
 
   try {
-    const snap = await db.collection('subscribers')
-      .where('username', '==', username.trim().toLowerCase()).limit(1).get();
-    if (snap.empty) return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور خاطئة' });
+    const sub = stmts.findByUsername.get(username.trim().toLowerCase());
+    if (!sub) return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور خاطئة' });
 
-    const doc  = snap.docs[0];
-    const data = doc.data();
-    const ok   = await bcrypt.compare(password, data.passwordHash || '');
+    const ok = await bcrypt.compare(password, sub.password_hash || '');
     if (!ok) return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور خاطئة' });
 
-    const status = subscriptionStatus(data);
+    const status = subscriptionStatus(sub);
     if (!status.active) {
       return res.status(403).json({
         error: 'انتهت مدة اشتراكك',
@@ -99,19 +135,19 @@ app.post('/api/login', async (req, res) => {
       });
     }
 
-    const token = signToken({ sub: doc.id, username: data.username });
+    const token = signToken({ sub: sub.id, username: sub.username });
     res.json({
       token,
       user: {
-        id: doc.id,
-        username: data.username,
-        fullName: data.fullName,
-        gender: data.gender,
+        id: sub.id,
+        username: sub.username,
+        fullName: sub.full_name,
+        gender: sub.gender,
         daysLeft: status.daysLeft,
         endDate: status.endDate,
-        hasProfile: !!data.profile,
-        editsLeft: MAX_PROFILE_EDITS - (data.profileEdits || 0),
-        locked: (data.profileEdits || 0) >= MAX_PROFILE_EDITS,
+        hasProfile: !!sub.profile,
+        editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits || 0),
+        locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
       }
     });
   } catch (e) {
@@ -123,78 +159,69 @@ app.post('/api/login', async (req, res) => {
 /* ═══════════════════════════════════════
    SUBSCRIBER — self endpoints
 ═══════════════════════════════════════ */
-app.get('/api/me', auth, requireSubscriber, async (req, res) => {
-  try {
-    const sub = await fetchSubscriber(req.user.sub);
-    const status = subscriptionStatus(sub);
-    if (!status.active) return res.status(403).json({ error: 'انتهى اشتراكك', expired: true });
-    res.json({
-      id: sub.id,
-      username: sub.username,
-      fullName: sub.fullName,
-      gender: sub.gender,
-      profile: sub.profile || null,
-      macros: sub.macros || null,
-      daysLeft: status.daysLeft,
-      endDate: status.endDate,
-      editsLeft: MAX_PROFILE_EDITS - (sub.profileEdits || 0),
-      locked: (sub.profileEdits || 0) >= MAX_PROFILE_EDITS,
-      workoutProgress: sub.workoutProgress || {},
-      selectedPlan: sub.selectedPlan || null,
-    });
-  } catch { res.status(404).json({ error: 'not found' }); }
+app.get('/api/me', auth, requireSubscriber, (req, res) => {
+  const sub = stmts.findById.get(req.user.sub);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+  const status = subscriptionStatus(sub);
+  if (!status.active) return res.status(403).json({ error: 'انتهى اشتراكك', expired: true });
+  res.json({
+    id: sub.id,
+    username: sub.username,
+    fullName: sub.full_name,
+    gender: sub.gender,
+    profile: parseJson(sub.profile, null),
+    macros:  parseJson(sub.macros, null),
+    daysLeft: status.daysLeft,
+    endDate: status.endDate,
+    editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits || 0),
+    locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
+    workoutProgress: parseJson(sub.workout_progress, {}),
+    selectedPlan: sub.selected_plan || null,
+  });
 });
 
-app.post('/api/me/profile', auth, requireSubscriber, async (req, res) => {
+app.post('/api/me/profile', auth, requireSubscriber, (req, res) => {
   const { profile, macros } = req.body || {};
   if (!profile || !macros) return res.status(400).json({ error: 'incomplete data' });
-  try {
-    const sub = await fetchSubscriber(req.user.sub);
-    const edits = sub.profileEdits || 0;
-    if (edits >= MAX_PROFILE_EDITS) {
-      return res.status(403).json({
-        error: 'وصلتِ للحد الأقصى من التعديلات',
-        locked: true,
-        message: 'يرجى التواصل مع خدمة العملاء لإعادة تفعيل الحسابة'
-      });
-    }
-    await db.collection('subscribers').doc(req.user.sub).update({
-      profile, macros,
-      profileEdits: edits + 1,
-      lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+  const sub = stmts.findById.get(req.user.sub);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+  if ((sub.profile_edits || 0) >= MAX_PROFILE_EDITS) {
+    return res.status(403).json({
+      error: 'وصلتِ للحد الأقصى من التعديلات',
+      locked: true,
+      message: 'يرجى التواصل مع خدمة العملاء لإعادة تفعيل الحاسبة'
     });
-    res.json({ ok: true, editsLeft: MAX_PROFILE_EDITS - (edits + 1) });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
   }
+  stmts.saveProfile.run(JSON.stringify(profile), JSON.stringify(macros), sub.id);
+  res.json({ ok: true, editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits + 1) });
 });
 
-app.post('/api/me/plan', auth, requireSubscriber, async (req, res) => {
+app.post('/api/me/plan', auth, requireSubscriber, (req, res) => {
   const { selectedPlan } = req.body || {};
-  try {
-    await db.collection('subscribers').doc(req.user.sub).update({ selectedPlan });
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  stmts.savePlan.run(selectedPlan || null, req.user.sub);
+  res.json({ ok: true });
 });
 
-app.post('/api/me/progress', auth, requireSubscriber, async (req, res) => {
+app.post('/api/me/progress', auth, requireSubscriber, (req, res) => {
   const { exerciseId, weight, reps, date } = req.body || {};
   if (!exerciseId) return res.status(400).json({ error: 'exerciseId required' });
-  try {
-    const key = `workoutProgress.${exerciseId}`;
-    await db.collection('subscribers').doc(req.user.sub).update({
-      [key]: admin.firestore.FieldValue.arrayUnion({
-        weight: Number(weight) || 0,
-        reps: Number(reps) || 0,
-        date: date || new Date().toISOString(),
-      }),
-    });
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  const sub = stmts.findById.get(req.user.sub);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+  const progress = parseJson(sub.workout_progress, {});
+  if (!progress[exerciseId]) progress[exerciseId] = [];
+  progress[exerciseId].push({
+    weight: Number(weight) || 0,
+    reps: Number(reps) || 0,
+    date: date || new Date().toISOString(),
+  });
+  // keep only last 20 entries per exercise
+  if (progress[exerciseId].length > 20) progress[exerciseId] = progress[exerciseId].slice(-20);
+  stmts.saveProgress.run(JSON.stringify(progress), sub.id);
+  res.json({ ok: true });
 });
 
 /* ═══════════════════════════════════════
-   ADMIN — login + subscriber CRUD
+   ADMIN
 ═══════════════════════════════════════ */
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body || {};
@@ -204,35 +231,30 @@ app.post('/api/admin/login', (req, res) => {
   res.json({ token });
 });
 
-app.get('/api/admin/subscribers', auth, requireAdmin, async (_req, res) => {
-  if (!db) return res.status(503).json({ error: 'db not configured' });
-  try {
-    const snap = await db.collection('subscribers').orderBy('createdAt', 'desc').get();
-    const users = snap.docs.map(d => {
-      const data = d.data();
-      const st = subscriptionStatus(data);
-      return {
-        id: d.id,
-        username: data.username,
-        fullName: data.fullName,
-        gender: data.gender,
-        startDate: st.startDate,
-        endDate: st.endDate,
-        daysLeft: st.daysLeft,
-        active: st.active,
-        expired: st.expired,
-        profileEdits: data.profileEdits || 0,
-        editsLeft: MAX_PROFILE_EDITS - (data.profileEdits || 0),
-        locked: (data.profileEdits || 0) >= MAX_PROFILE_EDITS,
-        hasProfile: !!data.profile,
-      };
-    });
-    res.json({ subscribers: users });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+app.get('/api/admin/subscribers', auth, requireAdmin, (_req, res) => {
+  const rows = stmts.listAll.all();
+  const subscribers = rows.map(sub => {
+    const st = subscriptionStatus(sub);
+    return {
+      id: sub.id,
+      username: sub.username,
+      fullName: sub.full_name,
+      gender: sub.gender,
+      startDate: st.startDate,
+      endDate: st.endDate,
+      daysLeft: st.daysLeft,
+      active: st.active,
+      expired: st.expired,
+      profileEdits: sub.profile_edits || 0,
+      editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits || 0),
+      locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
+      hasProfile: !!sub.profile,
+    };
+  });
+  res.json({ subscribers });
 });
 
 app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
-  if (!db) return res.status(503).json({ error: 'db not configured' });
   const { username, password, fullName, gender, months } = req.body || {};
   if (!username || !password || !fullName)
     return res.status(400).json({ error: 'اسم المستخدم، كلمة المرور، والاسم الكامل مطلوبة' });
@@ -241,68 +263,74 @@ app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
   if (!/^[a-z0-9_.-]{3,30}$/.test(uname))
     return res.status(400).json({ error: 'اسم المستخدم: أحرف إنجليزية وأرقام فقط (3-30 حرف)' });
 
-  try {
-    const existing = await db.collection('subscribers').where('username', '==', uname).limit(1).get();
-    if (!existing.empty) return res.status(409).json({ error: 'اسم المستخدم موجود مسبقاً' });
+  const existing = stmts.findByUsername.get(uname);
+  if (existing) return res.status(409).json({ error: 'اسم المستخدم موجود مسبقاً' });
 
+  try {
     const now = Date.now();
     const durationMonths = Math.max(1, parseInt(months) || 1);
     const end = now + durationMonths * 30 * 86400000;
-
     const passwordHash = await bcrypt.hash(password, 10);
-    const doc = await db.collection('subscribers').add({
-      username: uname,
-      passwordHash,
-      fullName: fullName.trim(),
-      gender: gender === 'male' ? 'male' : 'female',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      startDate: admin.firestore.Timestamp.fromMillis(now),
-      endDate: admin.firestore.Timestamp.fromMillis(end),
-      active: true,
-      profileEdits: 0,
-    });
-    res.json({ ok: true, id: doc.id });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+    const id = newId();
+
+    stmts.insert.run(
+      id, uname, passwordHash, fullName.trim(),
+      gender === 'male' ? 'male' : 'female',
+      now, now, end
+    );
+    res.json({ ok: true, id });
+  } catch (e) {
+    console.error('create error:', e);
+    res.status(500).json({ error: 'حدث خطأ في إنشاء الحساب' });
+  }
 });
 
 app.patch('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => {
-  if (!db) return res.status(503).json({ error: 'db not configured' });
   const { newPassword, extendMonths, active, resetEdits, fullName } = req.body || {};
-  const updates = {};
+  const sub = stmts.findById.get(req.params.id);
+  if (!sub) return res.status(404).json({ error: 'not found' });
 
+  let changed = false;
   try {
-    if (newPassword) updates.passwordHash = await bcrypt.hash(newPassword, 10);
-    if (fullName)    updates.fullName     = fullName.trim();
-    if (active !== undefined) updates.active = !!active;
-    if (resetEdits)  updates.profileEdits  = 0;
-
+    if (newPassword) {
+      const hash = await bcrypt.hash(newPassword, 10);
+      stmts.updatePassword.run(hash, sub.id);
+      changed = true;
+    }
+    if (fullName) {
+      stmts.updateFullName.run(fullName.trim(), sub.id);
+      changed = true;
+    }
+    if (active !== undefined) {
+      stmts.updateActive.run(active ? 1 : 0, sub.id);
+      changed = true;
+    }
+    if (resetEdits) {
+      stmts.resetEdits.run(sub.id);
+      changed = true;
+    }
     if (extendMonths) {
-      const sub = await fetchSubscriber(req.params.id);
-      const currentEnd = sub.endDate?.toMillis ? sub.endDate.toMillis() : Date.now();
+      const currentEnd = sub.end_date || Date.now();
       const base = Math.max(currentEnd, Date.now());
       const newEnd = base + parseInt(extendMonths) * 30 * 86400000;
-      updates.endDate = admin.firestore.Timestamp.fromMillis(newEnd);
-      updates.active  = true;
+      stmts.updateEndDate.run(newEnd, sub.id);
+      changed = true;
     }
-
-    if (Object.keys(updates).length === 0)
-      return res.status(400).json({ error: 'لا يوجد تحديثات' });
-
-    await db.collection('subscribers').doc(req.params.id).update(updates);
+    if (!changed) return res.status(400).json({ error: 'لا يوجد تحديثات' });
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
-app.delete('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => {
-  if (!db) return res.status(503).json({ error: 'db not configured' });
-  try {
-    await db.collection('subscribers').doc(req.params.id).delete();
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+app.delete('/api/admin/subscribers/:id', auth, requireAdmin, (req, res) => {
+  const result = stmts.delete.run(req.params.id);
+  if (result.changes === 0) return res.status(404).json({ error: 'not found' });
+  res.json({ ok: true });
 });
 
 /* ═══════════════════════════════════════
-   ROUTES for HTML pages
+   ROUTES
 ═══════════════════════════════════════ */
 app.get('/admin', (_req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/app',   (_req, res) => res.sendFile(path.join(__dirname, 'app.html')));
