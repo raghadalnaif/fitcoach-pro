@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UR PASS — لوحة المدرب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#0000FF; --blue-d:#0000cc; --blue-l:#4d4dff; --blue-bg:#eef0ff;
+  --text:#0a0a1f; --muted:#6b6b8a; --border:#e2e6f5;
+  --bg:#f5f6fc; --surface:#ffffff; --surface2:#f7f8ff;
+  --red:#e63946; --green:#00a86b; --amber:#f59e0b;
+  --shadow:0 4px 20px rgba(0,0,255,.06); --shadow-lg:0 12px 40px rgba(0,0,255,.12);
+  --r:14px;
+  --font:'Tajawal',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+
+/* ── HEADER ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;
+  box-shadow:0 1px 4px rgba(0,0,255,.04)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:38px;height:38px;background:var(--blue);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px;letter-spacing:1px}
+.logo-text{font-size:18px;font-weight:900;color:var(--blue);letter-spacing:1px}
+.logo-sub{font-size:11px;color:var(--muted);font-weight:600}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn-logout{padding:9px 16px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── LOGIN GATE ── */
+.login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--surface);border-radius:20px;padding:36px 30px;width:100%;max-width:380px;
+  box-shadow:var(--shadow-lg)}
+.login-title{font-size:20px;font-weight:900;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px}
+
+/* ── MAIN LAYOUT ── */
+.container{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.page-title{font-size:26px;font-weight:900;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:900;color:var(--blue)}
+.stat-val.green{color:var(--green)}
+.stat-val.red{color:var(--red)}
+.stat-val.amber{color:var(--amber)}
+
+/* Toolbar */
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:var(--font);font-size:14px;background:var(--surface);outline:none}
+.search-input:focus{border-color:var(--blue)}
+.btn-primary{padding:11px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:7px}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+
+/* Subscriber cards grid */
+.subs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.sub-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;transition:all .2s;position:relative}
+.sub-card:hover{border-color:var(--blue-l);box-shadow:var(--shadow)}
+.sub-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sub-avatar{width:44px;height:44px;border-radius:12px;background:var(--blue-bg);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--blue)}
+.sub-avatar.female{background:#fef1f4;color:#e63946}
+.sub-info{flex:1;min-width:0}
+.sub-name{font-size:15px;font-weight:800;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-user{font-size:12px;color:var(--muted);font-family:monospace;direction:ltr;text-align:right}
+.sub-status{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.sub-status.active{background:#dcfce7;color:#166534}
+.sub-status.warn{background:#fef3c7;color:#92400e}
+.sub-status.expired{background:#fee2e2;color:#991b1b}
+.sub-meta{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+.sub-meta-item{display:flex;align-items:center;gap:5px}
+.sub-actions{display:flex;gap:6px;flex-wrap:wrap}
+.sub-btn{padding:7px 12px;font-family:var(--font);font-size:12px;font-weight:700;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;cursor:pointer;transition:all .2s}
+.sub-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sub-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.sub-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sub-btn.primary:hover{background:var(--blue-d);color:#fff}
+
+/* Empty state */
+.empty{background:var(--surface);border:2px dashed var(--border);border-radius:var(--r);
+  padding:60px 20px;text-align:center;color:var(--muted)}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:.5}
+.empty-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:13px;margin-bottom:20px}
+
+/* Modals */
+.modal-bg{position:fixed;inset:0;background:rgba(10,10,40,.5);backdrop-filter:blur(6px);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:20px;padding:26px;width:100%;max-width:440px;
+  max-height:90vh;overflow-y:auto;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:900}
+.modal-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;
+  width:32px;height:32px;border-radius:8px;font-family:var(--font);line-height:1;
+  display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:var(--font);font-size:14px;background:var(--surface);
+  outline:none;transition:all .2s;direction:rtl;text-align:right}
+.form-input:focus,.form-select:focus{border-color:var(--blue)}
+.form-input.ltr{direction:ltr;text-align:left}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:5px}
+
+.btn-form{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-form:hover{background:var(--blue-d)}
+.btn-form:disabled{opacity:.55;cursor:not-allowed}
+.btn-form.danger{background:var(--red)}
+.btn-form.danger:hover{background:#c81e2b}
+
+.credentials-box{background:var(--blue-bg);border:1.5px solid var(--blue);border-radius:12px;
+  padding:16px;margin-top:16px}
+.credentials-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:10px;text-align:center}
+.cred-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
+  border-bottom:1px dashed rgba(0,0,255,.15);font-size:14px}
+.cred-row:last-child{border-bottom:none}
+.cred-label{color:var(--muted);font-weight:600}
+.cred-val{font-family:monospace;font-weight:800;color:var(--blue);direction:ltr}
+.btn-copy{padding:9px 16px;background:var(--blue);color:#fff;border:none;border-radius:8px;
+  font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer;margin-top:12px;width:100%}
+.btn-copy:hover{background:var(--blue-d)}
+
+.error-msg{background:#fef1f2;color:var(--red);padding:10px 12px;border-radius:8px;
+  font-size:13px;font-weight:600;margin-bottom:14px;display:none}
+.error-msg.show{display:block}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:12px 22px;border-radius:12px;
+  font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow-lg);
+  animation:slideUp .3s ease}
+.toast.show{display:block}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+
+@media(max-width:640px){
+  .container{padding:16px 12px 40px}
+  .page-title{font-size:22px}
+  .subs-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="loginGate" class="login-gate">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:22px">
+      <div class="logo-mark" style="width:52px;height:52px;font-size:16px;margin:0 auto 10px">UP</div>
+      <div class="logo-text">UR PASS</div>
+      <div class="logo-sub">لوحة المدرب</div>
+    </div>
+    <div class="login-title">تسجيل دخول المدرب</div>
+    <div class="login-sub">أدخلي كلمة المرور الخاصة بلوحة التحكم</div>
+    <div class="error-msg" id="adminLoginError"></div>
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-input" id="adminPassword" placeholder="••••••••" required autofocus>
+      </div>
+      <button type="submit" class="btn-form" id="adminLoginBtn">دخول</button>
+    </form>
+    <div style="text-align:center;margin-top:16px">
+      <a href="/" style="font-size:12px;color:var(--muted);text-decoration:none">→ عودة لصفحة المشتركين</a>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD (hidden until logged in) -->
+<div id="dashboard" style="display:none">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-mark">UP</div>
+      <div>
+        <div class="logo-text">UR PASS</div>
+        <div class="logo-sub">لوحة المدرب</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-title">المشتركين</div>
+    <div class="page-sub">إدارة اشتراكات النادي</div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">إجمالي المشتركين</div><div class="stat-val" id="statTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">اشتراكات فعّالة</div><div class="stat-val green" id="statActive">0</div></div>
+      <div class="stat-card"><div class="stat-label">تنتهي قريباً (7 أيام)</div><div class="stat-val amber" id="statWarn">0</div></div>
+      <div class="stat-card"><div class="stat-label">منتهية</div><div class="stat-val red" id="statExpired">0</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="search-input" id="searchInput" placeholder="بحث بالاسم أو اسم المستخدم...">
+      <button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>
+    </div>
+
+    <div id="subsContainer"></div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="addModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">إضافة مشترك جديد</div>
+      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <div class="error-msg" id="addError"></div>
+    <div id="addFormWrap">
+      <form id="addForm">
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input type="text" class="form-input" id="addFullName" placeholder="فاطمة أحمد" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">الجنس</label>
+            <select class="form-select" id="addGender" required>
+              <option value="female">أنثى</option>
+              <option value="male">ذكر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">مدة الاشتراك</label>
+            <select class="form-select" id="addMonths" required>
+              <option value="1">شهر</option>
+              <option value="3">3 أشهر</option>
+              <option value="6">6 أشهر</option>
+              <option value="12">سنة</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">اسم المستخدم</label>
+          <input type="text" class="form-input ltr" id="addUsername" placeholder="fatima2026" required
+            pattern="[a-z0-9_.-]{3,30}" autocapitalize="off" autocomplete="off">
+          <div class="form-hint">أحرف إنجليزية وأرقام فقط (3-30 حرف)</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input ltr" id="addPassword" placeholder="مثال: ur1234" required minlength="4">
+            <button type="button" class="sub-btn" onclick="genPassword()">توليد</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-form" id="addBtn">إنشاء الحساب</button>
+      </form>
+    </div>
+    <div id="addSuccessWrap" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:44px">✅</div>
+        <div style="font-size:16px;font-weight:800;margin-top:8px">تم إنشاء الحساب</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">أرسلي هذه البيانات للمشترك</div>
+      </div>
+      <div class="credentials-box">
+        <div class="credentials-title">📋 بيانات الدخول</div>
+        <div class="cred-row"><span class="cred-label">اسم المستخدم</span><span class="cred-val" id="credUser">-</span></div>
+        <div class="cred-row"><span class="cred-label">كلمة المرور</span><span class="cred-val" id="credPass">-</span></div>
+        <div class="cred-row"><span class="cred-label">رابط الدخول</span><span class="cred-val" id="credUrl" style="font-size:11px">-</span></div>
+      </div>
+      <button class="btn-copy" onclick="copyCredentials()">📋 نسخ البيانات كاملة</button>
+      <button class="btn-form" style="margin-top:8px;background:var(--surface2);color:var(--text)" onclick="closeModal('addModal');resetAddForm()">تم — إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">تعديل مشترك</div>
+      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <div class="error-msg" id="editError"></div>
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800" id="editName">-</div>
+      <div style="font-size:12px;color:var(--muted);font-family:monospace;direction:ltr" id="editUser">-</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">تمديد الاشتراك</label>
+      <select class="form-select" id="editExtend">
+        <option value="">— لا تمديد —</option>
+        <option value="1">+ شهر</option>
+        <option value="3">+ 3 أشهر</option>
+        <option value="6">+ 6 أشهر</option>
+        <option value="12">+ سنة</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">كلمة مرور جديدة (اختياري)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-input ltr" id="editPassword" placeholder="اتركيها فارغة للإبقاء">
+        <button type="button" class="sub-btn" onclick="document.getElementById('editPassword').value=randomPassword()">توليد</button>
+      </div>
+    </div>
+    <div class="form-group" id="resetEditsGroup">
+      <label style="display:flex;gap:10px;align-items:center;cursor:pointer">
+        <input type="checkbox" id="editResetEdits" style="width:18px;height:18px;accent-color:var(--blue)">
+        <span style="font-size:14px;font-weight:700">إعادة تفعيل حاسبة السعرات (3 محاولات جديدة)</span>
+      </label>
+    </div>
+    <button class="btn-form" onclick="saveEdit()">حفظ التعديلات</button>
+    <button class="btn-form danger" style="margin-top:10px" onclick="confirmDelete()">🗑️ حذف الحساب نهائياً</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════ AUTH ═══════════════════ */
+const ADMIN_TOKEN_KEY = 'urpass_admin_token';
+
+let subscribers = [];
+let editingId = null;
+
+function isAdminLoggedIn() { return !!localStorage.getItem(ADMIN_TOKEN_KEY); }
+function adminToken() { return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function saveAdminToken(t) { localStorage.setItem(ADMIN_TOKEN_KEY, t); }
+function logout() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  location.reload();
+}
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${adminToken()}`,
+      ...(opts.headers || {}),
+    },
+  });
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401 || r.status === 403) {
+    logout();
+    throw new Error('unauthorized');
+  }
+  if (!r.ok) throw new Error(data.error || 'خطأ');
+  return data;
+}
+
+function toast(msg, kind = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + kind;
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════ INIT ═══════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  if (isAdminLoggedIn()) showDashboard();
+  else showLoginGate();
+});
+
+function showLoginGate() {
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadSubscribers();
+}
+
+/* ═══════════════════ ADMIN LOGIN ═══════════════════ */
+document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const pw = document.getElementById('adminPassword').value;
+  const btn = document.getElementById('adminLoginBtn');
+  const err = document.getElementById('adminLoginError');
+  btn.disabled = true; btn.textContent = 'جاري الدخول...';
+  err.classList.remove('show');
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'كلمة مرور خاطئة');
+    saveAdminToken(data.token);
+    showDashboard();
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'دخول';
+  }
+});
+
+/* ═══════════════════ LOAD SUBSCRIBERS ═══════════════════ */
+async function loadSubscribers() {
+  try {
+    const data = await api('/api/admin/subscribers');
+    subscribers = data.subscribers || [];
+    renderStats();
+    renderSubs();
+  } catch (e) {
+    if (e.message !== 'unauthorized') toast('فشل تحميل المشتركين: ' + e.message, 'error');
+  }
+}
+
+function renderStats() {
+  const total = subscribers.length;
+  const active = subscribers.filter(s => s.active).length;
+  const warn = subscribers.filter(s => s.active && s.daysLeft <= 7).length;
+  const expired = subscribers.filter(s => !s.active).length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statWarn').textContent = warn;
+  document.getElementById('statExpired').textContent = expired;
+}
+
+function initials(name = '') {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
+}
+
+function fmtDate(ms) {
+  if (!ms) return '-';
+  return new Date(ms).toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+}
+
+function renderSubs() {
+  const container = document.getElementById('subsContainer');
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const list = search
+    ? subscribers.filter(s => s.username.includes(search) || s.fullName.toLowerCase().includes(search))
+    : subscribers;
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">${search ? 'لا نتائج' : 'لا يوجد مشتركين بعد'}</div>
+        <div class="empty-sub">${search ? 'جرّبي بحث آخر' : 'ابدئي بإضافة أول مشترك'}</div>
+        ${!search ? '<button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="subs-grid">${list.map(sub => {
+    const statusCls = !sub.active ? 'expired' : sub.daysLeft <= 7 ? 'warn' : 'active';
+    const statusTxt = !sub.active ? 'منتهي' : sub.daysLeft <= 7 ? `${sub.daysLeft} يوم متبقي` : 'فعّال';
+    return `
+      <div class="sub-card">
+        <div class="sub-head">
+          <div class="sub-avatar ${sub.gender}">${initials(sub.fullName)}</div>
+          <div class="sub-info">
+            <div class="sub-name">${sub.fullName}</div>
+            <div class="sub-user">@${sub.username}</div>
+          </div>
+          <span class="sub-status ${statusCls}">${statusTxt}</span>
+        </div>
+        <div class="sub-meta">
+          <div class="sub-meta-item">📅 ${fmtDate(sub.endDate)}</div>
+          <div class="sub-meta-item">✏️ ${sub.editsLeft}/3 تعديل</div>
+          ${sub.hasProfile ? '<div class="sub-meta-item">✓ حسّبت السعرات</div>' : ''}
+        </div>
+        <div class="sub-actions">
+          <button class="sub-btn primary" onclick="openEditModal('${sub.id}')">تعديل</button>
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
+document.getElementById('searchInput').addEventListener('input', renderSubs);
+
+/* ═══════════════════ ADD SUBSCRIBER ═══════════════════ */
+function openAddModal() {
+  resetAddForm();
+  document.getElementById('addModal').classList.add('open');
+}
+
+function resetAddForm() {
+  document.getElementById('addForm').reset();
+  document.getElementById('addFormWrap').style.display = 'block';
+  document.getElementById('addSuccessWrap').style.display = 'none';
+  document.getElementById('addError').classList.remove('show');
+  document.getElementById('addBtn').disabled = false;
+  document.getElementById('addBtn').textContent = 'إنشاء الحساب';
+}
+
+function randomPassword() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let p = '';
+  for (let i=0; i<7; i++) p += chars[Math.floor(Math.random()*chars.length)];
+  return p;
+}
+
+function genPassword() {
+  document.getElementById('addPassword').value = randomPassword();
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('addBtn');
+  const err = document.getElementById('addError');
+  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+  err.classList.remove('show');
+  const body = {
+    fullName: document.getElementById('addFullName').value.trim(),
+    gender:   document.getElementById('addGender').value,
+    months:   document.getElementById('addMonths').value,
+    username: document.getElementById('addUsername').value.trim().toLowerCase(),
+    password: document.getElementById('addPassword').value,
+  };
+  try {
+    await api('/api/admin/subscribers', { method:'POST', body:JSON.stringify(body) });
+    document.getElementById('credUser').textContent = body.username;
+    document.getElementById('credPass').textContent = body.password;
+    document.getElementById('credUrl').textContent  = location.origin + '/';
+    document.getElementById('addFormWrap').style.display = 'none';
+    document.getElementById('addSuccessWrap').style.display = 'block';
+    loadSubscribers();
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'إنشاء الحساب';
+  }
+});
+
+function copyCredentials() {
+  const user = document.getElementById('credUser').textContent;
+  const pass = document.getElementById('credPass').textContent;
+  const url  = document.getElementById('credUrl').textContent;
+  const text = `مرحباً في UR PASS 💙\n\nبيانات دخولك:\n\n🔗 الرابط: ${url}\n👤 اسم المستخدم: ${user}\n🔑 كلمة المرور: ${pass}\n\nنراك في التدريب!`;
+  navigator.clipboard.writeText(text).then(() => toast('تم نسخ البيانات ✓'));
+}
+
+/* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */
+function openEditModal(id) {
+  const sub = subscribers.find(s => s.id === id);
+  if (!sub) return;
+  editingId = id;
+  document.getElementById('editName').textContent = sub.fullName;
+  document.getElementById('editUser').textContent = '@' + sub.username;
+  document.getElementById('editExtend').value = '';
+  document.getElementById('editPassword').value = '';
+  document.getElementById('editResetEdits').checked = false;
+  document.getElementById('editError').classList.remove('show');
+  document.getElementById('editModal').classList.add('open');
+}
+
+async function saveEdit() {
+  const body = {};
+  const ext = document.getElementById('editExtend').value;
+  const pw  = document.getElementById('editPassword').value.trim();
+  const reset = document.getElementById('editResetEdits').checked;
+  if (ext) body.extendMonths = parseInt(ext);
+  if (pw)  body.newPassword  = pw;
+  if (reset) body.resetEdits = true;
+  if (Object.keys(body).length === 0) {
+    const err = document.getElementById('editError');
+    err.textContent = 'لم تختاري أي تعديل';
+    err.classList.add('show');
+    return;
+  }
+  try {
+    await api('/api/admin/subscribers/' + editingId, { method:'PATCH', body:JSON.stringify(body) });
+    closeModal('editModal');
+    toast('تم الحفظ ✓');
+    loadSubscribers();
+  } catch (e) {
+    const err = document.getElementById('editError');
+    err.textContent = e.message;
+    err.classList.add('show');
+  }
+}
+
+function confirmDelete() {
+  const sub = subscribers.find(s => s.id === editingId);
+  if (!sub) return;
+  if (!confirm(`حذف نهائي للمشترك "${sub.fullName}"؟\nلا يمكن التراجع.`)) return;
+  api('/api/admin/subscribers/' + editingId, { method:'DELETE' })
+    .then(() => { closeModal('editModal'); toast('تم الحذف ✓'); loadSubscribers(); })
+    .catch(e => toast(e.message, 'error'));
+}
+
+/* ═══════════════════ HELPERS ═══════════════════ */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(el => {
+  el.addEventListener('click', (e) => { if (e.target === el) el.classList.remove('open'); });
+});
+</script>
+</body>
+</html>

@@ -3,1266 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قارن | أفضل الأسعار من كل المتاجر</title>
+<title>UR PASS — تسجيل الدخول</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-
-<!-- Firebase Compat SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#f4f6ff; --surface:#ffffff; --surface2:#f0f2fc; --surface3:#e6eaf8;
-  --border:#dde2f4; --border2:#cdd4f0;
-  --primary:#6c5ce7; --primary-l:#8b7cf0; --primary-d:#5a4ad0;
-  --secondary:#00b894;
-  --gold:#d48000; --gold-bg:rgba(212,128,0,.08);
-  --red:#e84545; --green:#00b894;
-  --amazon:#c47000; --noon:#8a6d00; --aliexpress:#cc3333; --shein:#c43050; --temu:#cc4420;
-  --text:#1a1535; --muted:#6b6896; --subtle:#a0a0c0;
-  --r:16px; --r-sm:10px;
+  --blue:#0000FF; --blue-d:#0000cc; --blue-l:#4d4dff; --blue-bg:#eef0ff;
+  --text:#0a0a1f; --muted:#6b6b8a; --border:#e2e6f5;
+  --bg:#ffffff; --surface:#f7f8ff;
+  --red:#e63946; --green:#00a86b;
+  --shadow:0 10px 40px rgba(0,0,255,.12);
   --font:'Tajawal',system-ui,sans-serif;
-  --shadow:0 4px 20px rgba(80,80,180,.08);
-  --shadow-lg:0 12px 48px rgba(80,80,180,.14);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;overflow-x:hidden}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
+  direction:rtl;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--blue-bg) 0%,transparent 60%),var(--bg)}
 
-/* ── HEADER ── */
-.header{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;
-  background:rgba(255,255,255,.92);backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 1px 12px rgba(80,80,180,.06)}
-.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--secondary));
-  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.logo-name{font-size:22px;font-weight:900;letter-spacing:-0.5px;
-  background:linear-gradient(135deg,var(--primary-l),var(--secondary));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
-.header-nav{display:flex;align-items:center;gap:8px}
-.nav-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-sm);
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--muted);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
-  box-shadow:0 1px 4px rgba(80,80,180,.06)}
-.nav-btn:hover{border-color:var(--primary);color:var(--primary)}
-.user-avatar{width:34px;height:34px;border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;
-  cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:all .2s}
-.user-avatar:hover{border-color:var(--primary-l)}
+.login-card{background:var(--bg);border:1px solid var(--border);border-radius:24px;
+  padding:44px 36px;width:100%;max-width:420px;box-shadow:var(--shadow);animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── HERO ── */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:90px 20px 60px;position:relative;overflow:hidden}
-.hero-glow{position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 90% 55% at 50% -5%,rgba(108,92,231,.1) 0%,transparent 70%),
-    radial-gradient(ellipse 50% 35% at 85% 40%,rgba(0,184,148,.06) 0%,transparent 60%)}
-.hero-grid{position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(108,92,231,.07) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(108,92,231,.07) 1px,transparent 1px);
-  background-size:44px 44px;
-  mask-image:radial-gradient(ellipse 70% 70% at center,black,transparent);
-  -webkit-mask-image:radial-gradient(ellipse 70% 70% at center,black,transparent)}
-.hero-content{max-width:820px;width:100%;text-align:center;position:relative;z-index:1}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;
-  background:rgba(108,92,231,.08);border:1px solid rgba(108,92,231,.22);
-  color:var(--primary);padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:28px}
-.hero-title{font-size:clamp(36px,6.5vw,74px);font-weight:900;line-height:1.08;
-  letter-spacing:-1.5px;margin-bottom:18px}
-.hero-title .grad{background:linear-gradient(135deg,var(--primary-l),var(--secondary));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:clamp(15px,2.2vw,18px);color:var(--muted);margin-bottom:48px;line-height:1.65}
+.logo-wrap{text-align:center;margin-bottom:32px}
+.logo-svg{width:80px;height:80px;margin:0 auto 14px;display:block}
+.logo-name{font-size:32px;font-weight:900;color:var(--blue);letter-spacing:2px;line-height:1}
+.logo-tag{font-size:12px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:1px}
 
-/* ── SEARCH BOX ── */
-.search-box{background:var(--surface);border:1px solid var(--border2);border-radius:22px;
-  padding:22px;max-width:740px;margin:0 auto;width:100%;
-  box-shadow:var(--shadow-lg),0 0 0 1px rgba(108,92,231,.08)}
-.search-tabs{display:flex;gap:6px;padding:5px;background:var(--surface2);
-  border-radius:var(--r-sm);margin-bottom:18px;border:1px solid var(--border)}
-.s-tab{flex:1;padding:10px 14px;border-radius:8px;border:none;background:transparent;
-  color:var(--muted);font-family:var(--font);font-size:14px;font-weight:700;
-  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
-.s-tab.active{background:var(--surface);color:var(--primary);box-shadow:0 2px 10px rgba(108,92,231,.12)}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-.input-wrap{position:relative;margin-bottom:18px}
-.s-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
-  padding:14px 18px 14px 52px;color:var(--text);font-family:var(--font);font-size:16px;
-  font-weight:500;outline:none;transition:all .25s;direction:rtl}
-.s-input::placeholder{color:var(--subtle)}
-.s-input:focus{border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 3px rgba(108,92,231,.1)}
-.s-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--subtle);font-size:20px;pointer-events:none}
-.suggestions{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);
-  border:1px solid var(--border2);border-radius:12px;overflow:hidden;z-index:60;
-  box-shadow:var(--shadow);display:none}
-.suggestions.open{display:block}
-.sugg-item{padding:11px 16px;cursor:pointer;font-size:14px;
-  display:flex;align-items:center;gap:10px;transition:background .15s;color:var(--muted)}
-.sugg-item:hover{background:var(--surface2);color:var(--text)}
-.drop-zone{border:2px dashed var(--border2);border-radius:14px;padding:30px 20px;
-  text-align:center;cursor:pointer;transition:all .25s;margin-bottom:18px;position:relative;overflow:hidden}
-.drop-zone:hover,.drop-zone.over{border-color:var(--primary);background:rgba(124,107,240,.04)}
-.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{font-size:42px;margin-bottom:10px}
-.drop-label{font-size:15px;font-weight:700;color:var(--muted);margin-bottom:4px}
-.drop-hint{font-size:12px;color:var(--subtle)}
-.img-preview{display:none}
-.img-preview-inner{display:flex;align-items:center;gap:14px;padding:6px 0}
-.img-preview-inner img{width:80px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--primary)}
-.img-preview-name{font-size:14px;font-weight:700;margin-bottom:4px}
-.img-preview-ok{font-size:12px;color:var(--secondary)}
-.img-remove{margin-top:8px;padding:4px 12px;background:rgba(255,71,71,.12);
-  border:1px solid rgba(255,71,71,.25);color:var(--red);border-radius:8px;
-  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s}
-.img-remove:hover{background:rgba(255,71,71,.2)}
-.chips-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.chip{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;
-  border:1px solid var(--border);background:var(--surface2);cursor:pointer;
-  font-size:13px;font-weight:700;transition:all .2s;color:var(--muted);user-select:none}
-.chip-dot{width:8px;height:8px;border-radius:50%}
-.chip[data-p="amazon"] .chip-dot{background:var(--amazon)}
-.chip[data-p="noon"] .chip-dot{background:var(--noon)}
-.chip[data-p="aliexpress"] .chip-dot{background:var(--aliexpress)}
-.chip[data-p="shein"] .chip-dot{background:var(--shein)}
-.chip[data-p="temu"] .chip-dot{background:var(--temu)}
-.chip.on[data-p="amazon"]{border-color:var(--amazon);color:var(--amazon);background:rgba(255,153,0,.07)}
-.chip.on[data-p="noon"]{border-color:var(--noon);color:var(--noon);background:rgba(247,193,49,.07)}
-.chip.on[data-p="aliexpress"]{border-color:var(--aliexpress);color:var(--aliexpress);background:rgba(255,71,71,.07)}
-.chip.on[data-p="shein"]{border-color:var(--shein);color:var(--shein);background:rgba(233,69,96,.07)}
-.chip.on[data-p="temu"]{border-color:var(--temu);color:var(--temu);background:rgba(255,101,52,.07)}
-.btn-search{width:100%;padding:17px;background:linear-gradient(135deg,var(--primary),var(--primary-d));
-  color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:17px;font-weight:800;
-  cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
-.btn-search:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(124,107,240,.45)}
-.btn-search:active{transform:translateY(0)}
-.btn-search:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
-.platform-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:36px}
-.plt-pill{display:flex;align-items:center;gap:7px;background:var(--surface2);
-  border:1px solid var(--border);padding:6px 14px;border-radius:20px;
-  font-size:12px;font-weight:700;color:var(--muted)}
+.title{font-size:22px;font-weight:900;text-align:center;margin-bottom:6px}
+.subtitle{font-size:14px;color:var(--muted);text-align:center;margin-bottom:28px}
 
-/* ── HISTORY ── */
-.hist-section{padding:0 20px 60px;max-width:760px;margin:0 auto;display:none}
-.hist-title{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.hist-chips{display:flex;gap:8px;flex-wrap:wrap}
-.hist-chip{padding:7px 14px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;gap:6px}
-.hist-chip:hover{border-color:var(--primary);color:var(--text)}
-
-/* ── LOADING ── */
-#loadingSection{display:none;padding:60px 20px;max-width:900px;margin:0 auto;text-align:center}
-.loading-head{font-size:19px;font-weight:700;color:var(--muted);margin-bottom:8px}
-.loading-q{color:var(--primary-l)}
-.loading-sub{font-size:13px;color:var(--subtle);margin-bottom:36px}
-.loading-platforms{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.lp-card{display:flex;flex-direction:column;align-items:center;gap:10px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:20px 24px;min-width:110px;transition:all .35s}
-.lp-card.done{border-color:var(--secondary);box-shadow:0 0 24px rgba(0,212,168,.18)}
-.lp-name{font-size:12px;font-weight:700;color:var(--muted)}
-.spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--primary);
-  border-radius:50%;animation:spin .75s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.lp-check{font-size:26px}
-
-/* ── RESULTS ── */
-#resultsSection{display:none;padding:44px 20px 100px;max-width:1220px;margin:0 auto}
-.results-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
-.results-title{font-size:21px;font-weight:800}
-.results-q{color:var(--primary)}
-.results-sub{font-size:13px;color:var(--muted);margin-top:4px}
-.sort-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sort-label{font-size:12px;color:var(--muted);font-weight:700}
-.sort-btn{padding:7px 14px;border-radius:var(--r-sm);border:1px solid var(--border);
-  background:var(--surface2);color:var(--muted);font-size:13px;font-weight:700;
-  cursor:pointer;font-family:var(--font);transition:all .2s}
-.sort-btn.active{border-color:var(--primary);color:var(--primary-l);background:rgba(124,107,240,.1)}
-
-/* BEST DEAL */
-.best-deal{background:linear-gradient(130deg,rgba(212,128,0,.05),rgba(108,92,231,.05));
-  border:1.5px solid rgba(212,128,0,.22);border-radius:22px;padding:26px 30px;margin-bottom:30px;
-  display:flex;align-items:center;gap:24px;position:relative;overflow:hidden;animation:fadeUp .5s ease}
-.best-deal::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
-  background:radial-gradient(circle,rgba(244,185,66,.12),transparent 70%);pointer-events:none}
-.bd-crown{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
-.bd-crown-icon{font-size:40px}
-.bd-crown-label{font-size:10px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
-.bd-info{flex:1}
-.bd-name{font-size:19px;font-weight:800;margin-bottom:6px}
-.bd-platform{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px}
-.bd-prices{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.bd-price{font-size:34px;font-weight:900;color:var(--gold)}
-.bd-original{font-size:16px;color:var(--subtle);text-decoration:line-through}
-.bd-save{background:rgba(0,212,168,.13);color:var(--secondary);
-  border:1px solid rgba(0,212,168,.28);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
-.bd-meta{display:flex;align-items:center;gap:16px;margin-top:14px;font-size:13px;color:var(--muted);flex-wrap:wrap}
-.bd-actions{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
-.btn-buy{padding:13px 26px;background:linear-gradient(135deg,var(--gold),#da9e25);
-  color:#1a0e00;border:none;border-radius:var(--r-sm);font-family:var(--font);
-  font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap}
-.btn-buy:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,185,66,.4)}
-.btn-share{padding:10px 16px;background:var(--surface2);border:1px solid var(--border);
-  color:var(--muted);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;
-  font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-share:hover{border-color:var(--primary);color:var(--text)}
-
-/* PRODUCT CARDS */
-.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.pcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);
-  overflow:hidden;transition:all .25s;animation:fadeUp .5s ease both;position:relative}
-.pcard:hover{border-color:var(--primary-l);transform:translateY(-4px);box-shadow:var(--shadow)}
-.pcard.top-deal{border-color:rgba(244,185,66,.28)}
-.pcard.na{opacity:.5;pointer-events:none}
-.pbar{height:4px}
-.pbar.amazon{background:var(--amazon)}.pbar.noon{background:var(--noon)}
-.pbar.aliexpress{background:var(--aliexpress)}.pbar.shein{background:var(--shein)}.pbar.temu{background:var(--temu)}
-.pcbody{padding:16px}
-.pcard-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.ptag{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700}
-.pdot{width:9px;height:9px;border-radius:50%}
-.ptag.amazon .pdot{background:var(--amazon)}.ptag.noon .pdot{background:var(--noon)}
-.ptag.aliexpress .pdot{background:var(--aliexpress)}.ptag.shein .pdot{background:var(--shein)}.ptag.temu .pdot{background:var(--temu)}
-.pbadge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px}
-.badge-best{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(244,185,66,.3)}
-.badge-fast{background:rgba(0,212,168,.1);color:var(--secondary);border:1px solid rgba(0,212,168,.3)}
-
-/* PRODUCT IMAGE — real or emoji */
-.pimg-wrap{width:100%;height:160px;border-radius:10px;margin-bottom:12px;
-  overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center}
-.pimg-wrap img{width:100%;height:100%;object-fit:contain;padding:8px;display:block}
-.pimg-emoji{font-size:56px;display:flex;align-items:center;justify-content:center}
-
-/* HEART BUTTON */
-.heart-btn{position:absolute;top:46px;left:14px;
-  width:32px;height:32px;border-radius:50%;
-  background:rgba(255,71,71,.12);border:1px solid rgba(255,71,71,.25);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:16px;transition:all .2s;z-index:5}
-.heart-btn:hover{background:rgba(255,71,71,.25);transform:scale(1.15)}
-.heart-btn.saved{background:rgba(255,71,71,.25);border-color:var(--red)}
-
-.pname{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;line-height:1.45;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.pprice-row{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.pprice{font-size:21px;font-weight:900}
-.poriginal{font-size:12px;color:var(--subtle);text-decoration:line-through}
-.pdiscount{font-size:11px;font-weight:700;color:var(--secondary)}
-.prating{display:flex;align-items:center;gap:5px;margin-bottom:10px}
-.stars{color:var(--gold);font-size:12px}
-.rnum{font-size:13px;font-weight:700}
-.rcnt{font-size:11px;color:var(--subtle)}
-.pmeta{display:flex;gap:10px;font-size:12px;color:var(--muted);margin-bottom:14px;flex-wrap:wrap}
-.btn-pcard{width:100%;padding:11px;border-radius:var(--r-sm);border:1px solid;
-  font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;
-  text-decoration:none;display:block;text-align:center}
-.btn-pcard.amazon{background:rgba(255,153,0,.1);color:var(--amazon);border-color:rgba(255,153,0,.25)}
-.btn-pcard.noon{background:rgba(247,193,49,.1);color:var(--noon);border-color:rgba(247,193,49,.25)}
-.btn-pcard.aliexpress{background:rgba(255,71,71,.1);color:var(--aliexpress);border-color:rgba(255,71,71,.25)}
-.btn-pcard.shein{background:rgba(233,69,96,.1);color:var(--shein);border-color:rgba(233,69,96,.25)}
-.btn-pcard.temu{background:rgba(255,101,52,.1);color:var(--temu);border-color:rgba(255,101,52,.25)}
-.btn-pcard:hover{filter:brightness(1.25);transform:translateY(-1px)}
-/* Extra options */
-.extras-wrap{margin-top:8px;display:flex;flex-direction:column;gap:5px}
-.extra-option{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;
-  background:var(--surface2);border:1px solid var(--border);text-decoration:none;
-  transition:background .15s;font-size:12px}
-.extra-option:hover{background:var(--surface3)}
-.extra-name{flex:1;color:var(--text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.extra-price{font-weight:800;white-space:nowrap}
-.extra-arrow{color:var(--subtle);font-size:14px}
-
-/* COMPARISON TABLE */
-.comp-wrap{margin-top:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.comp-head{padding:16px 22px;font-size:15px;font-weight:700;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.comp-table{width:100%;border-collapse:collapse}
-.comp-table th{padding:12px 20px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-.comp-table td{padding:14px 20px;font-size:14px;border-bottom:1px solid rgba(37,37,64,.5);vertical-align:middle}
-.comp-table tr:last-child td{border-bottom:none}
-.comp-table tr:hover td{background:rgba(255,255,255,.015)}
-.comp-table tr.best-row td{background:rgba(244,185,66,.035)}
-.tplatform{display:flex;align-items:center;gap:8px;font-weight:700}
-.tdot{width:10px;height:10px;border-radius:50%}
-.tprice{font-weight:900;font-size:16px}
-.new-search-wrap{text-align:center;margin-top:48px}
-.btn-new-search{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;
-  background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:14px;
-  font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .25s}
-.btn-new-search:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,107,240,.2)}
-
-/* ── AUTH MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(60,40,120,.35);z-index:500;
-  display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:22px;
-  padding:32px;width:100%;max-width:420px;animation:fadeUp .3s ease}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.modal-title{font-size:20px;font-weight:900}
-.modal-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;
-  font-family:var(--font);line-height:1;transition:color .2s}
-.modal-close:hover{color:var(--text)}
-.auth-tabs{display:flex;gap:6px;padding:5px;background:var(--surface2);border-radius:var(--r-sm);margin-bottom:24px}
-.auth-tab{flex:1;padding:9px;border-radius:8px;border:none;background:transparent;
-  color:var(--muted);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
-.auth-tab.active{background:var(--primary-d);color:#fff}
 .form-group{margin-bottom:16px}
-.form-label{display:block;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px}
-.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
-  padding:12px 14px;color:var(--text);font-family:var(--font);font-size:15px;outline:none;
-  transition:all .25s;direction:rtl}
-.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,92,231,.1)}
-.form-input::placeholder{color:var(--subtle)}
-.btn-auth{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),var(--primary-d));
-  color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:16px;
-  font-weight:800;cursor:pointer;transition:all .25s;margin-top:8px}
-.btn-auth:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,107,240,.4)}
-.btn-auth:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.auth-error{font-size:13px;color:var(--red);margin-bottom:12px;padding:10px 14px;
-  background:rgba(255,71,71,.08);border-radius:8px;border:1px solid rgba(255,71,71,.2);display:none}
+.form-label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px}
+.form-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 16px;color:var(--text);font-family:var(--font);font-size:15px;font-weight:500;
+  outline:none;transition:all .2s;direction:ltr;text-align:right}
+.form-input:focus{border-color:var(--blue);background:var(--bg);box-shadow:0 0 0 4px rgba(0,0,255,.08)}
+.form-input::placeholder{color:#b5b5c8;font-weight:400}
 
-/* ── FAVORITES MODAL ── */
-.fav-modal{max-width:700px}
-.fav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:4px}
-.fav-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;
-  padding:14px;position:relative;transition:all .2s}
-.fav-card:hover{border-color:var(--border2)}
-.fav-remove{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;
-  background:rgba(255,71,71,.15);border:1px solid rgba(255,71,71,.3);color:var(--red);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .2s}
-.fav-remove:hover{background:rgba(255,71,71,.3)}
-.fav-img{width:100%;height:80px;border-radius:8px;background:var(--surface3);
-  display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:10px;overflow:hidden}
-.fav-img img{width:100%;height:100%;object-fit:contain;padding:6px}
-.fav-name{font-size:12px;font-weight:600;margin-bottom:8px;line-height:1.35;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.fav-price{font-size:15px;font-weight:900;color:var(--gold)}
-.fav-meta{font-size:11px;color:var(--muted);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
-.fav-buy{width:100%;margin-top:10px;padding:8px;border-radius:8px;border:1px solid;
-  font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
-.fav-empty{text-align:center;padding:40px 20px;color:var(--muted)}
-.fav-empty-icon{font-size:48px;margin-bottom:12px}
+.btn-login{width:100%;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:12px;
+  font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-login:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,255,.28)}
+.btn-login:active{transform:translateY(0)}
+.btn-login:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* ── USER DROPDOWN ── */
-.user-menu{position:absolute;top:70px;left:20px;background:var(--surface);
-  border:1px solid var(--border2);border-radius:14px;padding:8px;
-  min-width:200px;box-shadow:var(--shadow);z-index:300;display:none;animation:fadeUp .2s ease}
-.user-menu.open{display:block}
-.user-info-box{padding:12px;border-bottom:1px solid var(--border);margin-bottom:6px}
-.user-name-display{font-size:14px;font-weight:700}
-.user-email-display{font-size:12px;color:var(--muted);margin-top:2px}
-.user-menu-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;
-  cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all .15s}
-.user-menu-item:hover{background:var(--surface2);color:var(--text)}
-.user-menu-item.danger{color:var(--red)}
-.user-menu-item.danger:hover{background:rgba(255,71,71,.08)}
+.error-box{background:#fef1f2;border:1px solid #f9c8cc;color:var(--red);
+  padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px;
+  display:none;text-align:right}
+.error-box.show{display:block;animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-/* ── TOAST ── */
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:var(--surface2);border:1px solid var(--border2);border-radius:12px;
-  padding:12px 26px;font-size:14px;font-weight:600;z-index:9999;
-  transition:transform .32s cubic-bezier(.34,1.56,.64,1);min-width:180px;
-  text-align:center;pointer-events:none;box-shadow:var(--shadow)}
-#toast.show{transform:translateX(-50%) translateY(0)}
-#toast.success{border-color:rgba(0,212,168,.4);color:var(--secondary)}
-#toast.error{border-color:rgba(255,71,71,.4);color:var(--red)}
-#toast.info{border-color:rgba(124,107,240,.4);color:var(--primary-l)}
+.help-note{font-size:12px;color:var(--muted);text-align:center;margin-top:22px;line-height:1.7}
+.help-note a{color:var(--blue);text-decoration:none;font-weight:700}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-
-footer{background:var(--surface);border-top:1px solid var(--border);
-  padding:22px 28px;text-align:center;color:var(--subtle);font-size:13px}
-footer span{color:var(--primary-l)}
-
-@media(max-width:768px){
-  .header{padding:0 14px}
-  .nav-txt{display:none}
-  .hero{padding:84px 14px 40px}
-  .search-box{padding:16px}
-  .results-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
-  .best-deal{flex-direction:column;align-items:flex-start;gap:18px}
-  .bd-actions{flex-direction:row;width:100%}
-  .btn-buy,.btn-share{flex:1}
-  .results-top{flex-direction:column}
-  .comp-table th,.comp-table td{padding:10px 12px;font-size:13px}
-}
-@media(max-width:420px){
-  .results-grid{grid-template-columns:1fr 1fr}
-  .chips{gap:6px}
-  .chip{padding:6px 10px;font-size:12px}
-}
+.admin-link{position:fixed;bottom:16px;left:16px;font-size:11px;color:#ccc;text-decoration:none;font-weight:600}
+.admin-link:hover{color:var(--blue)}
 </style>
 </head>
 <body>
 
-<div id="toast"></div>
+<div class="login-card">
+  <div class="logo-wrap">
+    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M25 20 L25 55 Q25 75 50 75 Q75 75 75 55 L75 20 L60 20 L60 55 Q60 62 50 62 Q40 62 40 55 L40 20 Z" fill="#0000FF"/>
+      <path d="M25 45 L25 80 L40 80 L40 65 L55 65 Q75 65 75 50 Q75 35 55 35 L25 35 Z M40 48 L55 48 Q60 48 60 50 Q60 52 55 52 L40 52 Z" fill="#0000FF" opacity=".92"/>
+    </svg>
+    <div class="logo-name">UR PASS</div>
+    <div class="logo-tag">FITNESS &amp; NUTRITION</div>
+  </div>
 
-<!-- ══════════ AUTH MODAL ══════════ -->
-<div class="modal-overlay" id="authModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="authModalTitle">مرحباً في قارن 👋</div>
-      <button class="modal-close" onclick="closeAuth()">✕</button>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="loginTab" onclick="switchAuth('login')">تسجيل الدخول</button>
-      <button class="auth-tab" id="registerTab" onclick="switchAuth('register')">حساب جديد</button>
-    </div>
+  <div class="title">تسجيل الدخول</div>
+  <div class="subtitle">أدخلي بيانات الدخول التي زوّدك بها المدرب</div>
 
-    <!-- Login -->
-    <div id="loginForm">
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني</label>
-        <input class="form-input" id="loginEmail" type="email" placeholder="example@gmail.com" style="direction:ltr">
-      </div>
-      <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <input class="form-input" id="loginPass" type="password" placeholder="••••••••">
-      </div>
-      <div class="auth-error" id="loginErr"></div>
-      <button class="btn-auth" id="loginBtn" onclick="doLogin()">دخول →</button>
-    </div>
+  <div class="error-box" id="errorBox"></div>
 
-    <!-- Register -->
-    <div id="registerForm" style="display:none">
-      <div class="form-group">
-        <label class="form-label">الاسم</label>
-        <input class="form-input" id="regName" placeholder="محمد أحمد">
-      </div>
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني</label>
-        <input class="form-input" id="regEmail" type="email" placeholder="example@gmail.com" style="direction:ltr">
-      </div>
-      <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <input class="form-input" id="regPass" type="password" placeholder="••••••••">
-      </div>
-      <div class="auth-error" id="regErr"></div>
-      <button class="btn-auth" id="regBtn" onclick="doRegister()">إنشاء حساب →</button>
+  <form id="loginForm">
+    <div class="form-group">
+      <label class="form-label">اسم المستخدم</label>
+      <input type="text" class="form-input" id="username" placeholder="username" autocomplete="username" required autofocus>
     </div>
+    <div class="form-group">
+      <label class="form-label">كلمة المرور</label>
+      <input type="password" class="form-input" id="password" placeholder="••••••••" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn-login" id="btnLogin">دخول</button>
+  </form>
+
+  <div class="help-note">
+    نسيتِ بياناتك؟ تواصلي مع المدرب لإعادة إرسالها
   </div>
 </div>
 
-<!-- ══════════ FAVORITES MODAL ══════════ -->
-<div class="modal-overlay" id="favModal">
-  <div class="modal fav-modal">
-    <div class="modal-header">
-      <div class="modal-title">❤️ مفضلتي</div>
-      <button class="modal-close" onclick="closeFav()">✕</button>
-    </div>
-    <div id="favContent">
-      <div class="fav-empty"><div class="fav-empty-icon">❤️</div>لا توجد منتجات محفوظة بعد</div>
-    </div>
-  </div>
-</div>
+<a href="/admin" class="admin-link">لوحة المدرب</a>
 
-<!-- ══════════ USER DROPDOWN ══════════ -->
-<div class="user-menu" id="userMenu">
-  <div class="user-info-box">
-    <div class="user-name-display" id="menuName">—</div>
-    <div class="user-email-display" id="menuEmail">—</div>
-  </div>
-  <div class="user-menu-item" onclick="openFav()">❤️ مفضلتي</div>
-  <div class="user-menu-item danger" onclick="doLogout()">🚪 تسجيل الخروج</div>
-</div>
-
-<!-- ══════════ HEADER ══════════ -->
-<header class="header">
-  <div class="logo" onclick="scrollTop()">
-    <div class="logo-icon">🔍</div>
-    <span class="logo-name">قارن</span>
-    <span class="logo-tag">BETA</span>
-  </div>
-  <nav class="header-nav">
-    <button class="nav-btn" onclick="goSearch()">
-      <span>🔍</span><span class="nav-txt">بحث جديد</span>
-    </button>
-    <button class="nav-btn" onclick="showHistory()">
-      <span>🕐</span><span class="nav-txt">السجل</span>
-    </button>
-    <!-- Guest -->
-    <button class="nav-btn" id="loginNavBtn" onclick="openAuth()">
-      <span>👤</span><span class="nav-txt">دخول</span>
-    </button>
-    <!-- Logged in -->
-    <div class="user-avatar" id="userAvatar" style="display:none" onclick="toggleMenu()">?</div>
-  </nav>
-</header>
-
-<!-- ══════════ HERO ══════════ -->
-<section class="hero" id="heroSection">
-  <div class="hero-glow"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">✨ مقارنة أسعار حقيقية من 5 متاجر عالمية</div>
-    <h1 class="hero-title">اشترِ بـ<span class="grad">أفضل سعر</span><br>من أي متجر تريده</h1>
-    <p class="hero-sub">ابحث عن أي منتج بالاسم أو الصورة<br>وسنقارن الأسعار الحقيقية فوراً من أمازون، نون، علي إكسبريس، شي ان، وتيمو</p>
-
-    <div class="search-box" id="searchBox">
-      <div class="search-tabs">
-        <button class="s-tab active" id="tabName" onclick="switchTab('name',this)">🔤 بحث بالاسم</button>
-        <button class="s-tab" id="tabImage" onclick="switchTab('image',this)">📷 بحث بالصورة</button>
-      </div>
-
-      <div class="tab-panel active" id="namePanel">
-        <div class="input-wrap">
-          <input class="s-input" id="searchInput" type="text"
-            placeholder="مثال: iPhone 15 Pro، سماعة JBL، حذاء نايك..."
-            autocomplete="off" oninput="onInput(this.value)" onkeydown="onKey(event)">
-          <span class="s-icon">🔍</span>
-          <div class="suggestions" id="suggestions"></div>
-        </div>
-      </div>
-
-      <div class="tab-panel" id="imagePanel">
-        <div class="drop-zone" id="dropZone"
-          ondragover="doDragOver(event)" ondragleave="doDragLeave()" ondrop="doDrop(event)">
-          <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
-          <div id="dropContent">
-            <div class="drop-icon">🖼️</div>
-            <div class="drop-label">اسحب صورة المنتج هنا</div>
-            <div class="drop-hint">أو انقر لاختيار صورة • PNG، JPG، WEBP</div>
-          </div>
-          <div class="img-preview" id="imgPreview">
-            <div class="img-preview-inner">
-              <img id="previewImg" src="" alt="preview">
-              <div>
-                <div class="img-preview-name" id="imgName">—</div>
-                <div class="img-preview-ok">✓ جاهز للبحث</div>
-                <button class="img-remove" onclick="removeImg()">✕ إزالة</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="chips-label">ابحث في هذه المتاجر</div>
-      <div class="chips" id="chips">
-        <div class="chip on" data-p="amazon"     onclick="toggleChip(this)"><span class="chip-dot"></span> أمازون</div>
-        <div class="chip on" data-p="noon"       onclick="toggleChip(this)"><span class="chip-dot"></span> نون</div>
-        <div class="chip on" data-p="aliexpress" onclick="toggleChip(this)"><span class="chip-dot"></span> علي إكسبريس</div>
-        <div class="chip on" data-p="shein"      onclick="toggleChip(this)"><span class="chip-dot"></span> شي ان</div>
-        <div class="chip on" data-p="temu"       onclick="toggleChip(this)"><span class="chip-dot"></span> تيمو</div>
-      </div>
-
-      <button class="btn-search" id="searchBtn" onclick="doSearch()">🚀 قارن الأسعار الآن</button>
-    </div>
-
-    <div class="platform-row">
-      <div class="plt-pill"><span>🟠</span> أمازون</div>
-      <div class="plt-pill"><span>🟡</span> نون</div>
-      <div class="plt-pill"><span>🔴</span> علي إكسبريس</div>
-      <div class="plt-pill"><span>💗</span> شي ان</div>
-      <div class="plt-pill"><span>🟠</span> تيمو</div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════ HISTORY ══════════ -->
-<div class="hist-section" id="histSection">
-  <div class="hist-title">🕐 عمليات البحث الأخيرة</div>
-  <div class="hist-chips" id="histChips"></div>
-</div>
-
-<!-- ══════════ LOADING ══════════ -->
-<div id="loadingSection">
-  <div class="loading-head">🔍 جارٍ البحث عن "<span class="loading-q" id="lqText"></span>"</div>
-  <div class="loading-sub">نبحث في المتاجر للعثور على أفضل سعر حقيقي لك...</div>
-  <div class="loading-platforms" id="lPlatforms"></div>
-</div>
-
-<!-- ══════════ RESULTS ══════════ -->
-<section id="resultsSection">
-  <div class="results-top">
-    <div>
-      <div class="results-title">نتائج: "<span class="results-q" id="rQuery"></span>"</div>
-      <div class="results-sub" id="rSub"></div>
-    </div>
-    <div class="sort-bar">
-      <span class="sort-label">ترتيب:</span>
-      <button class="sort-btn active" onclick="doSort('price',this)">💰 الأرخص</button>
-      <button class="sort-btn" onclick="doSort('delivery',this)">⚡ الأسرع</button>
-      <button class="sort-btn" onclick="doSort('rating',this)">⭐ الأعلى تقييماً</button>
-    </div>
-  </div>
-  <div id="bestDeal"></div>
-  <div class="results-grid" id="resultsGrid"></div>
-  <div id="compTable"></div>
-  <div class="new-search-wrap">
-    <button class="btn-new-search" onclick="goSearch()">🔄 ابحث عن منتج آخر</button>
-  </div>
-</section>
-
-<footer><span>قارن</span> — مقارنة أسعار حقيقية من أكبر 5 متاجر عالمية</footer>
-
-<!-- ══════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════ -->
 <script>
-/* ─── PLATFORMS ─── */
-const PLT = {
-  amazon:     { name:'أمازون',       color:'#FF9900', emoji:'🟠' },
-  noon:       { name:'نون',          color:'#F7C131', emoji:'🟡' },
-  aliexpress: { name:'علي إكسبريس', color:'#FF4747', emoji:'🔴' },
-  shein:      { name:'شي ان',        color:'#E94560', emoji:'💗' },
-  temu:       { name:'تيمو',         color:'#FF6534', emoji:'🟠' },
-};
+const form = document.getElementById('loginForm');
+const btn  = document.getElementById('btnLogin');
+const err  = document.getElementById('errorBox');
 
-const PLT_EMOJI = { amazon:'📦', noon:'🛍️', aliexpress:'🏪', shein:'👗', temu:'🛒' };
+// If already logged in, go to app
+if (localStorage.getItem('urpass_token')) location.href = '/app';
 
-/* ─── MOCK FALLBACK (when API not configured) ─── */
-const MOCK_DB = [
-  { kw:['iphone','ايفون','apple','ابل'], name:'Apple iPhone 15 Pro Max 256GB', emoji:'📱', bg:'linear-gradient(135deg,#1c1c2e,#2d2d4e)', cat:'هواتف',
-    p:{ amazon:{price:4799,orig:5299,del:'2-4 أيام',rat:4.8,rev:14523}, noon:{price:4999,orig:5299,del:'3-5 أيام',rat:4.7,rev:9871}, aliexpress:{price:3699,orig:4100,del:'15-25 يوم',rat:4.3,rev:52341}, shein:null, temu:{price:3450,orig:3900,del:'12-22 يوم',rat:4.0,rev:18932} } },
-  { kw:['samsung','سامسونج','galaxy','جالكسي'], name:'Samsung Galaxy S24 Ultra 256GB', emoji:'📱', bg:'linear-gradient(135deg,#0d3b66,#1a5f9e)', cat:'هواتف',
-    p:{ amazon:{price:4299,orig:4799,del:'1-3 أيام',rat:4.7,rev:23412}, noon:{price:4399,orig:4799,del:'2-4 أيام',rat:4.6,rev:15234}, aliexpress:{price:3299,orig:3700,del:'18-28 يوم',rat:4.2,rev:67234}, shein:null, temu:{price:3150,orig:3600,del:'15-25 يوم',rat:3.9,rev:24123} } },
-  { kw:['سماعة','headphone','سماعات','jbl','sony','سوني','airpods','ايربودز'], name:'Sony WH-1000XM5 سماعات لاسلكية', emoji:'🎧', bg:'linear-gradient(135deg,#1a1a2e,#16213e)', cat:'سماعات',
-    p:{ amazon:{price:1299,orig:1499,del:'2-4 أيام',rat:4.8,rev:18234}, noon:{price:1349,orig:1499,del:'3-5 أيام',rat:4.7,rev:9823}, aliexpress:{price:899,orig:1100,del:'18-28 يوم',rat:4.2,rev:43210}, shein:{price:799,orig:950,del:'14-21 يوم',rat:3.9,rev:8932}, temu:{price:749,orig:900,del:'15-23 يوم',rat:3.8,rev:19821} } },
-  { kw:['ساعة','watch','smartwatch'], name:'Apple Watch Series 9 GPS 45mm', emoji:'⌚', bg:'linear-gradient(135deg,#0f3460,#16213e)', cat:'ساعات',
-    p:{ amazon:{price:1799,orig:1999,del:'2-3 أيام',rat:4.8,rev:25341}, noon:{price:1849,orig:1999,del:'3-5 أيام',rat:4.7,rev:14523}, aliexpress:{price:1299,orig:1500,del:'20-30 يوم',rat:4.1,rev:56231}, shein:null, temu:{price:1199,orig:1400,del:'18-25 يوم',rat:3.9,rev:23142} } },
-  { kw:['laptop','لابتوب','macbook','ماك بوك'], name:'MacBook Air M3 16GB / 512GB', emoji:'💻', bg:'linear-gradient(135deg,#1c1c1e,#2c2c2e)', cat:'أجهزة',
-    p:{ amazon:{price:5499,orig:5999,del:'2-4 أيام',rat:4.9,rev:12341}, noon:{price:5699,orig:5999,del:'3-6 أيام',rat:4.8,rev:7823}, aliexpress:{price:4299,orig:4800,del:'18-28 يوم',rat:4.0,rev:32145}, shein:null, temu:null } },
-  { kw:['حذاء','shoes','نايك','nike','adidas','اديداس','sneakers'], name:'Nike Air Max 270', emoji:'👟', bg:'linear-gradient(135deg,#2d1b69,#11998e)', cat:'أحذية',
-    p:{ amazon:{price:449,orig:549,del:'2-4 أيام',rat:4.6,rev:43251}, noon:{price:479,orig:549,del:'3-5 أيام',rat:4.5,rev:28341}, aliexpress:{price:189,orig:250,del:'20-35 يوم',rat:3.8,rev:123421}, shein:{price:159,orig:220,del:'14-21 يوم',rat:3.7,rev:56721}, temu:{price:149,orig:210,del:'15-25 يوم',rat:3.6,rev:78921} } },
-  { kw:['عطر','perfume','dior','chanel','عطور'], name:'Dior Sauvage عطر رجالي 100ml', emoji:'🧴', bg:'linear-gradient(135deg,#1a0a2e,#2d1654)', cat:'عطور',
-    p:{ amazon:{price:599,orig:699,del:'2-4 أيام',rat:4.7,rev:23412}, noon:{price:649,orig:699,del:'3-5 أيام',rat:4.6,rev:15231}, aliexpress:{price:299,orig:380,del:'20-30 يوم',rat:3.9,rev:78231}, shein:{price:259,orig:320,del:'14-22 يوم',rat:3.7,rev:23141}, temu:{price:249,orig:310,del:'16-24 يوم',rat:3.6,rev:34521} } },
-  { kw:['شنطة','bag','حقيبة','backpack'], name:'حقيبة ظهر كلاسيكية 30L', emoji:'🎒', bg:'linear-gradient(135deg,#4a2040,#2d1b4e)', cat:'حقائب',
-    p:{ amazon:{price:199,orig:249,del:'2-4 أيام',rat:4.5,rev:18234}, noon:{price:219,orig:249,del:'3-5 أيام',rat:4.4,rev:12341}, aliexpress:{price:89,orig:130,del:'18-28 يوم',rat:4.0,rev:87231}, shein:{price:79,orig:110,del:'12-18 يوم',rat:3.9,rev:34521}, temu:{price:69,orig:100,del:'15-22 يوم',rat:3.8,rev:52341} } },
-];
+function showError(msg) {
+  err.textContent = msg;
+  err.classList.add('show');
+  setTimeout(() => err.classList.remove('show'), 5000);
+}
 
-const SUGG = [
-  {ic:'📱',t:'iPhone 15 Pro Max'},{ic:'📱',t:'Samsung Galaxy S24 Ultra'},
-  {ic:'🎧',t:'سماعة سوني WH-1000XM5'},{ic:'⌚',t:'Apple Watch Series 9'},
-  {ic:'💻',t:'MacBook Air M3'},{ic:'👟',t:'Nike Air Max 270'},
-  {ic:'🎮',t:'PS5 DualSense يد تحكم'},{ic:'🧴',t:'عطر Dior Sauvage'},
-  {ic:'👕',t:'هودي قطن كلاسيكي'},{ic:'📷',t:'Sony Alpha كاميرا'},
-];
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'جاري الدخول...';
 
-/* ─── STATE ─── */
-const S = {
-  tab: 'name',
-  platforms: ['amazon','noon','aliexpress','shein','temu'],
-  image: null, imageFile: null,
-  results: [],
-  history: JSON.parse(localStorage.getItem('q_hist') || '[]'),
-  favs: {},
-  currentUser: null,
-  usingMock: false,
-};
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
 
-let fb = null, fbAuth = null;
-
-/* ─── FIREBASE INIT ─── */
-async function initFirebase() {
   try {
-    const res = await fetch('/api/config');
-    const cfg = await res.json();
-    if (!cfg.apiKey) { console.warn('Firebase not configured'); return; }
-    fb = firebase.initializeApp(cfg);
-    fbAuth = firebase.auth();
-    fbAuth.onAuthStateChanged(onAuthChange);
-    console.log('✅ Firebase ready');
-  } catch (e) {
-    console.warn('Firebase config fetch failed:', e.message);
-  }
-}
-
-function onAuthChange(user) {
-  S.currentUser = user;
-  if (user) {
-    const initials = (user.displayName || user.email || '?')[0].toUpperCase();
-    document.getElementById('userAvatar').textContent = initials;
-    document.getElementById('userAvatar').style.display = 'flex';
-    document.getElementById('loginNavBtn').style.display = 'none';
-    document.getElementById('menuName').textContent = user.displayName || 'مستخدم';
-    document.getElementById('menuEmail').textContent = user.email;
-    loadFavIds();
-  } else {
-    document.getElementById('userAvatar').style.display = 'none';
-    document.getElementById('loginNavBtn').style.display = 'flex';
-    S.favs = {};
-  }
-}
-
-/* ─── AUTH ─── */
-function openAuth() {
-  if (!fbAuth) { toast('ميزة التسجيل غير متاحة — يرجى ضبط Firebase','error'); return; }
-  document.getElementById('authModal').classList.add('open');
-}
-function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
-function switchAuth(mode) {
-  document.getElementById('loginForm').style.display = mode==='login' ? '' : 'none';
-  document.getElementById('registerForm').style.display = mode==='register' ? '' : 'none';
-  document.getElementById('loginTab').classList.toggle('active', mode==='login');
-  document.getElementById('registerTab').classList.toggle('active', mode==='register');
-}
-
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  const err   = document.getElementById('loginErr');
-  const btn   = document.getElementById('loginBtn');
-  err.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'جارٍ الدخول...';
-  try {
-    await fbAuth.signInWithEmailAndPassword(email, pass);
-    closeAuth();
-    toast('أهلاً بك! 👋', 'success');
-  } catch (e) {
-    err.textContent = e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
-      ? 'بيانات الدخول غير صحيحة' : e.message;
-    err.style.display = 'block';
-  }
-  btn.disabled = false; btn.textContent = 'دخول →';
-}
-
-async function doRegister() {
-  const name  = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const pass  = document.getElementById('regPass').value;
-  const err   = document.getElementById('regErr');
-  const btn   = document.getElementById('regBtn');
-  err.style.display = 'none';
-  if (!name || !email || !pass) { showErr(err, 'يرجى ملء جميع الحقول'); return; }
-  if (pass.length < 6) { showErr(err, 'كلمة المرور 6 أحرف على الأقل'); return; }
-  btn.disabled = true; btn.textContent = 'جارٍ الإنشاء...';
-  try {
-    const cred = await fbAuth.createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({ displayName: name });
-    // Save user to backend (email collection)
-    await fetch('/api/users', {
+    const r = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uid: cred.user.uid, email, name }),
-    }).catch(() => {});
-    closeAuth();
-    toast('مرحباً ' + name + '! 🎉', 'success');
-  } catch (e) {
-    showErr(err, e.code === 'auth/email-already-in-use' ? 'هذا الإيميل مسجل مسبقاً' : e.message);
-  }
-  btn.disabled = false; btn.textContent = 'إنشاء حساب →';
-}
-
-function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
-
-async function doLogout() {
-  await fbAuth.signOut();
-  document.getElementById('userMenu').classList.remove('open');
-  toast('تم تسجيل الخروج', 'info');
-}
-
-function toggleMenu() {
-  document.getElementById('userMenu').classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('#userMenu') && !e.target.closest('#userAvatar'))
-    document.getElementById('userMenu').classList.remove('open');
-});
-
-/* ─── FAVORITES ─── */
-async function loadFavIds() {
-  if (!S.currentUser) return;
-  try {
-    const res = await fetch(`/api/favorites/${S.currentUser.uid}`);
-    const { favorites } = await res.json();
-    S.favs = {};
-    (favorites || []).forEach(f => {
-      const key = favKey(f.product);
-      S.favs[key] = f.id;
+      body: JSON.stringify({ username, password }),
     });
-  } catch {}
-}
+    const data = await r.json();
 
-function favKey(product) { return `${product.platform}_${product.name}`.slice(0,60); }
-
-async function toggleFav(product, btnEl) {
-  if (!S.currentUser) { openAuth(); return; }
-  const key = favKey(product);
-  if (S.favs[key]) {
-    // Remove
-    try {
-      await fetch(`/api/favorites/${S.favs[key]}`, { method: 'DELETE' });
-      delete S.favs[key];
-      btnEl.classList.remove('saved');
-      btnEl.textContent = '🤍';
-      toast('تمت الإزالة من المفضلة', 'info');
-    } catch {}
-  } else {
-    // Add
-    try {
-      const res = await fetch('/api/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: S.currentUser.uid, product }),
-      });
-      const { id } = await res.json();
-      S.favs[key] = id;
-      btnEl.classList.add('saved');
-      btnEl.textContent = '❤️';
-      toast('تمت الإضافة للمفضلة ❤️', 'success');
-    } catch {}
-  }
-}
-
-async function openFav() {
-  document.getElementById('userMenu').classList.remove('open');
-  if (!S.currentUser) { openAuth(); return; }
-  document.getElementById('favModal').classList.add('open');
-  document.getElementById('favContent').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ جارٍ التحميل...</div>';
-  try {
-    const res = await fetch(`/api/favorites/${S.currentUser.uid}`);
-    const { favorites } = await res.json();
-    renderFavs(favorites || []);
-  } catch {
-    document.getElementById('favContent').innerHTML = '<div class="fav-empty"><div class="fav-empty-icon">⚠️</div>تعذّر التحميل</div>';
-  }
-}
-
-function closeFav() { document.getElementById('favModal').classList.remove('open'); }
-
-function renderFavs(favs) {
-  if (!favs.length) {
-    document.getElementById('favContent').innerHTML = '<div class="fav-empty"><div class="fav-empty-icon">❤️</div><div>لا توجد منتجات محفوظة</div><div style="font-size:13px;color:var(--subtle);margin-top:6px">اضغط ❤️ على أي منتج لحفظه هنا</div></div>';
-    return;
-  }
-  const plt = PLT;
-  document.getElementById('favContent').innerHTML = `
-    <div class="fav-grid">
-      ${favs.map(f => {
-        const p   = f.product;
-        const pl  = plt[p.platform] || { name:p.platform, color:'#888' };
-        const img = p.image
-          ? `<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'">`
-          : `<span style="font-size:36px">${p.emoji||'📦'}</span>`;
-        return `<div class="fav-card">
-          <div class="fav-remove" onclick="removeFav('${f.id}',this.closest('.fav-card'))">✕</div>
-          <div class="fav-img">${img}</div>
-          <div class="fav-name">${p.name}</div>
-          <div class="fav-price">${p.price?.toLocaleString()} ر.س</div>
-          <div class="fav-meta">
-            <span style="color:${pl.color}">${pl.name}</span>
-            <span>⚡ ${p.delivery||''}</span>
-          </div>
-          <button class="fav-buy btn-pcard ${p.platform}" onclick="window.open('${p.link||'#'}','_blank')">
-            🛒 اشترِ الآن
-          </button>
-        </div>`;
-      }).join('')}
-    </div>`;
-}
-
-async function removeFav(id, cardEl) {
-  try {
-    await fetch(`/api/favorites/${id}`, { method:'DELETE' });
-    cardEl.remove();
-    // Remove from local map
-    for (const [k, v] of Object.entries(S.favs)) if (v===id) delete S.favs[k];
-    toast('تمت الإزالة','info');
-  } catch {}
-}
-
-/* ─── TABS & CHIPS ─── */
-function switchTab(tab, el) {
-  S.tab = tab;
-  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById(tab+'Panel').classList.add('active');
-}
-function toggleChip(el) {
-  const p = el.dataset.p;
-  if (el.classList.contains('on')) {
-    if (S.platforms.length<=1){ toast('اختر متجراً واحداً على الأقل','error'); return; }
-    el.classList.remove('on'); S.platforms = S.platforms.filter(x=>x!==p);
-  } else {
-    el.classList.add('on'); S.platforms.push(p);
-  }
-}
-
-/* ─── AUTOCOMPLETE ─── */
-function onInput(val) {
-  const box = document.getElementById('suggestions');
-  if (val.length < 2) { box.classList.remove('open'); return; }
-  const v = val.toLowerCase();
-  const hits = SUGG.filter(s => s.t.toLowerCase().includes(v) || v.includes(s.t.toLowerCase().split(' ')[0])).slice(0,5);
-  if (!hits.length) { box.classList.remove('open'); return; }
-  box.innerHTML = hits.map(s => `<div class="sugg-item" onclick="pickSugg('${s.t}')"><span>${s.ic}</span>${s.t}</div>`).join('');
-  box.classList.add('open');
-}
-function pickSugg(t) { document.getElementById('searchInput').value=t; document.getElementById('suggestions').classList.remove('open'); }
-function onKey(e) {
-  if (e.key==='Enter'){ document.getElementById('suggestions').classList.remove('open'); doSearch(); }
-  if (e.key==='Escape') document.getElementById('suggestions').classList.remove('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('.input-wrap')) document.getElementById('suggestions').classList.remove('open');
-});
-
-/* ─── IMAGE UPLOAD ─── */
-function doDragOver(e){ e.preventDefault(); document.getElementById('dropZone').classList.add('over'); }
-function doDragLeave(){ document.getElementById('dropZone').classList.remove('over'); }
-function doDrop(e){
-  e.preventDefault(); document.getElementById('dropZone').classList.remove('over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) loadImg(f); else toast('يرجى رفع صورة صالحة','error');
-}
-function onFileSelect(e){ if(e.target.files[0]) loadImg(e.target.files[0]); }
-function loadImg(file) {
-  S.imageFile = file;
-  const r = new FileReader();
-  r.onload = e => {
-    document.getElementById('previewImg').src = e.target.result;
-    document.getElementById('imgName').textContent = file.name;
-    document.getElementById('dropContent').style.display = 'none';
-    document.getElementById('imgPreview').style.display = 'block';
-  };
-  r.readAsDataURL(file);
-  toast('تم رفع الصورة ✓','success');
-}
-function removeImg() {
-  S.imageFile = null;
-  document.getElementById('fileInput').value = '';
-  document.getElementById('dropContent').style.display = 'block';
-  document.getElementById('imgPreview').style.display = 'none';
-}
-
-/* ─── MAIN SEARCH ─── */
-async function doSearch() {
-  const q = S.tab==='name' ? document.getElementById('searchInput').value.trim() : '';
-  const hasImg = S.tab==='image' && S.imageFile;
-  if (!q && !hasImg) { toast('يرجى إدخال اسم أو رفع صورة','error'); document.getElementById('searchInput').focus(); return; }
-  if (!S.platforms.length) { toast('اختر متجراً واحداً على الأقل','error'); return; }
-
-  if (q) saveHistory(q);
-  showLoading(q || '📷 '+(S.imageFile?.name||'الصورة'));
-  await fakeDelay();
-
-  let results = [], detectedName = '';
-  S.usingMock = false;
-
-  try {
-    if (hasImg) {
-      const form = new FormData();
-      form.append('image', S.imageFile);
-      const res = await fetch('/api/search-image', { method:'POST', body:form });
-      const data = await res.json();
-      if (data.fallback || !data.results) throw new Error('fallback');
-      results = data.results;
-      detectedName = data.detectedName || '';
-    } else {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      if (data.fallback || !data.results) throw new Error('fallback');
-      results = data.results;
-    }
-    // Filter by selected platforms
-    results = results.filter(r => S.platforms.includes(r.platform));
-  } catch {
-    // Fallback to mock
-    S.usingMock = true;
-    results = buildMock(q || detectedName || '');
-  }
-
-  // Track search count
-  if (S.currentUser) {
-    fetch(`/api/users/${S.currentUser.uid}/search`, { method:'POST' }).catch(()=>{});
-  }
-
-  const finalName = detectedName || q;
-  S.results = sortArr(results, 'price');
-  document.getElementById('loadingSection').style.display = 'none';
-  renderResults(finalName, S.results);
-}
-
-async function fakeDelay() {
-  const box = document.getElementById('lPlatforms');
-  const delays = [500,750,1000,1300,1600];
-  await Promise.all(S.platforms.map((p,i) =>
-    new Promise(res => setTimeout(()=>{
-      document.getElementById(`lp_${p}`)?.classList.add('done');
-      const sp = document.getElementById(`sp_${p}`);
-      if(sp) sp.outerHTML='<div class="lp-check">✅</div>';
-      res();
-    }, delays[i]||800+i*300))
-  ));
-  await new Promise(r=>setTimeout(r,300));
-}
-
-/* ─── MOCK FALLBACK ─── */
-function buildMock(q) {
-  const s = q.toLowerCase();
-  let prod = null;
-  for (const p of MOCK_DB) if (p.kw.some(k=>s.includes(k)||k.includes(s.split(' ')[0]))) { prod=p; break; }
-  // If no keyword match, build a generic product using the actual query
-  if (!prod) {
-    const base = Math.floor(Math.random()*400+80);
-    prod = {
-      name: q, emoji: '📦', bg: 'var(--surface2)',
-      p: {
-        amazon:     { price: Math.round(base*1.15), orig: Math.round(base*1.4), del:'2-4 أيام', rat:4.2, rev:1100 },
-        noon:       { price: Math.round(base*1.18), orig: Math.round(base*1.4), del:'3-5 أيام', rat:4.1, rev:740 },
-        aliexpress: { price: Math.round(base*0.55), orig: Math.round(base*0.75), del:'15-30 يوم', rat:4.0, rev:4200 },
-        shein:      { price: Math.round(base*0.50), orig: Math.round(base*0.70), del:'12-20 يوم', rat:3.9, rev:2800 },
-        temu:       { price: Math.round(base*0.48), orig: Math.round(base*0.68), del:'14-25 يوم', rat:3.8, rev:3500 },
+    if (!r.ok) {
+      if (data.expired) {
+        showError((data.error || 'انتهى اشتراكك') + ' — ' + (data.message || ''));
+      } else {
+        showError(data.error || 'حدث خطأ');
       }
-    };
+      btn.disabled = false;
+      btn.textContent = 'دخول';
+      return;
+    }
+
+    localStorage.setItem('urpass_token', data.token);
+    localStorage.setItem('urpass_user', JSON.stringify(data.user));
+    btn.textContent = 'تم — جاري التحويل...';
+    setTimeout(() => location.href = '/app', 400);
+  } catch (e) {
+    showError('تعذّر الاتصال بالخادم');
+    btn.disabled = false;
+    btn.textContent = 'دخول';
   }
-  return S.platforms.map(plt => {
-    const d = prod.p[plt];
-    if (!d) return null;
-    const v = 1+(Math.random()-.5)*.04;
-    return { platform:plt, name:prod.name, price:Math.round(d.price*v), orig:d.orig,
-      delivery:d.del, rating:d.rat, reviews:d.rev,
-      disc:Math.round((1-d.price/d.orig)*100), image:null, link: PLT_SEARCH_URL(plt, prod.name),
-      _emoji:prod.emoji, _bg:prod.bg };
-  }).filter(Boolean);
-}
-
-function PLT_SEARCH_URL(plt, q) {
-  const e = encodeURIComponent(q);
-  const urls = {
-    amazon:     `https://www.amazon.sa/s?k=${e}`,
-    noon:       `https://www.noon.com/saudi-en/search/?q=${e}`,
-    aliexpress: `https://www.aliexpress.com/wholesale?SearchText=${e}`,
-    shein:      `https://www.shein.com/search.html?q=${e}`,
-    temu:       `https://www.temu.com/search_result.html?search_key=${e}`,
-  };
-  return urls[plt] || '#';
-}
-
-/* ─── SORT ─── */
-function sortArr(res, by) {
-  return [...res].sort((a,b)=>{
-    if(by==='price')    return a.price-b.price;
-    if(by==='delivery') return parseInt(a.delivery||'99')-parseInt(b.delivery||'99');
-    if(by==='rating')   return (b.rating||0)-(a.rating||0);
-    return 0;
-  });
-}
-function doSort(by,el){
-  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  S.results=sortArr(S.results,by);
-  renderBD(S.results[0]);
-  renderGrid(S.results);
-  renderTable(S.results);
-  const lbl={price:'الأرخص',delivery:'الأسرع',rating:'الأعلى تقييماً'};
-  toast(`تم الترتيب: ${lbl[by]}`,'info');
-}
-
-/* ─── LOADING ─── */
-function showLoading(q) {
-  document.getElementById('lqText').textContent = q;
-  document.getElementById('loadingSection').style.display = 'block';
-  document.getElementById('resultsSection').style.display = 'none';
-  document.getElementById('histSection').style.display = 'none';
-  document.getElementById('lPlatforms').innerHTML = S.platforms.map(p =>
-    `<div class="lp-card" id="lp_${p}"><div class="spinner" id="sp_${p}"></div><div class="lp-name">${PLT[p].name}</div></div>`
-  ).join('');
-  document.getElementById('loadingSection').scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-/* ─── RENDER ─── */
-function renderResults(q, res) {
-  const sec = document.getElementById('resultsSection');
-  sec.style.display = 'block';
-  document.getElementById('rQuery').textContent = q || '📷 الصورة';
-  const note = S.usingMock ? ' — (أسعار تقريبية، البحث الحقيقي يحتاج إعداد API)' : '';
-  document.getElementById('rSub').textContent = `وجدنا ${res.length} عرض في ${[...new Set(res.map(r=>r.platform))].length} متجر${note}`;
-  renderBD(res[0]);
-  renderGrid(res);
-  renderTable(res);
-  setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'start'}),80);
-}
-
-function renderBD(r) {
-  const el = document.getElementById('bestDeal');
-  if (!r) { el.innerHTML=''; return; }
-  const plt  = PLT[r.platform];
-  const save = (r.orig||0) - r.price;
-  const disc = r.disc || (r.orig ? Math.round(save/r.orig*100) : 0);
-  el.innerHTML = `
-    <div class="best-deal">
-      <div class="bd-crown"><div class="bd-crown-icon">👑</div><div class="bd-crown-label">أفضل سعر</div></div>
-      <div class="bd-info">
-        <div class="bd-name">${r.name}</div>
-        <div class="bd-platform"><span style="color:${plt.color}">${plt.emoji}</span> ${plt.name}</div>
-        <div class="bd-prices">
-          <span class="bd-price">${r.price.toLocaleString()} ر.س</span>
-          ${r.orig ? `<span class="bd-original">${r.orig.toLocaleString()} ر.س</span>` : ''}
-          ${save>0 ? `<span class="bd-save">وفّر ${save.toLocaleString()} ر.س (-${disc}%)</span>` : ''}
-        </div>
-        <div class="bd-meta">
-          <span>⚡ التوصيل: <strong>${r.delivery||'—'}</strong></span>
-          ${r.rating ? `<span>⭐ <strong>${r.rating}/5</strong></span>` : ''}
-          ${r.reviews ? `<span style="color:var(--subtle)">(${Number(r.reviews).toLocaleString()} تقييم)</span>` : ''}
-        </div>
-      </div>
-      <div class="bd-actions">
-        <a class="btn-buy" href="${r.link||'#'}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">🛒 اشترِ من ${plt.name}</a>
-        <button class="btn-share" onclick="shareNow()">📤 مشاركة</button>
-      </div>
-    </div>`;
-}
-
-function renderGrid(res) {
-  // Group by platform, keep order of first appearance
-  const groups = {};
-  const order = [];
-  for (const r of res) {
-    if (!groups[r.platform]) { groups[r.platform] = []; order.push(r.platform); }
-    groups[r.platform].push(r);
-  }
-  const cheapest = res.reduce((m,r) => (!m||r.price<m.price)?r:m, null);
-
-  document.getElementById('resultsGrid').innerHTML = order.map((plt, gi) => {
-    const items = groups[plt];
-    const best  = items[0];
-    const info  = PLT[plt];
-    const fast  = parseInt(best.delivery||'99') <= 3;
-    const isCheapest = cheapest && best.platform === cheapest.platform && best.price === cheapest.price;
-    const fkey  = favKey(best);
-    const saved = !!S.favs[fkey];
-    const emoji = best._emoji || PLT_EMOJI[plt] || '📦';
-    const imgHtml = best.image
-      ? `<img src="${best.image}" alt="${best.name}" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="pimg-emoji" style="display:none">${emoji}</span>`
-      : `<span class="pimg-emoji">${emoji}</span>`;
-    const bgStyle = best.image ? '' : `background:${best._bg||'var(--surface3)'}`;
-
-    // Extra options (2nd, 3rd results for same platform)
-    const extras = items.slice(1).map((r,ei) => `
-      <a class="extra-option" href="${r.link||'#'}" target="_blank" rel="noopener">
-        <span class="extra-name">${r.name.length>55?r.name.slice(0,55)+'…':r.name}</span>
-        <span class="extra-price" style="color:${info.color}">${r.price.toLocaleString()} ر.س</span>
-        <span class="extra-arrow">←</span>
-      </a>`).join('');
-
-    return `
-      <div class="pcard ${isCheapest?'top-deal':''}" style="animation-delay:${gi*.1}s">
-        <div class="pbar ${plt}"></div>
-        <button class="heart-btn ${saved?'saved':''}"
-          onclick="toggleFav(${JSON.stringify(JSON.stringify(best)).slice(1,-1)},this)"
-          title="${saved?'إزالة من المفضلة':'إضافة للمفضلة'}">
-          ${saved?'❤️':'🤍'}
-        </button>
-        <div class="pcbody">
-          <div class="pcard-head">
-            <div class="ptag ${plt}"><div class="pdot"></div>${info.name}</div>
-            ${isCheapest?'<span class="pbadge badge-best">👑 الأرخص</span>':''}
-            ${fast?'<span class="pbadge badge-fast">⚡ سريع</span>':''}
-          </div>
-          <div class="pimg-wrap" style="${bgStyle}">${imgHtml}</div>
-          <div class="pname">${best.name}</div>
-          <div class="pprice-row">
-            ${best.noPrice
-              ? `<span class="pprice" style="color:${info.color};font-size:15px">تحقق من السعر ←</span>`
-              : `<span class="pprice" style="color:${info.color}">${best.price.toLocaleString()} ر.س</span>
-                 ${best.orig ? `<span class="poriginal">${best.orig.toLocaleString()}</span>` : ''}
-                 ${best.disc ? `<span class="pdiscount">-${best.disc}%</span>` : ''}`
-            }
-          </div>
-          ${best.rating ? `<div class="prating"><span class="stars">${mkStars(best.rating)}</span><span class="rnum">${best.rating}</span>${best.reviews?`<span class="rcnt">(${Number(best.reviews).toLocaleString()})</span>`:''}</div>` : ''}
-          <div class="pmeta"><span>⚡ ${best.delivery||'—'}</span></div>
-          <a class="btn-pcard ${plt}" href="${best.link||'#'}" target="_blank" rel="noopener">
-            🛒 اشترِ من ${info.name}
-          </a>
-          ${extras ? `<div class="extras-wrap">${extras}</div>` : ''}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function renderTable(res) {
-  if (!res.length) { document.getElementById('compTable').innerHTML=''; return; }
-  const minP = Math.min(...res.map(r=>r.price));
-  document.getElementById('compTable').innerHTML = `
-    <div class="comp-wrap">
-      <div class="comp-head">📊 جدول مقارنة شامل</div>
-      <table class="comp-table">
-        <thead><tr><th>المتجر</th><th>السعر</th><th>السعر الأصلي</th><th>التوفير</th><th>التوصيل</th><th>التقييم</th></tr></thead>
-        <tbody>
-          ${res.map(r=>{
-            const plt=PLT[r.platform]; const best=r.price===minP;
-            const save=(r.orig||0)-r.price;
-            return `<tr class="${best?'best-row':''}">
-              <td><div class="tplatform"><div class="tdot" style="background:${plt.color}"></div>${best?'👑 ':''}${plt.name}</div></td>
-              <td class="tprice" style="color:${plt.color}">${r.price.toLocaleString()} ر.س</td>
-              <td style="color:var(--subtle);text-decoration:line-through">${r.orig?r.orig.toLocaleString()+' ر.س':'—'}</td>
-              <td style="color:var(--secondary)">${save>0?save.toLocaleString()+' ر.س':'—'}</td>
-              <td>${r.delivery||'—'}</td>
-              <td>${r.rating?`⭐ ${r.rating}`:'—'} ${r.reviews?`<span style="color:var(--subtle);font-size:12px">(${Number(r.reviews).toLocaleString()})</span>`:''}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>`;
-}
-
-function mkStars(n) {
-  return '★'.repeat(Math.floor(n))+(n%1>=.5?'⭑':'')+('☆').repeat(5-Math.floor(n)-(n%1>=.5?1:0));
-}
-
-// Handle heart button data encoding safely
-function renderGrid_fixHeart() {}
-
-/* ─── HISTORY ─── */
-function saveHistory(q){ S.history=[q,...S.history.filter(h=>h!==q)].slice(0,12); localStorage.setItem('q_hist',JSON.stringify(S.history)); }
-function showHistory(){
-  if(!S.history.length){toast('لا يوجد سجل بعد','info');return;}
-  const sec=document.getElementById('histSection'); sec.style.display='block';
-  document.getElementById('histChips').innerHTML=S.history.map(q=>`<div class="hist-chip" onclick="histSearch('${q.replace(/'/g,"\\'")}')">🔍 ${q}</div>`).join('');
-  sec.scrollIntoView({behavior:'smooth',block:'center'});
-}
-function histSearch(q){ document.getElementById('searchInput').value=q; S.tab='name'; document.getElementById('tabName').click(); goSearch(); setTimeout(doSearch,250); }
-
-/* ─── MISC ─── */
-function shareNow(){
-  if(navigator.share) navigator.share({title:'قارن — أفضل سعر',url:location.href}).catch(()=>{});
-  else navigator.clipboard?.writeText(location.href).then(()=>toast('تم نسخ الرابط ✓','success'));
-}
-function goSearch(){ document.getElementById('searchBox').scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>document.getElementById('searchInput').focus(),500); }
-function scrollTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
-
-let _tt;
-function toast(msg,type='info'){
-  const t=document.getElementById('toast'); t.textContent=msg; t.className=`show ${type}`;
-  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),3200);
-}
-
-/* ─── INIT ─── */
-initFirebase();
-if (S.history.length) showHistory();
-
-// Fix heart button click to properly serialize product data
-document.addEventListener('click', e => {
-  const hb = e.target.closest('.heart-btn');
-  if (!hb) return;
-  const card = hb.closest('.pcard');
-  if (!card) return;
-  const idx = Array.from(document.querySelectorAll('.pcard')).indexOf(card);
-  if (idx >= 0 && S.results[idx]) {
-    e.stopPropagation();
-    toggleFav(S.results[idx], hb);
-  }
-}, true);
-
-// Remove inline onclick from heart buttons after render to avoid encoding issues
-const _origRenderGrid = renderGrid;
-window.renderGrid = function(res) {
-  _origRenderGrid(res);
-  document.querySelectorAll('.heart-btn').forEach((btn, i) => {
-    btn.removeAttribute('onclick');
-  });
-};
+});
 </script>
 </body>
 </html>
