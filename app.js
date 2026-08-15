@@ -220,13 +220,13 @@ document.getElementById('calcForm').addEventListener('submit', async (e) => {
     document.getElementById('heroProt').textContent = protein;
 
     updateEditsBadge();
-    toast('تم الحفظ ✓ لديكِ ' + state.editsLeft + ' محاولات متبقية');
+    toast('تم الحفظ لديكِ ' + state.editsLeft + ' محاولات متبقية');
 
-    btn.textContent = 'احسبي وحفظي 💾';
+    btn.textContent = 'احسبي وحفظي';
     btn.disabled = false;
   } catch (e) {
     toast(e.message, 'error');
-    btn.textContent = 'احسبي وحفظي 💾';
+    btn.textContent = 'احسبي وحفظي';
     btn.disabled = false;
   }
 });
@@ -235,22 +235,29 @@ document.getElementById('calcForm').addEventListener('submit', async (e) => {
 // Base plan designed for 1500 cal — everything scales proportionally
 const MEAL_BASE_CAL = 1500;
 
+const MEAL_ICONS = {
+  breakfast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+  lunch:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>',
+  snack:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z"/><path d="M12 6v6l4 2"/></svg>',
+  dinner:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>',
+};
+
 const MEAL_PLAN = [
   {
-    id: 'breakfast', name: 'الفطور', icon: '🌅', time: 'صباحاً — بعد الاستيقاظ',
+    id: 'breakfast', name: 'الفطور', time: 'صباحاً — بعد الاستيقاظ',
     options: [
-      { title: 'خيار 1 🥚', items: [
+      { title: 'خيار 1', items: [
           { n: 'بيضة كاملة + بياضتان', q: 140, u: 'غ' },
           { n: 'توست أسمر', q: 30, u: 'غ' },
           { n: 'طماطم + خيار', q: 0, u: 'بلا حد' },
         ], macros: { p: 24, c: 18, f: 10 } },
-      { title: 'خيار 2 🥣', items: [
+      { title: 'خيار 2', items: [
           { n: 'شوفان حبة كاملة (جاف)', q: 45, u: 'غ' },
           { n: 'زبادي يوناني خالي الدسم', q: 170, u: 'غ' },
           { n: 'توت مجمد / طازج', q: 60, u: 'غ' },
           { n: 'قرفة', q: 0, u: 'صفر سعرات' },
         ], macros: { p: 22, c: 45, f: 5 } },
-      { title: 'خيار 3 🥗', items: [
+      { title: 'خيار 3', items: [
           { n: 'بيضتان + بياض بيض', q: 130, u: 'غ' },
           { n: 'فلفل + سبانخ + بصل', q: 0, u: 'بلا حد' },
           { n: 'زيت زيتون', q: 5, u: 'ملعقة صغيرة' },
@@ -258,20 +265,20 @@ const MEAL_PLAN = [
     ]
   },
   {
-    id: 'lunch', name: 'الغداء — الوجبة الكبرى', icon: '🍽️', time: 'ظهراً — أهم وجبة',
+    id: 'lunch', name: 'الغداء — الوجبة الكبرى', time: 'ظهراً — أهم وجبة',
     options: [
-      { title: 'خيار 1 🍗', items: [
+      { title: 'خيار 1', items: [
           { n: 'صدر دجاج مشوي بالبهارات', q: 120, u: 'غ' },
           { n: 'أرز بني مطبوخ', q: 130, u: 'غ' },
           { n: 'زيت زيتون', q: 5, u: 'ملعقة صغيرة' },
           { n: 'سلطة خضراء / خضار مشوية', q: 0, u: 'بلا حد' },
         ], macros: { p: 39, c: 42, f: 12 } },
-      { title: 'خيار 2 🐟', items: [
+      { title: 'خيار 2', items: [
           { n: 'سلمون مشوي بالليمون والثوم', q: 110, u: 'غ' },
           { n: 'برغل مطبوخ', q: 130, u: 'غ' },
           { n: 'طماطم + خيار + بقدونس', q: 0, u: 'بلا حد' },
         ], macros: { p: 30, c: 40, f: 16 } },
-      { title: 'خيار 3 🍗', items: [
+      { title: 'خيار 3', items: [
           { n: 'صدر دجاج مسلوق بالبهارات', q: 120, u: 'غ' },
           { n: 'بطاطس مسلوقة بالكمون', q: 170, u: 'غ' },
           { n: 'زيت زيتون + ليمون', q: 8, u: 'ملعقة كبيرة' },
@@ -280,37 +287,37 @@ const MEAL_PLAN = [
     ]
   },
   {
-    id: 'snack', name: 'سناك العصر', icon: '🍎', time: 'بعد الظهر — قبل أو بعد التمرين',
+    id: 'snack', name: 'سناك العصر', time: 'بعد الظهر — قبل أو بعد التمرين',
     options: [
-      { title: 'خيار 1 🥛', items: [
+      { title: 'خيار 1', items: [
           { n: 'زبادي يوناني خالي الدسم', q: 170, u: 'غ' },
           { n: 'تفاحة صغيرة أو توت', q: 90, u: 'غ' },
         ], macros: { p: 19, c: 22, f: 0 } },
-      { title: 'خيار 2 🌴', items: [
+      { title: 'خيار 2', items: [
           { n: 'تمر', q: 24, u: '2 حبات' },
           { n: 'لوز نيء', q: 12, u: '6 حبات' },
         ], macros: { p: 4, c: 22, f: 8 } },
-      { title: 'خيار 3 🥛', items: [
+      { title: 'خيار 3', items: [
           { n: 'حليب قليل الدسم', q: 250, u: 'مل' },
           { n: 'موزة صغيرة', q: 90, u: 'غ' },
         ], macros: { p: 12, c: 32, f: 4 } },
     ]
   },
   {
-    id: 'dinner', name: 'العشاء', icon: '🌙', time: 'مساءً — قبل النوم بساعتين',
+    id: 'dinner', name: 'العشاء', time: 'مساءً — قبل النوم بساعتين',
     options: [
-      { title: 'خيار 1 🥩', items: [
+      { title: 'خيار 1', items: [
           { n: 'لحم مفروم خالي أو قليل الشحوم (نيء)', q: 110, u: 'غ' },
           { n: 'بطاطس حلوة مطبوخة', q: 130, u: 'غ' },
           { n: 'بهارات: كمون، كركم، ثوم بودرة', q: 0, u: 'صفر سعرات' },
         ], macros: { p: 29, c: 30, f: 12 } },
-      { title: 'خيار 2 🐔', items: [
+      { title: 'خيار 2', items: [
           { n: 'صدر دجاج مشوي أو مسلوق', q: 110, u: 'غ' },
           { n: 'برغل مطبوخ', q: 100, u: 'غ' },
           { n: 'زيت زيتون + ليمون', q: 5, u: 'ملعقة صغيرة' },
           { n: 'طماطم + خيار + بقدونس', q: 0, u: 'بلا حد' },
         ], macros: { p: 32, c: 27, f: 8 } },
-      { title: 'خيار 3 🐟', items: [
+      { title: 'خيار 3', items: [
           { n: 'تونة بالماء (مصفاة)', q: 110, u: 'غ' },
           { n: 'شريحة توست أسمر', q: 30, u: 'غ' },
           { n: 'أفوكادو', q: 45, u: 'غ' },
@@ -370,9 +377,12 @@ function renderMeals() {
     return `
       <div class="meal-block">
         <div class="meal-head">
-          <div>
-            <div class="meal-name">${meal.icon} ${meal.name}</div>
-            <div class="meal-time">${meal.time}</div>
+          <div class="meal-head-left">
+            <div class="meal-icon">${MEAL_ICONS[meal.id] || ''}</div>
+            <div>
+              <div class="meal-name">${meal.name}</div>
+              <div class="meal-time">${meal.time}</div>
+            </div>
           </div>
           <div class="meal-tag">MEAL 0${mi+1}</div>
         </div>
@@ -385,49 +395,49 @@ function renderMeals() {
 // Exercise DB — muscles, sets, reps, YouTube search query for videos
 const EX = {
   // Chest
-  bench_press:      { ar: 'بنش برس', en: 'Barbell Bench Press', m: 'صدر', ico: '💪' },
-  db_bench:         { ar: 'بنش دمبل', en: 'Dumbbell Bench Press', m: 'صدر', ico: '💪' },
-  incline_press:    { ar: 'بنش مائل', en: 'Incline Dumbbell Press', m: 'صدر علوي', ico: '💪' },
-  pushup:           { ar: 'ضغط أرضي', en: 'Push Up', m: 'صدر', ico: '💪' },
+  bench_press:      { ar: 'بنش برس', en: 'Barbell Bench Press', m: 'صدر', ico: '' },
+  db_bench:         { ar: 'بنش دمبل', en: 'Dumbbell Bench Press', m: 'صدر', ico: '' },
+  incline_press:    { ar: 'بنش مائل', en: 'Incline Dumbbell Press', m: 'صدر علوي', ico: '' },
+  pushup:           { ar: 'ضغط أرضي', en: 'Push Up', m: 'صدر', ico: '' },
 
   // Back
-  pullup:           { ar: 'العقلة', en: 'Pull Up', m: 'ظهر', ico: '🏋️' },
-  lat_pulldown:     { ar: 'سحب علوي', en: 'Lat Pulldown', m: 'ظهر', ico: '🏋️' },
-  bb_row:           { ar: 'تجديف بار', en: 'Barbell Row', m: 'ظهر', ico: '🏋️' },
-  db_row:           { ar: 'تجديف دمبل', en: 'Dumbbell Row', m: 'ظهر', ico: '🏋️' },
-  cable_row:        { ar: 'تجديف كابل', en: 'Cable Row', m: 'ظهر', ico: '🏋️' },
-  face_pull:        { ar: 'شد وجه', en: 'Face Pull', m: 'ظهر علوي', ico: '🏋️' },
+  pullup:           { ar: 'العقلة', en: 'Pull Up', m: 'ظهر', ico: '' },
+  lat_pulldown:     { ar: 'سحب علوي', en: 'Lat Pulldown', m: 'ظهر', ico: '' },
+  bb_row:           { ar: 'تجديف بار', en: 'Barbell Row', m: 'ظهر', ico: '' },
+  db_row:           { ar: 'تجديف دمبل', en: 'Dumbbell Row', m: 'ظهر', ico: '' },
+  cable_row:        { ar: 'تجديف كابل', en: 'Cable Row', m: 'ظهر', ico: '' },
+  face_pull:        { ar: 'شد وجه', en: 'Face Pull', m: 'ظهر علوي', ico: '' },
 
   // Shoulders
-  ohp:              { ar: 'ضغط أكتاف', en: 'Overhead Shoulder Press', m: 'أكتاف', ico: '💪' },
-  lateral_raise:    { ar: 'رفرفة جانبية', en: 'Lateral Raise', m: 'أكتاف جانبية', ico: '💪' },
+  ohp:              { ar: 'ضغط أكتاف', en: 'Overhead Shoulder Press', m: 'أكتاف', ico: '' },
+  lateral_raise:    { ar: 'رفرفة جانبية', en: 'Lateral Raise', m: 'أكتاف جانبية', ico: '' },
 
   // Arms
-  bicep_curl:       { ar: 'بايسبس دمبل', en: 'Dumbbell Bicep Curl', m: 'بايسبس', ico: '💪' },
-  hammer_curl:      { ar: 'هامر كيرل', en: 'Hammer Curl', m: 'بايسبس', ico: '💪' },
-  tricep_dip:       { ar: 'ديبس', en: 'Tricep Dips', m: 'ترايسبس', ico: '💪' },
-  tricep_ext:       { ar: 'تمديد ترايسبس', en: 'Tricep Extension', m: 'ترايسبس', ico: '💪' },
+  bicep_curl:       { ar: 'بايسبس دمبل', en: 'Dumbbell Bicep Curl', m: 'بايسبس', ico: '' },
+  hammer_curl:      { ar: 'هامر كيرل', en: 'Hammer Curl', m: 'بايسبس', ico: '' },
+  tricep_dip:       { ar: 'ديبس', en: 'Tricep Dips', m: 'ترايسبس', ico: '' },
+  tricep_ext:       { ar: 'تمديد ترايسبس', en: 'Tricep Extension', m: 'ترايسبس', ico: '' },
 
   // Legs / Glutes
-  squat:            { ar: 'سكوات بار', en: 'Barbell Squat', m: 'أرجل', ico: '🦵' },
-  goblet_squat:     { ar: 'سكوات دمبل', en: 'Goblet Squat', m: 'أرجل', ico: '🦵' },
-  sumo_squat:       { ar: 'سكوات سومو', en: 'Sumo Squat', m: 'أرجل داخلية + جلوت', ico: '🦵' },
-  bulgarian:        { ar: 'بلغاري سبليت', en: 'Bulgarian Split Squat', m: 'أرجل + جلوت', ico: '🦵' },
-  lunges:           { ar: 'اندفاع', en: 'Walking Lunges', m: 'أرجل', ico: '🦵' },
-  rdl:              { ar: 'رومانيان ديدلفت', en: 'Romanian Deadlift', m: 'ظهر سفلي + جلوت', ico: '🦵' },
-  deadlift:         { ar: 'ديدلفت', en: 'Deadlift', m: 'كامل الجسم', ico: '🏋️' },
-  hip_thrust:       { ar: 'هيب ثراست', en: 'Hip Thrust', m: 'جلوت', ico: '🍑' },
-  glute_bridge:     { ar: 'جلوت بريدج', en: 'Glute Bridge', m: 'جلوت', ico: '🍑' },
-  cable_kickback:   { ar: 'ركلة كابل', en: 'Cable Glute Kickback', m: 'جلوت', ico: '🍑' },
-  leg_press:        { ar: 'ليج برس', en: 'Leg Press', m: 'أرجل', ico: '🦵' },
-  leg_curl:         { ar: 'تجعيد أرجل', en: 'Leg Curl', m: 'خلفية الفخذ', ico: '🦵' },
-  leg_ext:          { ar: 'تمديد أرجل', en: 'Leg Extension', m: 'أمامية الفخذ', ico: '🦵' },
-  calf_raise:       { ar: 'رفع سمانة', en: 'Calf Raise', m: 'سمانة', ico: '🦵' },
+  squat:            { ar: 'سكوات بار', en: 'Barbell Squat', m: 'أرجل', ico: '' },
+  goblet_squat:     { ar: 'سكوات دمبل', en: 'Goblet Squat', m: 'أرجل', ico: '' },
+  sumo_squat:       { ar: 'سكوات سومو', en: 'Sumo Squat', m: 'أرجل داخلية + جلوت', ico: '' },
+  bulgarian:        { ar: 'بلغاري سبليت', en: 'Bulgarian Split Squat', m: 'أرجل + جلوت', ico: '' },
+  lunges:           { ar: 'اندفاع', en: 'Walking Lunges', m: 'أرجل', ico: '' },
+  rdl:              { ar: 'رومانيان ديدلفت', en: 'Romanian Deadlift', m: 'ظهر سفلي + جلوت', ico: '' },
+  deadlift:         { ar: 'ديدلفت', en: 'Deadlift', m: 'كامل الجسم', ico: '' },
+  hip_thrust:       { ar: 'هيب ثراست', en: 'Hip Thrust', m: 'جلوت', ico: '' },
+  glute_bridge:     { ar: 'جلوت بريدج', en: 'Glute Bridge', m: 'جلوت', ico: '' },
+  cable_kickback:   { ar: 'ركلة كابل', en: 'Cable Glute Kickback', m: 'جلوت', ico: '' },
+  leg_press:        { ar: 'ليج برس', en: 'Leg Press', m: 'أرجل', ico: '' },
+  leg_curl:         { ar: 'تجعيد أرجل', en: 'Leg Curl', m: 'خلفية الفخذ', ico: '' },
+  leg_ext:          { ar: 'تمديد أرجل', en: 'Leg Extension', m: 'أمامية الفخذ', ico: '' },
+  calf_raise:       { ar: 'رفع سمانة', en: 'Calf Raise', m: 'سمانة', ico: '' },
 
   // Core
-  plank:            { ar: 'بلانك', en: 'Plank', m: 'كور', ico: '🧘' },
-  russian_twist:    { ar: 'روسيان تويست', en: 'Russian Twist', m: 'كور جانبي', ico: '🧘' },
-  leg_raise:        { ar: 'رفع أرجل', en: 'Hanging Leg Raise', m: 'بطن سفلي', ico: '🧘' },
+  plank:            { ar: 'بلانك', en: 'Plank', m: 'كور', ico: '' },
+  russian_twist:    { ar: 'روسيان تويست', en: 'Russian Twist', m: 'كور جانبي', ico: '' },
+  leg_raise:        { ar: 'رفع أرجل', en: 'Hanging Leg Raise', m: 'بطن سفلي', ico: '' },
 };
 
 // Attach a set scheme: {sets, reps}
@@ -641,8 +651,7 @@ function renderPlanPicker(active = null) {
     const isOn = active === key;
     return `
       <div class="plan-card ${isOn ? 'on' : ''}" onclick="selectPlan('${key}')">
-        <div class="plan-check">✓</div>
-        <div class="plan-card-ico">${d === '3' ? '🌱' : d === '4' ? '🔥' : '⚡'}</div>
+        <div class="plan-check"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
         <div class="plan-card-days">${d}</div>
         <div class="plan-card-lbl">أيام / أسبوع</div>
       </div>`;
@@ -703,12 +712,15 @@ function renderDay(planKey, idx) {
     const videoUrl = state.videos[item.id];
     const preview = videoUrl
       ? `<video class="ex-video-inline" src="${videoUrl}" muted loop playsinline autoplay preload="metadata"></video>`
-      : `<div class="ex-img-placeholder">${e.ico}</div>`;
+      : `<svg class="ex-img-placeholder" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
+    const watchLabel = videoUrl
+      ? '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> اضغطي هنا لمشاهدة التمرين'
+      : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg> لا يوجد فيديو بعد';
     return `
       <div class="ex-card">
         <div class="ex-img-wrap" onclick="openExVideo('${item.id}')">
           ${preview}
-          <div class="ex-play">▶</div>
+          <div class="ex-play"><svg class="ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         </div>
         <div class="ex-info">
           <div class="ex-name">${e.ar}</div>
@@ -718,15 +730,13 @@ function renderDay(planKey, idx) {
             <div>مجموعات: <b>${item.sets}</b></div>
             <div>تكرارات: <b>${item.reps}</b></div>
           </div>
-          <button class="btn-watch" onclick="openExVideo('${item.id}')">
-            ${videoUrl ? '▶ اضغطي هنا لمشاهدة التمرين' : '📷 لا يوجد فيديو بعد'}
-          </button>
+          <button class="btn-watch" onclick="openExVideo('${item.id}')">${watchLabel}</button>
           <div class="ex-progress">
             <input type="number" id="w_${item.id}" placeholder="الوزن" value="${last?.weight || ''}">
             <input type="number" id="r_${item.id}" placeholder="التكرار" value="${last?.reps || ''}">
             <button class="ex-save" onclick="saveExercise('${item.id}')">حفظ</button>
           </div>
-          ${last ? `<div class="ex-last">✓ آخر تسجيل: ${last.weight} كجم × ${last.reps}</div>` : ''}
+          ${last ? `<div class="ex-last"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> آخر تسجيل: ${last.weight} كجم × ${last.reps}</div>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -743,7 +753,7 @@ async function saveExercise(exId) {
     });
     if (!state.workoutProgress[exId]) state.workoutProgress[exId] = [];
     state.workoutProgress[exId].push({ weight: +w, reps: +r, date: new Date().toISOString() });
-    toast('تم الحفظ ✓');
+    toast('تم الحفظ');
     renderDay(state.selectedPlan, state.currentDay);
   } catch (e) { toast(e.message, 'error'); }
 }
@@ -757,9 +767,9 @@ function openExVideo(exId) {
   if (title) title.textContent = e ? e.ar : '';
   if (!url) {
     frame.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fff;text-align:center;padding:20px">
-      <div style="font-size:56px;margin-bottom:12px">🎬</div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:56px;height:56px;margin-bottom:14px;opacity:.6"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
       <div style="font-size:16px;font-weight:800;margin-bottom:6px">لم يتم رفع الفيديو بعد</div>
-      <div style="font-size:13px;opacity:.8">اتواصلي مع المدرب لرفع فيديو الشرح</div>
+      <div style="font-size:13px;opacity:.7">تواصلي مع المدرب لرفع فيديو الشرح</div>
     </div>`;
   } else {
     frame.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>`;

@@ -8,54 +8,62 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --blue:#0000FF; --blue-d:#0000cc; --blue-l:#4d4dff; --blue-bg:#eef0ff;
-  --text:#0a0a1f; --muted:#6b6b8a; --border:#e2e6f5;
-  --bg:#ffffff; --surface:#f7f8ff;
-  --red:#e63946; --green:#00a86b;
-  --shadow:0 10px 40px rgba(0,0,255,.12);
+  --blue:#2626EC; --blue-d:#1E1EC7; --blue-l:#5252F1; --blue-bg:#EEF0FF;
+  --text:#0F172A; --muted:#64748B; --border:#E5E7EB;
+  --bg:#F8FAFC; --surface:#ffffff;
+  --red:#EF4444; --green:#10B981;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.04);
+  --shadow:0 4px 24px rgba(38,38,236,.08);
+  --shadow-lg:0 20px 60px rgba(38,38,236,.16);
   --font:'Tajawal',system-ui,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
   direction:rtl;display:flex;align-items:center;justify-content:center;padding:20px;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--blue-bg) 0%,transparent 60%),var(--bg)}
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%,rgba(38,38,236,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 30% at 100% 100%,rgba(38,38,236,.04) 0%,transparent 60%),
+    var(--bg)}
 
-.login-card{background:var(--bg);border:1px solid var(--border);border-radius:24px;
-  padding:44px 36px;width:100%;max-width:420px;box-shadow:var(--shadow);animation:fadeUp .5s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:44px 36px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);animation:fadeUp .5s cubic-bezier(.16,1,.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
-.logo-wrap{text-align:center;margin-bottom:32px}
-.logo-svg{width:80px;height:80px;margin:0 auto 14px;display:block}
-.logo-name{font-size:32px;font-weight:900;color:var(--blue);letter-spacing:2px;line-height:1}
-.logo-tag{font-size:12px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:1px}
+.logo-wrap{text-align:center;margin-bottom:36px}
+.logo-mark{width:64px;height:64px;background:var(--blue);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+  box-shadow:0 8px 24px rgba(38,38,236,.28)}
+.logo-mark svg{width:32px;height:32px;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.logo-name{font-size:24px;font-weight:900;color:var(--text);letter-spacing:2px;line-height:1}
+.logo-tag{font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;letter-spacing:2px;text-transform:uppercase}
 
-.title{font-size:22px;font-weight:900;text-align:center;margin-bottom:6px}
-.subtitle{font-size:14px;color:var(--muted);text-align:center;margin-bottom:28px}
+.title{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
+.subtitle{font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px}
 
-.form-group{margin-bottom:16px}
+.form-group{margin-bottom:18px}
 .form-label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px}
-.form-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+.form-input{width:100%;background:#F8FAFC;border:1.5px solid var(--border);border-radius:12px;
   padding:14px 16px;color:var(--text);font-family:var(--font);font-size:15px;font-weight:500;
   outline:none;transition:all .2s;direction:ltr;text-align:right}
-.form-input:focus{border-color:var(--blue);background:var(--bg);box-shadow:0 0 0 4px rgba(0,0,255,.08)}
-.form-input::placeholder{color:#b5b5c8;font-weight:400}
+.form-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(38,38,236,.08)}
+.form-input::placeholder{color:#94A3B8;font-weight:400}
 
-.btn-login{width:100%;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:12px;
-  font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
-.btn-login:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,255,.28)}
+.btn-login{width:100%;padding:15px;background:var(--blue);color:#fff;border:none;border-radius:12px;
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;
+  margin-top:8px;box-shadow:0 4px 16px rgba(38,38,236,.2)}
+.btn-login:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 24px rgba(38,38,236,.32)}
 .btn-login:active{transform:translateY(0)}
 .btn-login:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 
-.error-box{background:#fef1f2;border:1px solid #f9c8cc;color:var(--red);
+.error-box{background:#FEF2F2;border:1px solid #FECACA;color:var(--red);
   padding:12px 14px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px;
   display:none;text-align:right}
 .error-box.show{display:block;animation:shake .35s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-.help-note{font-size:12px;color:var(--muted);text-align:center;margin-top:22px;line-height:1.7}
-.help-note a{color:var(--blue);text-decoration:none;font-weight:700}
+.help-note{font-size:12px;color:var(--muted);text-align:center;margin-top:24px;line-height:1.7}
 
-.admin-link{position:fixed;bottom:16px;left:16px;font-size:11px;color:#ccc;text-decoration:none;font-weight:600}
+.admin-link{position:fixed;bottom:20px;left:20px;font-size:11px;color:#CBD5E1;text-decoration:none;font-weight:600;transition:color .2s}
 .admin-link:hover{color:var(--blue)}
 </style>
 </head>
@@ -63,12 +71,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 <div class="login-card">
   <div class="logo-wrap">
-    <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <path d="M25 20 L25 55 Q25 75 50 75 Q75 75 75 55 L75 20 L60 20 L60 55 Q60 62 50 62 Q40 62 40 55 L40 20 Z" fill="#0000FF"/>
-      <path d="M25 45 L25 80 L40 80 L40 65 L55 65 Q75 65 75 50 Q75 35 55 35 L25 35 Z M40 48 L55 48 Q60 48 60 50 Q60 52 55 52 L40 52 Z" fill="#0000FF" opacity=".92"/>
-    </svg>
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M6 3v10a6 6 0 0 0 12 0V3"/><path d="M9 8h6"/></svg>
+    </div>
     <div class="logo-name">UR PASS</div>
-    <div class="logo-tag">FITNESS &amp; NUTRITION</div>
+    <div class="logo-tag">Fitness &amp; Nutrition</div>
   </div>
 
   <div class="title">تسجيل الدخول</div>
@@ -88,9 +95,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <button type="submit" class="btn-login" id="btnLogin">دخول</button>
   </form>
 
-  <div class="help-note">
-    نسيتِ بياناتك؟ تواصلي مع المدرب لإعادة إرسالها
-  </div>
+  <div class="help-note">نسيتِ بياناتك؟ تواصلي مع المدرب لإعادة إرسالها</div>
 </div>
 
 <a href="/admin" class="admin-link">لوحة المدرب</a>
@@ -100,7 +105,6 @@ const form = document.getElementById('loginForm');
 const btn  = document.getElementById('btnLogin');
 const err  = document.getElementById('errorBox');
 
-// If already logged in, go to app
 if (localStorage.getItem('urpass_token')) location.href = '/app';
 
 function showError(msg) {
@@ -127,11 +131,7 @@ form.addEventListener('submit', async (e) => {
     const data = await r.json();
 
     if (!r.ok) {
-      if (data.expired) {
-        showError((data.error || 'انتهى اشتراكك') + ' — ' + (data.message || ''));
-      } else {
-        showError(data.error || 'حدث خطأ');
-      }
+      showError(data.expired ? (data.error + ' — ' + (data.message || '')) : (data.error || 'حدث خطأ'));
       btn.disabled = false;
       btn.textContent = 'دخول';
       return;
@@ -141,7 +141,7 @@ form.addEventListener('submit', async (e) => {
     localStorage.setItem('urpass_user', JSON.stringify(data.user));
     btn.textContent = 'تم — جاري التحويل...';
     setTimeout(() => location.href = '/app', 400);
-  } catch (e) {
+  } catch {
     showError('تعذّر الاتصال بالخادم');
     btn.disabled = false;
     btn.textContent = 'دخول';

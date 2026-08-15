@@ -8,233 +8,304 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --blue:#0000FF; --blue-d:#0000cc; --blue-l:#4d4dff; --blue-bg:#eef0ff;
-  --text:#0a0a1f; --muted:#6b6b8a; --border:#e2e6f5;
-  --bg:#f5f6fc; --surface:#ffffff; --surface2:#f7f8ff; --surface3:#eef0ff;
-  --red:#e63946; --green:#00a86b; --amber:#f59e0b; --pink:#ec4899;
-  --shadow:0 4px 20px rgba(0,0,255,.06); --shadow-lg:0 12px 40px rgba(0,0,255,.14);
-  --r:14px; --r-sm:10px;
+  --blue:#2626EC; --blue-d:#1E1EC7; --blue-l:#5252F1; --blue-bg:#EEF0FF; --blue-bg2:#F5F6FF;
+  --text:#0F172A; --muted:#64748B; --subtle:#94A3B8; --border:#E5E7EB;
+  --bg:#F8FAFC; --surface:#ffffff; --surface2:#F8FAFC;
+  --red:#EF4444; --green:#10B981; --amber:#F59E0B;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.04);
+  --shadow:0 4px 20px rgba(38,38,236,.06);
+  --shadow-lg:0 20px 60px rgba(38,38,236,.14);
+  --r:16px; --r-sm:10px;
   --font:'Tajawal',system-ui,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;padding-bottom:80px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
+  direction:rtl;padding-bottom:82px;-webkit-font-smoothing:antialiased}
+
+/* Icons — universal */
+.ico{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-lg{width:24px;height:24px}
+.ico-xl{width:32px;height:32px}
 
 /* ── HEADER ── */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;
   display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;
-  box-shadow:0 1px 4px rgba(0,0,255,.04)}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:36px;height:36px;background:var(--blue);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px;letter-spacing:1px}
-.logo-text{font-size:17px;font-weight:900;color:var(--blue);letter-spacing:1px}
-.header-user{display:flex;align-items:center;gap:12px}
-.user-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface2);
-  border-radius:20px;font-size:12px;font-weight:700}
-.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
-.user-avatar.female{background:var(--pink)}
-.days-left{padding:5px 11px;background:var(--green);color:#fff;border-radius:20px;font-size:11px;font-weight:800}
-.days-left.warn{background:var(--amber)}
-.btn-icon{background:none;border:none;padding:8px;cursor:pointer;color:var(--muted);
-  border-radius:8px;font-size:20px;line-height:1;transition:all .2s}
-.btn-icon:hover{background:var(--surface2);color:var(--red)}
+  box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:38px;height:38px;background:var(--blue);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;padding:6px;
+  box-shadow:0 4px 12px rgba(38,38,236,.24)}
+.brand-mark svg{width:100%;height:100%;fill:#fff}
+.brand-name{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
 
-/* ── TABS BAR (bottom on mobile, top on desktop) ── */
+.header-actions{display:flex;align-items:center;gap:10px}
+.badge-days{padding:6px 12px;background:var(--green);color:#fff;border-radius:20px;
+  font-size:11px;font-weight:800;letter-spacing:.3px}
+.badge-days.warn{background:var(--amber)}
+.btn-icon{background:var(--surface2);border:1px solid var(--border);padding:8px;cursor:pointer;color:var(--muted);
+  border-radius:10px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.btn-icon:hover{border-color:var(--red);color:var(--red);background:#FEF2F2}
+
+/* ── BOTTOM NAV ── */
 .tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
-  padding:8px 4px;display:flex;justify-content:space-around;z-index:20;box-shadow:0 -4px 20px rgba(0,0,255,.06)}
-.tab-btn{flex:1;background:none;border:none;padding:8px 4px;cursor:pointer;
+  padding:6px 4px;display:flex;justify-content:space-around;z-index:20;
+  box-shadow:0 -4px 20px rgba(15,23,42,.04)}
+.tab-btn{flex:1;background:none;border:none;padding:10px 4px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:var(--muted);font-family:var(--font);transition:color .15s}
+  color:var(--muted);font-family:var(--font);transition:color .15s;border-radius:10px}
 .tab-btn.active{color:var(--blue)}
-.tab-ico{font-size:22px;line-height:1}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-ico{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
 .tab-lbl{font-size:11px;font-weight:700}
 
 /* ── LAYOUT ── */
-.container{max-width:1000px;margin:0 auto;padding:20px 16px}
-.page{display:none;animation:fadeIn .3s ease}
+.container{max-width:1000px;margin:0 auto;padding:24px 16px}
+.page{display:none;animation:fadeIn .3s cubic-bezier(.16,1,.3,1)}
 .page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
+/* ── HERO ── */
 .hero-card{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);
-  color:#fff;border-radius:20px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
-.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;
-  background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%)}
-.hero-greeting{font-size:14px;font-weight:600;opacity:.85;margin-bottom:4px;position:relative}
-.hero-name{font-size:22px;font-weight:900;margin-bottom:14px;position:relative}
+  color:#fff;border-radius:20px;padding:28px 26px;margin-bottom:24px;position:relative;overflow:hidden;
+  box-shadow:0 20px 40px -12px rgba(38,38,236,.32)}
+.hero-card::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%)}
+.hero-card::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;
+  background:radial-gradient(circle,rgba(255,255,255,.08),transparent 65%)}
+.hero-greeting{font-size:13px;font-weight:600;opacity:.85;margin-bottom:6px;position:relative;letter-spacing:.3px}
+.hero-name{font-size:22px;font-weight:900;margin-bottom:20px;position:relative}
 .hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;position:relative}
-.hero-stat{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:12px;padding:10px 14px}
-.hero-stat-lbl{font-size:11px;font-weight:600;opacity:.85;margin-bottom:2px}
-.hero-stat-val{font-size:18px;font-weight:900}
+.hero-stat{background:rgba(255,255,255,.14);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px 14px}
+.hero-stat-lbl{font-size:11px;font-weight:600;opacity:.85;margin-bottom:3px}
+.hero-stat-val{font-size:19px;font-weight:900;letter-spacing:-.3px}
 
-.section-title{font-size:20px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.section-title .badge{font-size:10px;background:var(--blue-bg);color:var(--blue);padding:3px 9px;border-radius:20px;font-weight:800}
+/* ── SECTIONS ── */
+.section-title{font-size:19px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.section-title .badge{font-size:11px;background:var(--blue-bg);color:var(--blue);
+  padding:4px 10px;border-radius:20px;font-weight:800}
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
 .card-title{font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .ico{color:var(--blue)}
 
-.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-.qa-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 14px;
-  cursor:pointer;transition:all .2s;text-align:center;font-family:var(--font)}
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.qa-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:22px 14px;
+  cursor:pointer;transition:all .2s;text-align:center;font-family:var(--font);
+  display:flex;flex-direction:column;align-items:center}
 .qa-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow)}
-.qa-ico{font-size:32px;margin-bottom:8px}
+.qa-ico{width:32px;height:32px;stroke:var(--muted);stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px;transition:stroke .2s}
+.qa-btn:hover .qa-ico{stroke:var(--blue)}
 .qa-lbl{font-size:13px;font-weight:800;color:var(--text)}
 
-/* ── CALCULATOR ── */
-.calc-form{max-width:640px}
+/* ── TIPS LIST ── */
+.tips-list{list-style:none;padding:0}
+.tips-list li{padding:11px 0;padding-right:32px;position:relative;color:var(--muted);
+  font-size:14px;line-height:1.7;border-bottom:1px solid var(--border)}
+.tips-list li:last-child{border-bottom:none}
+.tips-list li::before{content:'';position:absolute;right:0;top:19px;width:6px;height:6px;
+  border-radius:50%;background:var(--blue)}
+.tips-list li b{color:var(--blue);font-weight:800}
+
+/* ── FORMS ── */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
-.form-input,.form-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.form-input,.form-select{width:100%;padding:13px 15px;border:1.5px solid var(--border);border-radius:11px;
   font-family:var(--font);font-size:14px;background:var(--surface);outline:none;transition:all .2s;
-  direction:rtl;text-align:right}
+  direction:rtl;text-align:right;color:var(--text)}
 .form-input.ltr{direction:ltr;text-align:center}
-.form-input:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,0,255,.08)}
-.form-hint{font-size:11px;color:var(--muted);margin-top:5px}
+.form-input:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(38,38,236,.08)}
+.form-hint{font-size:11px;color:var(--muted);margin-top:6px}
 
 .chip-row{display:flex;gap:8px;flex-wrap:wrap}
-.chip{padding:10px 14px;border:1.5px solid var(--border);background:var(--surface);border-radius:10px;
-  font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .2s}
+.chip{padding:11px 16px;border:1.5px solid var(--border);background:var(--surface);border-radius:11px;
+  font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s}
 .chip:hover{border-color:var(--blue-l)}
 .chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 
 .btn-primary{padding:14px 24px;background:var(--blue);color:#fff;border:none;border-radius:12px;
-  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s}
-.btn-primary:hover{background:var(--blue-d)}
-.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px rgba(38,38,236,.2)}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 24px rgba(38,38,236,.32)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-outline{padding:12px 20px;background:var(--surface);color:var(--blue);border:1.5px solid var(--blue);
-  border-radius:10px;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s}
+  border-radius:11px;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn-outline:hover{background:var(--blue-bg)}
 
-.edits-warning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px 14px;
-  border-radius:10px;font-size:13px;font-weight:600;margin-bottom:14px}
-.edits-warning.danger{background:#fef1f2;border-color:#f9c8cc;color:var(--red)}
+.edits-warning{background:#FEFCE8;border:1px solid #FDE68A;color:#854D0E;padding:14px 16px;
+  border-radius:12px;font-size:13px;font-weight:600;margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:10px}
+.edits-warning.danger{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+.edits-warning .ico{color:currentColor;flex-shrink:0;margin-top:1px}
 
+/* ── MACROS RESULT ── */
 .macros-result{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);color:#fff;
-  border-radius:16px;padding:24px;margin-top:20px;display:none}
+  border-radius:18px;padding:26px;margin-top:22px;display:none;
+  box-shadow:0 20px 40px -12px rgba(38,38,236,.32)}
 .macros-result.show{display:block;animation:fadeIn .4s}
-.macros-title{font-size:15px;font-weight:800;opacity:.9;margin-bottom:6px}
-.macros-cal{font-size:44px;font-weight:900;margin-bottom:16px;line-height:1}
+.macros-title{font-size:14px;font-weight:800;opacity:.9;margin-bottom:6px}
+.macros-cal{font-size:44px;font-weight:900;margin-bottom:18px;line-height:1;letter-spacing:-1px}
+.macros-cal span{font-size:16px;font-weight:600;opacity:.8;margin-right:6px}
 .macros-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.macro-card{background:rgba(255,255,255,.18);backdrop-filter:blur(10px);border-radius:12px;padding:14px 10px;text-align:center}
-.macro-val{font-size:22px;font-weight:900;margin-bottom:2px}
-.macro-lbl{font-size:11px;font-weight:700;opacity:.9}
+.macro-card{background:rgba(255,255,255,.18);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 10px;text-align:center}
+.macro-val{font-size:22px;font-weight:900;margin-bottom:3px;letter-spacing:-.5px}
+.macro-lbl{font-size:11px;font-weight:700;opacity:.85}
 
 /* ── MEAL PLAN ── */
-.meal-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}
-.ms-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center}
-.ms-val{font-size:22px;font-weight:900;color:var(--blue)}
-.ms-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+.meal-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:22px}
+.ms-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 12px;text-align:center;box-shadow:var(--shadow-sm)}
+.ms-val{font-size:22px;font-weight:900;color:var(--blue);letter-spacing:-.5px}
+.ms-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:3px}
 
 .meal-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:18px;margin-bottom:14px}
-.meal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.meal-name{font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px}
+  padding:20px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.meal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);gap:12px}
+.meal-head-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.meal-icon{width:40px;height:40px;background:var(--blue-bg);color:var(--blue);border-radius:11px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.meal-icon .ico{width:22px;height:22px}
+.meal-name{font-size:16px;font-weight:900;margin-bottom:2px}
 .meal-time{font-size:12px;color:var(--muted);font-weight:600}
-.meal-tag{font-size:10px;background:var(--blue-bg);color:var(--blue);padding:3px 8px;border-radius:20px;font-weight:800;letter-spacing:.5px}
+.meal-tag{font-size:10px;background:var(--surface2);color:var(--muted);padding:4px 10px;
+  border-radius:20px;font-weight:800;letter-spacing:.6px;border:1px solid var(--border);
+  align-self:flex-start;white-space:nowrap}
 
 .options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.opt-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px}
-.opt-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.opt-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.opt-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.opt-cal{background:var(--blue);color:#fff;padding:4px 10px;border-radius:20px;font-weight:900;font-size:11px}
 .opt-items{list-style:none;margin-bottom:12px}
-.opt-item{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px dashed var(--border)}
+.opt-item{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;
+  border-bottom:1px dashed var(--border);gap:8px}
 .opt-item:last-child{border-bottom:none}
 .opt-item-name{color:var(--text);font-weight:600;flex:1}
-.opt-item-qty{color:var(--muted);font-family:monospace;font-weight:700;font-size:12px}
+.opt-item-qty{color:var(--muted);font-family:'Segoe UI Mono',monospace;font-weight:700;font-size:12px;white-space:nowrap;direction:ltr}
 .opt-macros{display:flex;justify-content:space-between;padding-top:10px;border-top:1.5px solid var(--border);font-size:11px}
 .opt-macro{text-align:center;flex:1}
 .opt-macro-val{font-size:13px;font-weight:900;color:var(--blue)}
-.opt-macro-lbl{font-size:10px;color:var(--muted);font-weight:700}
-.opt-cal{background:var(--blue);color:#fff;padding:3px 10px;border-radius:20px;font-weight:900;font-size:12px}
+.opt-macro-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:1px}
 
-.free-list{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:14px}
-.free-list-title{font-size:13px;font-weight:800;color:#166534;margin-bottom:10px}
+.free-list{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px;margin-top:14px}
+.free-list-title{font-size:13px;font-weight:800;color:#166534;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px}
+.free-list-title .ico{color:#166534}
 .free-items{display:flex;gap:8px;flex-wrap:wrap}
-.free-item{background:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;color:#166534}
+.free-item{background:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;color:#166534}
 
 .meal-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 
-/* ── WORKOUTS ── */
+/* ── WORKOUT ── */
 .plan-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px}
-.plan-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:18px 14px;
+.plan-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:22px 14px;
   cursor:pointer;transition:all .2s;text-align:center;position:relative;font-family:var(--font)}
 .plan-card:hover{border-color:var(--blue-l);transform:translateY(-2px)}
-.plan-card.on{border-color:var(--blue);background:var(--blue-bg)}
-.plan-card-ico{font-size:32px;margin-bottom:6px}
-.plan-card-days{font-size:22px;font-weight:900;color:var(--blue);margin-bottom:2px}
+.plan-card.on{border-color:var(--blue);background:var(--blue-bg2)}
+.plan-card-days{font-size:32px;font-weight:900;color:var(--blue);margin-bottom:2px;letter-spacing:-1px}
 .plan-card-lbl{font-size:12px;font-weight:700;color:var(--muted)}
-.plan-check{position:absolute;top:8px;left:8px;width:20px;height:20px;border-radius:50%;
-  background:var(--blue);color:#fff;display:none;align-items:center;justify-content:center;font-size:12px}
+.plan-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;
+  background:var(--blue);color:#fff;display:none;align-items:center;justify-content:center}
+.plan-check .ico{width:14px;height:14px;stroke-width:3}
 .plan-card.on .plan-check{display:flex}
 
 .day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;
   scrollbar-width:none;-ms-overflow-style:none}
 .day-tabs::-webkit-scrollbar{display:none}
-.day-tab{padding:10px 18px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;
+.day-tab{padding:11px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:11px;
   font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;
-  transition:all .15s}
+  transition:all .15s;color:var(--text)}
+.day-tab:hover{border-color:var(--blue-l)}
 .day-tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 
 .exercise-list{display:flex;flex-direction:column;gap:12px}
 .ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:16px;display:flex;gap:14px;transition:all .2s}
+  padding:16px;display:flex;gap:14px;transition:all .2s;box-shadow:var(--shadow-sm)}
 .ex-card:hover{box-shadow:var(--shadow)}
-.ex-img-wrap{width:110px;height:110px;flex-shrink:0;border-radius:12px;overflow:hidden;
+.ex-img-wrap{width:120px;height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;
   background:var(--surface2);display:flex;align-items:center;justify-content:center;
   border:1px solid var(--border);cursor:pointer;position:relative}
-.ex-img{width:100%;height:100%;object-fit:cover;display:block}
 .ex-video-inline{width:100%;height:100%;object-fit:cover;display:block}
-.ex-img-placeholder{font-size:36px;color:var(--muted)}
-.ex-play{position:absolute;bottom:6px;right:6px;background:rgba(0,0,255,.9);color:#fff;
-  width:26px;height:26px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;opacity:.9}
-.ex-img-wrap:hover .ex-play{opacity:1;background:var(--blue-d)}
-.btn-watch{width:100%;padding:9px 12px;background:var(--blue-bg);color:var(--blue);
+.ex-img-placeholder{color:var(--subtle);width:44px;height:44px;stroke-width:1.5;
+  stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ex-play{position:absolute;bottom:8px;right:8px;background:var(--blue);color:#fff;
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;opacity:.95;
+  box-shadow:0 4px 12px rgba(38,38,236,.4)}
+.ex-play .ico{width:12px;height:12px;fill:currentColor;stroke-width:0}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:15px;font-weight:800;margin-bottom:3px}
+.ex-name-en{font-size:12px;color:var(--muted);font-family:'Segoe UI',sans-serif;direction:ltr;text-align:right;margin-bottom:8px}
+.ex-muscle{display:inline-block;background:var(--blue-bg);color:var(--blue);padding:3px 10px;
+  border-radius:20px;font-size:11px;font-weight:800;margin-bottom:10px}
+.ex-scheme{display:flex;gap:16px;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:10px}
+.ex-scheme b{color:var(--text);font-weight:900}
+.btn-watch{width:100%;padding:10px 12px;background:var(--blue-bg);color:var(--blue);
   border:1.5px solid var(--blue);border-radius:10px;font-family:var(--font);
-  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:10px;
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:12px;
   display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-watch:hover{background:var(--blue);color:#fff}
-.ex-info{flex:1;min-width:0}
-.ex-name{font-size:15px;font-weight:800;margin-bottom:4px}
-.ex-name-en{font-size:12px;color:var(--muted);font-family:'Segoe UI',sans-serif;direction:ltr;text-align:right;margin-bottom:8px}
-.ex-muscle{display:inline-block;background:var(--blue-bg);color:var(--blue);padding:2px 9px;
-  border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px}
-.ex-scheme{display:flex;gap:14px;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:8px}
-.ex-scheme b{color:var(--text);font-weight:900}
+.btn-watch .ico{width:14px;height:14px;fill:currentColor;stroke-width:0}
 .ex-progress{display:flex;gap:8px;align-items:center}
-.ex-progress input{width:70px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;
-  font-family:var(--font);font-size:13px;text-align:center;font-weight:700;direction:ltr}
-.ex-progress input:focus{border-color:var(--blue);outline:none}
-.ex-save{padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;
-  font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer}
+.ex-progress input{width:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:var(--font);font-size:13px;text-align:center;font-weight:700;direction:ltr;outline:none}
+.ex-progress input:focus{border-color:var(--blue)}
+.ex-save{padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer;transition:background .15s}
 .ex-save:hover{background:var(--blue-d)}
-.ex-last{font-size:11px;color:var(--green);font-weight:700;margin-top:4px}
+.ex-last{font-size:11px;color:var(--green);font-weight:700;margin-top:6px;
+  display:flex;align-items:center;gap:5px}
+.ex-last .ico{width:12px;height:12px;stroke-width:3}
 
-.day-summary{background:var(--blue-bg);border-radius:12px;padding:14px 18px;margin-bottom:14px;
+.day-summary{background:var(--blue-bg2);border:1px solid var(--blue-bg);border-radius:12px;
+  padding:16px 20px;margin-bottom:14px;
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .day-title{font-size:16px;font-weight:900;color:var(--blue)}
 .day-count{font-size:12px;color:var(--muted);font-weight:700}
 
 /* ── VIDEO MODAL ── */
-.video-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;
-  display:none;align-items:center;justify-content:center;padding:20px}
+.video-modal{position:fixed;inset:0;background:rgba(15,23,42,.9);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
 .video-modal.open{display:flex}
-.video-frame{width:100%;max-width:800px;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;position:relative}
-.video-frame iframe{width:100%;height:100%;border:none}
-.video-close{position:absolute;top:-40px;left:0;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;font-family:var(--font)}
+.video-frame{width:100%;max-width:800px;aspect-ratio:16/9;background:#000;border-radius:16px;
+  overflow:hidden;position:relative;box-shadow:var(--shadow-lg)}
+.video-frame video{width:100%;height:100%;background:#000}
+.video-close{position:absolute;top:-44px;left:0;background:none;border:none;color:#fff;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px}
+.video-close:hover{background:rgba(255,255,255,.1)}
 
-/* ── LOCKED STATE ── */
-.locked-overlay{background:#fff7ed;border:2px solid #fed7aa;border-radius:14px;padding:24px;
+/* ── LOCKED ── */
+.locked-overlay{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:16px;padding:32px 24px;
   text-align:center;margin:20px 0}
-.locked-icon{font-size:44px;margin-bottom:10px}
-.locked-title{font-size:17px;font-weight:800;color:#9a3412;margin-bottom:6px}
-.locked-msg{font-size:14px;color:#9a3412;margin-bottom:16px;line-height:1.6}
+.locked-icon{width:56px;height:56px;stroke:var(--amber);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block}
+.locked-title{font-size:17px;font-weight:800;color:#92400E;margin-bottom:8px}
+.locked-msg{font-size:14px;color:#92400E;margin-bottom:16px;line-height:1.7}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:40px 20px}
+.empty-ico{width:56px;height:56px;stroke:var(--subtle);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block}
+.empty-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-  background:var(--text);color:#fff;padding:11px 22px;border-radius:12px;
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:12px 22px;border-radius:12px;
   font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow-lg)}
-.toast.show{display:block;animation:slideUp .3s}
+.toast.show{display:block;animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
 .toast.success{background:var(--green)}
 .toast.error{background:var(--red)}
 @keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -249,7 +320,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   .meal-block{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:12px}
   .card{border:1px solid #ccc;box-shadow:none}
   .opt-box{background:#fafafa}
-  .print-header{display:block !important;margin-bottom:20px;padding:14px;border-bottom:2px solid var(--blue)}
+  .print-header{display:block !important;margin-bottom:20px;padding:14px 0;border-bottom:2px solid var(--blue)}
 }
 .print-header{display:none}
 
@@ -265,13 +336,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <body>
 
 <div class="header">
-  <div class="logo">
-    <div class="logo-mark">UP</div>
-    <div class="logo-text">UR PASS</div>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 200 200">
+        <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
+        <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
+        <path d="M148 96 l22 42 l-22 42 z"/>
+      </svg>
+    </div>
+    <div class="brand-name">UR PASS</div>
   </div>
-  <div class="header-user">
-    <span class="days-left" id="daysLeftBadge">-</span>
-    <button class="btn-icon" onclick="logout()" title="خروج">⏻</button>
+  <div class="header-actions">
+    <span class="badge-days" id="daysLeftBadge">—</span>
+    <button class="btn-icon" onclick="logout()" title="خروج">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </button>
   </div>
 </div>
 
@@ -280,20 +359,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <!-- ─── HOME ─── -->
   <div class="page active" id="pageHome">
     <div class="hero-card">
-      <div class="hero-greeting">مرحباً بكِ 👋</div>
-      <div class="hero-name" id="heroName">-</div>
+      <div class="hero-greeting">مرحباً بكِ</div>
+      <div class="hero-name" id="heroName">—</div>
       <div class="hero-stats">
         <div class="hero-stat">
           <div class="hero-stat-lbl">سعراتك اليومية</div>
-          <div class="hero-stat-val"><span id="heroCal">—</span></div>
+          <div class="hero-stat-val" id="heroCal">—</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-lbl">البروتين المطلوب</div>
+          <div class="hero-stat-lbl">البروتين</div>
           <div class="hero-stat-val"><span id="heroProt">—</span>غ</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-lbl">أيام متبقية</div>
-          <div class="hero-stat-val"><span id="heroDays">—</span></div>
+          <div class="hero-stat-val" id="heroDays">—</div>
         </div>
       </div>
     </div>
@@ -301,48 +380,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="section-title">ابدئي من هنا</div>
     <div class="quick-actions">
       <div class="qa-btn" onclick="switchTab('calc')">
-        <div class="qa-ico">🔢</div>
+        <svg class="qa-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
         <div class="qa-lbl">حاسبة السعرات</div>
       </div>
       <div class="qa-btn" onclick="switchTab('meals')">
-        <div class="qa-ico">🍽️</div>
+        <svg class="qa-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
         <div class="qa-lbl">البرنامج الغذائي</div>
       </div>
       <div class="qa-btn" onclick="switchTab('workout')">
-        <div class="qa-ico">💪</div>
+        <svg class="qa-ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
         <div class="qa-lbl">جدول التمارين</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">💡 نصائح سريعة</div>
-      <ul style="padding-right:20px;line-height:2;color:var(--muted);font-size:14px">
-        <li>ابدئي بحساب سعراتك من تبويب <b style="color:var(--blue)">الحاسبة</b> — البرنامج الغذائي يتكيّف مع سعراتك تلقائياً</li>
-        <li>اختاري جدول تمارين مناسب لجدولك من <b style="color:var(--blue)">جدول التمارين</b> (3, 4, أو 5 أيام)</li>
-        <li>سجّلي وزنك في كل تمرين لتتبعي تطوّرك</li>
-        <li>البرنامج قابل للطباعة من زر "طباعة" في صفحة الغذاء</li>
+      <div class="card-title">
+        <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        نصائح سريعة
+      </div>
+      <ul class="tips-list">
+        <li>ابدئي بحساب سعراتك من تبويب <b>الحاسبة</b> — البرنامج الغذائي يتكيّف تلقائياً</li>
+        <li>اختاري جدول تمارين مناسب لجدولك من <b>جدول التمارين</b> (3, 4, أو 5 أيام)</li>
+        <li>سجّلي وزنك في كل تمرين لتتبعي تطوّرك أسبوعياً</li>
+        <li>البرنامج قابل للطباعة من زر <b>طباعة</b> في صفحة الغذاء</li>
       </ul>
     </div>
   </div>
 
   <!-- ─── CALCULATOR ─── -->
   <div class="page" id="pageCalc">
-    <div class="section-title">حاسبة السعرات <span class="badge" id="editsBadge">-</span></div>
+    <div class="section-title">حاسبة السعرات <span class="badge" id="editsBadge">—</span></div>
 
     <div id="lockedBox" style="display:none">
       <div class="locked-overlay">
-        <div class="locked-icon">🔒</div>
+        <svg class="locked-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         <div class="locked-title">وصلتِ للحد الأقصى من التعديلات</div>
-        <div class="locked-msg">
-          استخدمتِ 3 محاولات في تعديل الحاسبة.<br>
-          يرجى التواصل مع المدرب لإعادة تفعيل الحاسبة.
-        </div>
+        <div class="locked-msg">استخدمتِ 3 محاولات في تعديل الحاسبة.<br>يرجى التواصل مع المدرب لإعادة تفعيلها.</div>
       </div>
     </div>
 
     <div id="calcContent">
       <div class="edits-warning" id="editsWarning" style="display:none">
-        ⚠️ تنبيه: لديكِ <b id="editsCount">-</b> محاولات فقط لتعديل الحسابة. تأكدي من الأرقام قبل الحفظ.
+        <svg class="ico" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <div>تنبيه: لديكِ <b id="editsCount">—</b> محاولات فقط لتعديل الحسابة. تأكدي من الأرقام قبل الحفظ.</div>
       </div>
 
       <div class="card">
@@ -374,29 +454,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <div class="form-group">
             <label class="form-label">مستوى النشاط</label>
             <select class="form-select" id="activity" required>
-              <option value="1.2">قليل الحركة (مكتبي، لا رياضة)</option>
-              <option value="1.375">نشاط خفيف (رياضة 1-3 أيام)</option>
-              <option value="1.55" selected>نشاط متوسط (رياضة 3-5 أيام)</option>
-              <option value="1.725">نشاط عالي (رياضة 6-7 أيام)</option>
-              <option value="1.9">نشاط شاق جداً (تمرين مرتين يومياً)</option>
+              <option value="1.2">قليل الحركة — مكتبي، لا رياضة</option>
+              <option value="1.375">نشاط خفيف — رياضة 1-3 أيام</option>
+              <option value="1.55" selected>نشاط متوسط — رياضة 3-5 أيام</option>
+              <option value="1.725">نشاط عالي — رياضة 6-7 أيام</option>
+              <option value="1.9">نشاط شاق جداً — تمرين مرتين يومياً</option>
             </select>
           </div>
 
           <div class="form-group">
             <label class="form-label">الهدف</label>
             <div class="chip-row" id="goalChips">
-              <div class="chip on" data-v="lose">🔥 خسارة وزن</div>
-              <div class="chip" data-v="maintain">⚖️ ثبات</div>
-              <div class="chip" data-v="gain">💪 زيادة عضل</div>
+              <div class="chip on" data-v="lose">خسارة وزن</div>
+              <div class="chip" data-v="maintain">ثبات</div>
+              <div class="chip" data-v="gain">زيادة عضل</div>
             </div>
           </div>
 
-          <button type="submit" class="btn-primary" id="calcBtn">احسبي وحفظي 💾</button>
+          <button type="submit" class="btn-primary" id="calcBtn" style="width:100%">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            احسبي وحفظي
+          </button>
         </form>
 
         <div class="macros-result" id="macrosResult">
           <div class="macros-title">احتياجك اليومي</div>
-          <div class="macros-cal"><span id="rCal">0</span> سعرة</div>
+          <div class="macros-cal"><span id="rCal">0</span><span>سعرة</span></div>
           <div class="macros-grid">
             <div class="macro-card"><div class="macro-val"><span id="rProt">0</span>غ</div><div class="macro-lbl">بروتين</div></div>
             <div class="macro-card"><div class="macro-val"><span id="rCarb">0</span>غ</div><div class="macro-lbl">كارب</div></div>
@@ -413,21 +496,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <div style="font-size:22px;font-weight:900;color:var(--blue)">UR PASS</div>
-          <div style="font-size:11px;color:var(--muted);font-weight:600">FITNESS &amp; NUTRITION</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px">FITNESS &amp; NUTRITION</div>
         </div>
         <div style="text-align:left">
-          <div style="font-size:14px;font-weight:800" id="printName">-</div>
-          <div style="font-size:11px;color:var(--muted)" id="printDate">-</div>
+          <div style="font-size:14px;font-weight:800" id="printName">—</div>
+          <div style="font-size:11px;color:var(--muted)" id="printDate">—</div>
         </div>
       </div>
     </div>
 
     <div class="section-title no-print">البرنامج الغذائي</div>
 
-    <div id="mealsEmpty" class="card" style="text-align:center;padding:40px 20px;display:none">
-      <div style="font-size:48px;margin-bottom:12px">🍽️</div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:6px">لم تحسبي سعراتك بعد</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:18px">احسبي سعراتك أولاً ليتكيّف البرنامج معكِ</div>
+    <div id="mealsEmpty" class="card empty-state" style="display:none">
+      <svg class="empty-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
+      <div class="empty-title">لم تحسبي سعراتك بعد</div>
+      <div class="empty-sub">احسبي سعراتك أولاً ليتكيّف البرنامج معكِ</div>
       <button class="btn-primary" onclick="switchTab('calc')">اذهبي للحاسبة</button>
     </div>
 
@@ -435,29 +518,35 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="meal-summary" id="mealSummary"></div>
 
       <div class="meal-actions no-print">
-        <button class="btn-primary" onclick="window.print()">🖨️ طباعة البرنامج</button>
+        <button class="btn-primary" onclick="window.print()">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          طباعة البرنامج
+        </button>
       </div>
 
       <div id="mealsList"></div>
 
       <div class="free-list">
-        <div class="free-list-title">🌶️ التوابل والإضافات — صفر سعرات</div>
+        <div class="free-list-title">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          التوابل والإضافات — صفر سعرات
+        </div>
         <div class="free-items">
-          <span class="free-item">✅ كل أنواع البهارات</span>
-          <span class="free-item">✅ خل التفاح</span>
-          <span class="free-item">✅ خردل / ديجون</span>
-          <span class="free-item">✅ ثوم بودرة / بصل بودرة</span>
-          <span class="free-item">✅ كمون / كركم / فلفل أسود</span>
-          <span class="free-item">✅ عصير ليمون</span>
-          <span class="free-item">✅ شاي / قهوة بدون سكر</span>
-          <span class="free-item">✅ خضار ورقية (خس، سبانخ)</span>
+          <span class="free-item">كل البهارات</span>
+          <span class="free-item">خل التفاح</span>
+          <span class="free-item">خردل / ديجون</span>
+          <span class="free-item">ثوم بودرة / بصل بودرة</span>
+          <span class="free-item">كمون / كركم / فلفل أسود</span>
+          <span class="free-item">عصير ليمون</span>
+          <span class="free-item">شاي / قهوة بدون سكر</span>
+          <span class="free-item">خضار ورقية (خس، سبانخ)</span>
         </div>
       </div>
 
-      <div class="card" style="background:#fef7e6;border-color:#fbd48f;margin-top:14px">
-        <div style="font-weight:800;color:#92400e;margin-bottom:6px">⚠️ الأرقام دليل وليست إلزامية</div>
-        <div style="font-size:13px;color:#92400e;line-height:1.7">
-          هذه الوجبات مثال عملي. السعرات مرنة — تقدرين تحسبين أكلك بنفسك بأي طريقة تانية شريطة عدم تجاوز الكمية اليومية.
+      <div class="card" style="background:#FFFBEB;border-color:#FDE68A;margin-top:14px">
+        <div style="font-weight:800;color:#92400E;margin-bottom:6px">الأرقام دليل وليست إلزامية</div>
+        <div style="font-size:13px;color:#92400E;line-height:1.7">
+          هذه الوجبات مثال عملي. السعرات مرنة — تقدرين تحسبين أكلك بأي طريقة أخرى شريطة عدم تجاوز الكمية اليومية.
           استخدمي تطبيق <b>MyFitnessPal</b> لتسهيل تسجيل ما تأكلينه.
         </div>
       </div>
@@ -469,7 +558,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="section-title">جدول التمارين</div>
 
     <div class="card">
-      <div class="card-title">اختاري جدولك</div>
+      <div class="card-title">اختاري جدولك الأسبوعي</div>
       <div class="plan-picker" id="planPicker"></div>
     </div>
 
@@ -485,25 +574,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- ─── VIDEO MODAL ─── -->
 <div class="video-modal" id="videoModal">
   <div class="video-frame">
-    <button class="video-close" onclick="closeVideo()">✕ إغلاق</button>
-    <div id="videoTitle" style="position:absolute;top:-40px;right:0;color:#fff;font-weight:800;font-size:15px"></div>
+    <button class="video-close" onclick="closeVideo()">
+      <svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      إغلاق
+    </button>
+    <div id="videoTitle" style="position:absolute;top:-40px;right:80px;color:#fff;font-weight:800;font-size:15px"></div>
     <div id="videoFrame" style="width:100%;height:100%"></div>
   </div>
 </div>
 
-<!-- ─── TABS (BOTTOM NAV) ─── -->
+<!-- ─── TABS ─── -->
 <div class="tabs">
   <button class="tab-btn active" data-tab="home" onclick="switchTab('home')">
-    <span class="tab-ico">🏠</span><span class="tab-lbl">الرئيسية</span>
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M10 21v-6h4v6"/></svg>
+    <span class="tab-lbl">الرئيسية</span>
   </button>
   <button class="tab-btn" data-tab="calc" onclick="switchTab('calc')">
-    <span class="tab-ico">🔢</span><span class="tab-lbl">الحاسبة</span>
+    <svg class="tab-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+    <span class="tab-lbl">الحاسبة</span>
   </button>
   <button class="tab-btn" data-tab="meals" onclick="switchTab('meals')">
-    <span class="tab-ico">🍽️</span><span class="tab-lbl">الغذاء</span>
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
+    <span class="tab-lbl">الغذاء</span>
   </button>
   <button class="tab-btn" data-tab="workout" onclick="switchTab('workout')">
-    <span class="tab-ico">💪</span><span class="tab-lbl">التمارين</span>
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
+    <span class="tab-lbl">التمارين</span>
   </button>
 </div>
 

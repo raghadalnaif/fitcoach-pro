@@ -8,14 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --blue:#0000FF; --blue-d:#0000cc; --blue-l:#4d4dff; --blue-bg:#eef0ff;
-  --text:#0a0a1f; --muted:#6b6b8a; --border:#e2e6f5;
-  --bg:#f5f6fc; --surface:#ffffff; --surface2:#f7f8ff;
-  --red:#e63946; --green:#00a86b; --amber:#f59e0b;
-  --shadow:0 4px 20px rgba(0,0,255,.06); --shadow-lg:0 12px 40px rgba(0,0,255,.12);
+  --blue:#2626EC; --blue-d:#1E1EC7; --blue-l:#5252F1; --blue-bg:#EEF0FF; --blue-bg2:#F5F6FF;
+  --text:#0F172A; --muted:#64748B; --subtle:#94A3B8; --border:#E5E7EB;
+  --bg:#F8FAFC; --surface:#ffffff; --surface2:#F8FAFC;
+  --red:#EF4444; --green:#10B981; --amber:#F59E0B; --pink:#EC4899;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.04);
+  --shadow:0 4px 20px rgba(38,38,236,.06);
+  --shadow-lg:0 20px 60px rgba(38,38,236,.14);
   --r:14px;
   --font:'Tajawal',system-ui,sans-serif;
 }
+.ico{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
 
@@ -25,8 +29,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   box-shadow:0 1px 4px rgba(0,0,255,.04)}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-mark{width:38px;height:38px;background:var(--blue);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:14px;letter-spacing:1px}
-.logo-text{font-size:18px;font-weight:900;color:var(--blue);letter-spacing:1px}
+  display:flex;align-items:center;justify-content:center;padding:6px;
+  box-shadow:0 4px 12px rgba(38,38,236,.24)}
+.logo-mark svg{width:100%;height:100%;fill:#fff}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
 .logo-sub{font-size:11px;color:var(--muted);font-weight:600}
 .header-actions{display:flex;gap:8px;align-items:center}
 .btn-logout{padding:9px 16px;background:var(--surface2);border:1px solid var(--border);
@@ -35,11 +41,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-logout:hover{border-color:var(--red);color:var(--red)}
 
 /* Admin tabs */
-.tab-btn-admin{padding:12px 20px;background:none;border:none;border-bottom:3px solid transparent;
+.tab-btn-admin{padding:14px 20px;background:none;border:none;border-bottom:3px solid transparent;
   color:var(--muted);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;
-  transition:all .15s;margin-bottom:-1px}
+  transition:all .15s;margin-bottom:-1px;display:flex;align-items:center;gap:8px}
 .tab-btn-admin:hover{color:var(--blue)}
 .tab-btn-admin.on{color:var(--blue);border-bottom-color:var(--blue)}
+.btn-primary{display:inline-flex}
+.sub-btn{display:inline-flex;align-items:center;gap:6px}
 
 /* Library */
 .library-info{background:#eef7ff;border:1px solid #b8dcff;color:#0c4a80;
@@ -55,7 +63,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ex-preview{width:100%;height:130px;border-radius:8px;background:var(--surface2);
   display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;position:relative}
 .ex-preview video{width:100%;height:100%;object-fit:cover}
-.ex-preview .ex-icon{font-size:44px;opacity:.4}
+.ex-preview .ex-icon{width:40px;height:40px;stroke:var(--subtle);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
 .ex-status-badge{position:absolute;top:6px;left:6px;padding:3px 8px;border-radius:20px;
   font-size:10px;font-weight:800;color:#fff}
 .ex-status-badge.ok{background:var(--green)}
@@ -210,7 +219,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div id="loginGate" class="login-gate">
   <div class="login-box">
     <div style="text-align:center;margin-bottom:22px">
-      <div class="logo-mark" style="width:52px;height:52px;font-size:16px;margin:0 auto 10px">UP</div>
+      <div class="logo-mark" style="width:56px;height:56px;margin:0 auto 12px;padding:8px">
+        <svg viewBox="0 0 200 200">
+          <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
+          <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
+          <path d="M148 96 l22 42 l-22 42 z"/>
+        </svg>
+      </div>
       <div class="logo-text">UR PASS</div>
       <div class="logo-sub">لوحة المدرب</div>
     </div>
@@ -234,7 +249,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div id="dashboard" style="display:none">
   <div class="header">
     <div class="logo">
-      <div class="logo-mark">UP</div>
+      <div class="logo-mark">
+        <svg viewBox="0 0 200 200">
+          <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
+          <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
+          <path d="M148 96 l22 42 l-22 42 z"/>
+        </svg>
+      </div>
       <div>
         <div class="logo-text">UR PASS</div>
         <div class="logo-sub">لوحة المدرب</div>
@@ -247,8 +268,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
   <div class="container">
     <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border)">
-      <button class="tab-btn-admin on" data-tab="subs" onclick="switchAdminTab('subs')">👥 المشتركين</button>
-      <button class="tab-btn-admin" data-tab="library" onclick="switchAdminTab('library')">🎬 مكتبة التمارين</button>
+      <button class="tab-btn-admin on" data-tab="subs" onclick="switchAdminTab('subs')">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        المشتركين
+      </button>
+      <button class="tab-btn-admin" data-tab="library" onclick="switchAdminTab('library')">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
+        مكتبة التمارين
+      </button>
     </div>
 
     <div id="tabSubs">
@@ -294,7 +321,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <div class="modal">
     <div class="modal-head">
       <div class="modal-title">إضافة مشترك جديد</div>
-      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('addModal')"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="error-msg" id="addError"></div>
     <div id="addFormWrap">
@@ -340,17 +367,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
     <div id="addSuccessWrap" style="display:none">
       <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:44px">✅</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;margin:0 auto"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
         <div style="font-size:16px;font-weight:800;margin-top:8px">تم إنشاء الحساب</div>
         <div style="font-size:13px;color:var(--muted);margin-top:4px">أرسلي هذه البيانات للمشترك</div>
       </div>
       <div class="credentials-box">
-        <div class="credentials-title">📋 بيانات الدخول</div>
+        <div class="credentials-title">بيانات الدخول</div>
         <div class="cred-row"><span class="cred-label">اسم المستخدم</span><span class="cred-val" id="credUser">-</span></div>
         <div class="cred-row"><span class="cred-label">كلمة المرور</span><span class="cred-val" id="credPass">-</span></div>
         <div class="cred-row"><span class="cred-label">رابط الدخول</span><span class="cred-val" id="credUrl" style="font-size:11px">-</span></div>
       </div>
-      <button class="btn-copy" onclick="copyCredentials()">📋 نسخ البيانات كاملة</button>
+      <button class="btn-copy" onclick="copyCredentials()">نسخ البيانات كاملة</button>
       <button class="btn-form" style="margin-top:8px;background:var(--surface2);color:var(--text)" onclick="closeModal('addModal');resetAddForm()">تم — إغلاق</button>
     </div>
   </div>
@@ -361,7 +388,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <div class="modal">
     <div class="modal-head">
       <div class="modal-title">تعديل مشترك</div>
-      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('editModal')"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="error-msg" id="editError"></div>
     <div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:16px">
@@ -393,7 +420,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </label>
     </div>
     <button class="btn-form" onclick="saveEdit()">حفظ التعديلات</button>
-    <button class="btn-form danger" style="margin-top:10px" onclick="confirmDelete()">🗑️ حذف الحساب نهائياً</button>
+    <button class="btn-form danger" style="margin-top:10px" onclick="confirmDelete()">حذف الحساب نهائياً</button>
   </div>
 </div>
 
@@ -408,13 +435,13 @@ let editingId = null;
 
 /* ═══════════════════ EXERCISE LIBRARY ═══════════════════ */
 const EX_LIB = {
-  chest: { name: '💪 صدر', items: {
+  chest: { name: 'صدر', items: {
     bench_press:   { ar:'بنش برس', en:'Barbell Bench Press' },
     db_bench:      { ar:'بنش دمبل', en:'Dumbbell Bench Press' },
     incline_press: { ar:'بنش مائل', en:'Incline Dumbbell Press' },
     pushup:        { ar:'ضغط أرضي', en:'Push Up' },
   }},
-  back: { name: '🏋️ ظهر', items: {
+  back: { name: 'ظهر', items: {
     pullup:       { ar:'العقلة', en:'Pull Up' },
     lat_pulldown: { ar:'سحب علوي', en:'Lat Pulldown' },
     bb_row:       { ar:'تجديف بار', en:'Barbell Row' },
@@ -422,17 +449,17 @@ const EX_LIB = {
     cable_row:    { ar:'تجديف كابل', en:'Cable Row' },
     face_pull:    { ar:'شد وجه', en:'Face Pull' },
   }},
-  shoulders: { name: '🤸 أكتاف', items: {
+  shoulders: { name: 'أكتاف', items: {
     ohp:           { ar:'ضغط أكتاف', en:'Overhead Press' },
     lateral_raise: { ar:'رفرفة جانبية', en:'Lateral Raise' },
   }},
-  arms: { name: '💪 أذرع', items: {
+  arms: { name: 'أذرع', items: {
     bicep_curl:  { ar:'بايسبس دمبل', en:'Bicep Curl' },
     hammer_curl: { ar:'هامر كيرل', en:'Hammer Curl' },
     tricep_dip:  { ar:'ديبس', en:'Tricep Dips' },
     tricep_ext:  { ar:'تمديد ترايسبس', en:'Tricep Extension' },
   }},
-  legs: { name: '🦵 أرجل', items: {
+  legs: { name: 'أرجل', items: {
     squat:        { ar:'سكوات بار', en:'Barbell Squat' },
     goblet_squat: { ar:'سكوات دمبل', en:'Goblet Squat' },
     sumo_squat:   { ar:'سكوات سومو', en:'Sumo Squat' },
@@ -445,12 +472,12 @@ const EX_LIB = {
     leg_ext:      { ar:'تمديد أرجل', en:'Leg Extension' },
     calf_raise:   { ar:'رفع سمانة', en:'Calf Raise' },
   }},
-  glutes: { name: '🍑 جلوت', items: {
+  glutes: { name: 'جلوت', items: {
     hip_thrust:     { ar:'هيب ثراست', en:'Hip Thrust' },
     glute_bridge:   { ar:'جلوت بريدج', en:'Glute Bridge' },
     cable_kickback: { ar:'ركلة كابل', en:'Cable Glute Kickback' },
   }},
-  core: { name: '🧘 كور', items: {
+  core: { name: 'كور', items: {
     plank:         { ar:'بلانك', en:'Plank' },
     russian_twist: { ar:'روسيان تويست', en:'Russian Twist' },
     leg_raise:     { ar:'رفع أرجل', en:'Hanging Leg Raise' },
@@ -487,17 +514,17 @@ function renderLibrary() {
           <div class="ex-preview">
             ${hasVideo
               ? `<video src="${videoUrl}" muted loop playsinline autoplay></video>`
-              : `<div class="ex-icon">🎬</div>`}
-            <span class="ex-status-badge ${hasVideo ? 'ok' : 'no'}">${hasVideo ? '✓ مرفوع' : 'لا فيديو'}</span>
+              : `<svg class="ex-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`}
+            <span class="ex-status-badge ${hasVideo ? 'ok' : 'no'}">${hasVideo ? 'مرفوع' : 'لا فيديو'}</span>
           </div>
           <div class="ex-lib-name">${ex.ar}</div>
           <div class="ex-lib-en">${ex.en}</div>
           <div class="ex-lib-actions">
             <label class="ex-lib-btn">
-              <span>${hasVideo ? '🔄 استبدال' : '📤 رفع'}</span>
+              <span>${hasVideo ? 'استبدال' : 'رفع فيديو'}</span>
               <input type="file" accept="video/mp4,video/webm,video/quicktime" onchange="uploadExVideo('${id}', this)">
             </label>
-            ${hasVideo ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')">🗑️</button>` : ''}
+            ${hasVideo ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg></button>` : ''}
           </div>
           <div class="ex-lib-progress" id="prog_${id}"><div class="ex-lib-progress-bar" id="progbar_${id}"></div></div>
         </div>`;
@@ -533,7 +560,7 @@ async function uploadExVideo(id, input) {
   xhr.onload = () => {
     prog.classList.remove('on');
     if (xhr.status >= 200 && xhr.status < 300) {
-      toast('تم رفع الفيديو ✓');
+      toast('تم رفع الفيديو');
       loadLibrary();
     } else {
       let err = 'فشل الرفع';
@@ -553,7 +580,7 @@ async function deleteExVideo(id) {
   if (!confirm('حذف الفيديو؟')) return;
   try {
     await api(`/api/admin/exercises/${id}/video`, { method: 'DELETE' });
-    toast('تم الحذف ✓');
+    toast('تم الحذف');
     loadLibrary();
   } catch (e) { toast(e.message, 'error'); }
 }
@@ -676,7 +703,7 @@ function renderSubs() {
   if (list.length === 0) {
     container.innerHTML = `
       <div class="empty">
-        <div class="empty-icon">👥</div>
+        <svg style="width:52px;height:52px;stroke:var(--subtle);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         <div class="empty-title">${search ? 'لا نتائج' : 'لا يوجد مشتركين بعد'}</div>
         <div class="empty-sub">${search ? 'جرّبي بحث آخر' : 'ابدئي بإضافة أول مشترك'}</div>
         ${!search ? '<button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>' : ''}
@@ -700,7 +727,7 @@ function renderSubs() {
         <div class="sub-meta">
           <div class="sub-meta-item">📅 ${fmtDate(sub.endDate)}</div>
           <div class="sub-meta-item">✏️ ${sub.editsLeft}/3 تعديل</div>
-          ${sub.hasProfile ? '<div class="sub-meta-item">✓ حسّبت السعرات</div>' : ''}
+          ${sub.hasProfile ? '<div class="sub-meta-item">حسّبت السعرات</div>' : ''}
         </div>
         <div class="sub-actions">
           <button class="sub-btn primary" onclick="openEditModal('${sub.id}')">تعديل</button>
@@ -770,7 +797,7 @@ function copyCredentials() {
   const pass = document.getElementById('credPass').textContent;
   const url  = document.getElementById('credUrl').textContent;
   const text = `مرحباً في UR PASS 💙\n\nبيانات دخولك:\n\n🔗 الرابط: ${url}\n👤 اسم المستخدم: ${user}\n🔑 كلمة المرور: ${pass}\n\nنراك في التدريب!`;
-  navigator.clipboard.writeText(text).then(() => toast('تم نسخ البيانات ✓'));
+  navigator.clipboard.writeText(text).then(() => toast('تم نسخ البيانات'));
 }
 
 /* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */
@@ -804,7 +831,7 @@ async function saveEdit() {
   try {
     await api('/api/admin/subscribers/' + editingId, { method:'PATCH', body:JSON.stringify(body) });
     closeModal('editModal');
-    toast('تم الحفظ ✓');
+    toast('تم الحفظ');
     loadSubscribers();
   } catch (e) {
     const err = document.getElementById('editError');
@@ -818,7 +845,7 @@ function confirmDelete() {
   if (!sub) return;
   if (!confirm(`حذف نهائي للمشترك "${sub.fullName}"؟\nلا يمكن التراجع.`)) return;
   api('/api/admin/subscribers/' + editingId, { method:'DELETE' })
-    .then(() => { closeModal('editModal'); toast('تم الحذف ✓'); loadSubscribers(); })
+    .then(() => { closeModal('editModal'); toast('تم الحذف'); loadSubscribers(); })
     .catch(e => toast(e.message, 'error'));
 }
 
