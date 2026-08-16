@@ -250,8 +250,11 @@ button{font-family:inherit}
 
 .exercise-list{display:flex;flex-direction:column;gap:12px}
 .ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:16px;display:flex;gap:14px;transition:all .2s;box-shadow:var(--shadow-sm)}
+  padding:16px;display:flex;flex-direction:column;gap:12px;
+  transition:all .2s;box-shadow:var(--shadow-sm)}
 .ex-card:hover{box-shadow:var(--shadow)}
+.ex-head{display:flex;gap:14px;align-items:flex-start}
+.ex-head .ex-info{flex:1;min-width:0}
 .ex-img-wrap{width:120px;height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;
   background:var(--surface2);display:flex;align-items:center;justify-content:center;
   border:1px solid var(--border);cursor:pointer;position:relative}
