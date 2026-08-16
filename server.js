@@ -371,6 +371,19 @@ app.delete('/api/admin/subscribers/:id', auth, requireAdmin, (req, res) => {
    EXERCISE VIDEOS — uploaded files + YouTube URLs
 ═══════════════════════════════════════ */
 const YT_FILE = path.join(VIDEO_DIR, 'youtube.json');
+const YT_SEED = path.join(__dirname, 'youtube-seed.json');
+
+// Seed youtube.json from repo defaults if missing — merges seed into runtime,
+// preserving any admin-edited entries (existing keys win over seed).
+try {
+  if (fs.existsSync(YT_SEED)) {
+    const seed = JSON.parse(fs.readFileSync(YT_SEED, 'utf8'));
+    const current = fs.existsSync(YT_FILE) ? JSON.parse(fs.readFileSync(YT_FILE, 'utf8')) : {};
+    const merged = { ...seed, ...current };  // current wins on conflict
+    fs.writeFileSync(YT_FILE, JSON.stringify(merged, null, 2));
+    console.log(`✅ YouTube seed applied (${Object.keys(merged).length} exercises)`);
+  }
+} catch (e) { console.warn('youtube seed skipped:', e.message); }
 
 function findVideo(id) {
   for (const ext of ['.mp4', '.webm', '.mov']) {
