@@ -75,10 +75,21 @@ db.exec(`
     profile TEXT,
     macros TEXT,
     selected_plan TEXT,
-    workout_progress TEXT DEFAULT '{}'
+    workout_progress TEXT DEFAULT '{}',
+    phone TEXT
   );
   CREATE INDEX IF NOT EXISTS idx_username ON subscribers(username);
 `);
+
+// Migration: add phone column if missing on existing DB
+try {
+  const cols = db.prepare("PRAGMA table_info(subscribers)").all();
+  if (!cols.some(c => c.name === 'phone')) {
+    db.exec("ALTER TABLE subscribers ADD COLUMN phone TEXT");
+    console.log('✅ Migration: added phone column');
+  }
+} catch (e) { console.warn('migration skipped:', e.message); }
+
 console.log('✅ SQLite ready at', DB_PATH);
 
 const JWT_SECRET      = process.env.JWT_SECRET      || 'dev-secret-change-me';
@@ -129,6 +140,24 @@ function newId() {
   return crypto.randomBytes(9).toString('base64url');
 }
 
+// Normalize phone to international format without + (for wa.me links)
+// Default country: Saudi Arabia (966)
+function normalizePhone(raw, defaultCC = '966') {
+  if (!raw) return '';
+  let d = String(raw).replace(/\D/g, '');
+  if (!d) return '';
+  // Strip 00 prefix (international dial)
+  if (d.startsWith('00')) d = d.slice(2);
+  // Already has GCC/MENA country code
+  const cc = ['966','971','965','973','974','968','962','20','961','963','964','967','212','216','218','249','252'];
+  if (cc.some(c => d.startsWith(c) && d.length >= c.length + 7)) return d;
+  // Local Saudi format (05xxxxxxxx) → 9665xxxxxxxx
+  if (d.startsWith('0') && d.length >= 10) return defaultCC + d.slice(1);
+  // Bare 5xxxxxxxx (9 digits) → 9665xxxxxxxx
+  if (d.startsWith('5') && d.length === 9) return defaultCC + d;
+  return d;
+}
+
 /* ═══════════════════════════════════════
    PREPARED STATEMENTS
 ═══════════════════════════════════════ */
@@ -137,10 +166,11 @@ const stmts = {
   findById:       db.prepare('SELECT * FROM subscribers WHERE id = ?'),
   listAll:        db.prepare('SELECT * FROM subscribers ORDER BY created_at DESC'),
   insert:         db.prepare(`INSERT INTO subscribers
-                    (id, username, password_hash, full_name, gender, created_at, start_date, end_date, active, profile_edits)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0)`),
+                    (id, username, password_hash, full_name, gender, phone, created_at, start_date, end_date, active, profile_edits)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0)`),
   updatePassword:    db.prepare('UPDATE subscribers SET password_hash = ? WHERE id = ?'),
   updateFullName:    db.prepare('UPDATE subscribers SET full_name = ? WHERE id = ?'),
+  updatePhone:       db.prepare('UPDATE subscribers SET phone = ? WHERE id = ?'),
   updateActive:      db.prepare('UPDATE subscribers SET active = ? WHERE id = ?'),
   updateEndDate:     db.prepare('UPDATE subscribers SET end_date = ?, active = 1 WHERE id = ?'),
   resetEdits:        db.prepare('UPDATE subscribers SET profile_edits = 0 WHERE id = ?'),
@@ -241,21 +271,33 @@ app.post('/api/me/plan', auth, requireSubscriber, (req, res) => {
 });
 
 app.post('/api/me/progress', auth, requireSubscriber, (req, res) => {
-  const { exerciseId, weight, reps, date } = req.body || {};
+  const { exerciseId, weight, reps, sets, date } = req.body || {};
   if (!exerciseId) return res.status(400).json({ error: 'exerciseId required' });
   const sub = stmts.findById.get(req.user.sub);
   if (!sub) return res.status(404).json({ error: 'not found' });
   const progress = parseJson(sub.workout_progress, {});
   if (!progress[exerciseId]) progress[exerciseId] = [];
+
+  // New format: sets array. Legacy format: single weight/reps.
+  let setArr;
+  if (Array.isArray(sets)) {
+    setArr = sets
+      .map(s => ({ w: Number(s.w) || 0, r: Number(s.r) || 0 }))
+      .filter(s => s.w > 0 || s.r > 0);
+  } else {
+    const w = Number(weight) || 0, r = Number(reps) || 0;
+    if (w > 0 || r > 0) setArr = [{ w, r }];
+  }
+  if (!setArr || setArr.length === 0) return res.status(400).json({ error: 'no data' });
+
   progress[exerciseId].push({
-    weight: Number(weight) || 0,
-    reps: Number(reps) || 0,
     date: date || new Date().toISOString(),
+    sets: setArr,
   });
-  // keep only last 20 entries per exercise
-  if (progress[exerciseId].length > 20) progress[exerciseId] = progress[exerciseId].slice(-20);
+  // keep only last 30 sessions per exercise
+  if (progress[exerciseId].length > 30) progress[exerciseId] = progress[exerciseId].slice(-30);
   stmts.saveProgress.run(JSON.stringify(progress), sub.id);
-  res.json({ ok: true });
+  res.json({ ok: true, saved: setArr.length });
 });
 
 /* ═══════════════════════════════════════
@@ -278,6 +320,7 @@ app.get('/api/admin/subscribers', auth, requireAdmin, (_req, res) => {
       username: sub.username,
       fullName: sub.full_name,
       gender: sub.gender,
+      phone: sub.phone || '',
       startDate: st.startDate,
       endDate: st.endDate,
       daysLeft: st.daysLeft,
@@ -293,7 +336,7 @@ app.get('/api/admin/subscribers', auth, requireAdmin, (_req, res) => {
 });
 
 app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
-  const { username, password, fullName, gender, months } = req.body || {};
+  const { username, password, fullName, gender, months, phone } = req.body || {};
   if (!username || !password || !fullName)
     return res.status(400).json({ error: 'اسم المستخدم، كلمة المرور، والاسم الكامل مطلوبة' });
 
@@ -310,13 +353,15 @@ app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
     const end = now + durationMonths * 30 * 86400000;
     const passwordHash = await bcrypt.hash(password, 10);
     const id = newId();
+    const normPhone = normalizePhone(phone);
 
     stmts.insert.run(
       id, uname, passwordHash, fullName.trim(),
       gender === 'male' ? 'male' : 'female',
+      normPhone || null,
       now, now, end
     );
-    res.json({ ok: true, id });
+    res.json({ ok: true, id, phone: normPhone });
   } catch (e) {
     console.error('create error:', e);
     res.status(500).json({ error: 'حدث خطأ في إنشاء الحساب' });
@@ -324,7 +369,7 @@ app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
 });
 
 app.patch('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => {
-  const { newPassword, extendMonths, active, resetEdits, fullName } = req.body || {};
+  const { newPassword, extendMonths, active, resetEdits, fullName, phone } = req.body || {};
   const sub = stmts.findById.get(req.params.id);
   if (!sub) return res.status(404).json({ error: 'not found' });
 
@@ -337,6 +382,10 @@ app.patch('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => 
     }
     if (fullName) {
       stmts.updateFullName.run(fullName.trim(), sub.id);
+      changed = true;
+    }
+    if (phone !== undefined) {
+      stmts.updatePhone.run(normalizePhone(phone) || null, sub.id);
       changed = true;
     }
     if (active !== undefined) {

@@ -150,6 +150,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sub-btn.danger:hover{border-color:var(--red);color:var(--red)}
 .sub-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 .sub-btn.primary:hover{background:var(--blue-d);color:#fff}
+.sub-btn.wa{background:#25D366;color:#fff;border-color:#25D366;display:inline-flex;align-items:center;gap:5px}
+.sub-btn.wa:hover{background:#1DA851;color:#fff;border-color:#1DA851}
 
 /* Empty state */
 .empty{background:var(--surface);border:2px dashed var(--border);border-radius:var(--r);
@@ -347,6 +349,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <label class="form-label">الاسم الكامل</label>
           <input type="text" class="form-input" id="addFullName" placeholder="فاطمة أحمد" required>
         </div>
+        <div class="form-group">
+          <label class="form-label">رقم الجوال (واتساب)</label>
+          <input type="tel" class="form-input ltr" id="addPhone" placeholder="0501234567 أو 966501234567" required>
+          <div class="form-hint">يُستخدم لإرسال بيانات الدخول عبر واتساب مباشرة</div>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">الجنس</label>
@@ -390,6 +397,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
       <div class="credentials-box">
         <div class="credentials-title">بيانات الدخول</div>
+
+        <div style="display:none">
+          <span id="credName"></span>
+          <span id="credPhone"></span>
+        </div>
 
         <div class="cred-field">
           <div class="cred-field-info">
@@ -493,48 +505,48 @@ const EX_LIB = {
     bench_press:   { ar:'بنش برس', en:'Barbell Bench Press' },
     db_bench:      { ar:'بنش دمبل', en:'Dumbbell Bench Press' },
     incline_press: { ar:'بنش مائل', en:'Incline Dumbbell Press' },
-    pushup:        { ar:'ضغط أرضي', en:'Push Up' },
+    pushup:        { ar:'بوش أب', en:'Push Up' },
   }},
   back: { name: 'ظهر', items: {
-    pullup:       { ar:'العقلة', en:'Pull Up' },
-    lat_pulldown: { ar:'سحب علوي', en:'Lat Pulldown' },
-    bb_row:       { ar:'تجديف بار', en:'Barbell Row' },
-    db_row:       { ar:'تجديف دمبل', en:'Dumbbell Row' },
-    cable_row:    { ar:'تجديف كابل', en:'Cable Row' },
-    face_pull:    { ar:'شد وجه', en:'Face Pull' },
+    pullup:       { ar:'بول أب', en:'Pull Up' },
+    lat_pulldown: { ar:'لات بولداون', en:'Lat Pulldown' },
+    bb_row:       { ar:'بار رو', en:'Barbell Row' },
+    db_row:       { ar:'دمبل رو', en:'Dumbbell Row' },
+    cable_row:    { ar:'كيبل رو', en:'Cable Row' },
+    face_pull:    { ar:'فيس بول', en:'Face Pull' },
   }},
   shoulders: { name: 'أكتاف', items: {
-    ohp:           { ar:'ضغط أكتاف', en:'Overhead Press' },
-    lateral_raise: { ar:'رفرفة جانبية', en:'Lateral Raise' },
+    ohp:           { ar:'شولدر برس', en:'Overhead Press' },
+    lateral_raise: { ar:'لاترال ريز', en:'Lateral Raise' },
   }},
   arms: { name: 'أذرع', items: {
     bicep_curl:  { ar:'بايسبس دمبل', en:'Bicep Curl' },
     hammer_curl: { ar:'هامر كيرل', en:'Hammer Curl' },
     tricep_dip:  { ar:'ديبس', en:'Tricep Dips' },
-    tricep_ext:  { ar:'تمديد ترايسبس', en:'Tricep Extension' },
+    tricep_ext:  { ar:'ترايسبس إكستنشن', en:'Tricep Extension' },
   }},
   legs: { name: 'أرجل', items: {
-    squat:        { ar:'سكوات بار', en:'Barbell Squat' },
-    goblet_squat: { ar:'سكوات دمبل', en:'Goblet Squat' },
-    sumo_squat:   { ar:'سكوات سومو', en:'Sumo Squat' },
-    bulgarian:    { ar:'بلغاري سبليت', en:'Bulgarian Split Squat' },
-    lunges:       { ar:'اندفاع', en:'Walking Lunges' },
+    squat:        { ar:'باربل سكوات', en:'Barbell Squat' },
+    goblet_squat: { ar:'جوبلت سكوات', en:'Goblet Squat' },
+    sumo_squat:   { ar:'سومو سكوات', en:'Sumo Squat' },
+    bulgarian:    { ar:'بلغاريان سكوات', en:'Bulgarian Split Squat' },
+    lunges:       { ar:'لانجز', en:'Walking Lunges' },
     rdl:          { ar:'رومانيان ديدلفت', en:'Romanian Deadlift' },
     deadlift:     { ar:'ديدلفت', en:'Deadlift' },
     leg_press:    { ar:'ليج برس', en:'Leg Press' },
-    leg_curl:     { ar:'تجعيد أرجل', en:'Leg Curl' },
-    leg_ext:      { ar:'تمديد أرجل', en:'Leg Extension' },
-    calf_raise:   { ar:'رفع سمانة', en:'Calf Raise' },
+    leg_curl:     { ar:'ليج كيرل', en:'Leg Curl' },
+    leg_ext:      { ar:'ليج إكستنشن', en:'Leg Extension' },
+    calf_raise:   { ar:'كاف ريز', en:'Calf Raise' },
   }},
   glutes: { name: 'جلوت', items: {
     hip_thrust:     { ar:'هيب ثراست', en:'Hip Thrust' },
     glute_bridge:   { ar:'جلوت بريدج', en:'Glute Bridge' },
-    cable_kickback: { ar:'ركلة كابل', en:'Cable Glute Kickback' },
+    cable_kickback: { ar:'كيبل كيك باك', en:'Cable Glute Kickback' },
   }},
   core: { name: 'كور', items: {
     plank:         { ar:'بلانك', en:'Plank' },
     russian_twist: { ar:'روسيان تويست', en:'Russian Twist' },
-    leg_raise:     { ar:'رفع أرجل', en:'Hanging Leg Raise' },
+    leg_raise:     { ar:'ليج ريز', en:'Hanging Leg Raise' },
   }},
 };
 let libraryVideos = {};
@@ -583,7 +595,8 @@ function renderLibrary() {
             ${preview}
             <span class="ex-status-badge ${hasAny ? 'ok' : 'no'}">${statusLbl}</span>
           </div>
-          <div class="ex-lib-name" style="margin-bottom:8px">${ex.ar}</div>
+          <div class="ex-lib-name">${ex.ar}</div>
+          <div class="ex-lib-en">${ex.en}</div>
 
           <div class="yt-row">
             <input type="text" class="yt-input" id="yt_${id}" placeholder="https://youtu.be/..." value="${ytId ? 'https://youtu.be/' + ytId : ''}" dir="ltr">
@@ -808,6 +821,7 @@ function renderSubs() {
   container.innerHTML = `<div class="subs-grid">${list.map(sub => {
     const statusCls = !sub.active ? 'expired' : sub.daysLeft <= 7 ? 'warn' : 'active';
     const statusTxt = !sub.active ? 'منتهي' : sub.daysLeft <= 7 ? `${sub.daysLeft} يوم متبقي` : 'فعّال';
+    const hasPhone = !!sub.phone;
     return `
       <div class="sub-card">
         <div class="sub-head">
@@ -819,15 +833,40 @@ function renderSubs() {
           <span class="sub-status ${statusCls}">${statusTxt}</span>
         </div>
         <div class="sub-meta">
-          <div class="sub-meta-item">📅 ${fmtDate(sub.endDate)}</div>
-          <div class="sub-meta-item">✏️ ${sub.editsLeft}/3 تعديل</div>
-          ${sub.hasProfile ? '<div class="sub-meta-item">حسّبت السعرات</div>' : ''}
+          <div class="sub-meta-item">${fmtDate(sub.endDate)}</div>
+          <div class="sub-meta-item">${sub.editsLeft}/3 تعديل</div>
+          ${hasPhone ? `<div class="sub-meta-item" style="direction:ltr;font-family:monospace">${sub.phone}</div>` : ''}
         </div>
         <div class="sub-actions">
           <button class="sub-btn primary" onclick="openEditModal('${sub.id}')">تعديل</button>
+          ${hasPhone ? `<button class="sub-btn wa" onclick="sendWaToSub('${sub.id}')" title="إرسال واتساب">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487 2.981 1.287 2.981.859 3.518.804.537-.055 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+            واتساب</button>` : ''}
         </div>
       </div>`;
   }).join('')}</div>`;
+}
+
+function sendWaToSub(id) {
+  const sub = subscribers.find(s => s.id === id);
+  if (!sub || !sub.phone) return;
+  const name = firstName(sub.fullName);
+  const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
+  const url = location.origin + '/';
+  const msg = `${greet}
+
+شكراً لاشتراكك معنا في UR PASS.
+تم تجهيز حسابك في منطقة العضو، حيث ستجد جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
+
+بيانات الدخول:
+
+الرابط: ${url}
+اسم المستخدم: ${sub.username}
+
+في حال نسيان كلمة المرور، تواصل معي لإعادة إرسالها.
+
+جاهزون للانطلاق.`;
+  window.open(`https://wa.me/${sub.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 document.getElementById('searchInput').addEventListener('input', renderSubs);
@@ -858,6 +897,9 @@ function genPassword() {
   document.getElementById('addPassword').value = randomPassword();
 }
 
+// Track last-created subscriber's details for share buttons
+let lastCreated = { fullName: '', phone: '', username: '', password: '' };
+
 document.getElementById('addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('addBtn');
@@ -866,16 +908,25 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
   err.classList.remove('show');
   const body = {
     fullName: document.getElementById('addFullName').value.trim(),
+    phone:    document.getElementById('addPhone').value.trim(),
     gender:   document.getElementById('addGender').value,
     months:   document.getElementById('addMonths').value,
     username: document.getElementById('addUsername').value.trim().toLowerCase(),
     password: document.getElementById('addPassword').value,
   };
   try {
-    await api('/api/admin/subscribers', { method:'POST', body:JSON.stringify(body) });
-    document.getElementById('credUser').textContent = body.username;
-    document.getElementById('credPass').textContent = body.password;
-    document.getElementById('credUrl').textContent  = location.origin + '/';
+    const r = await api('/api/admin/subscribers', { method:'POST', body:JSON.stringify(body) });
+    lastCreated = {
+      fullName: body.fullName,
+      phone:    r.phone || body.phone,
+      username: body.username,
+      password: body.password,
+    };
+    document.getElementById('credUser').textContent  = body.username;
+    document.getElementById('credPass').textContent  = body.password;
+    document.getElementById('credUrl').textContent   = location.origin + '/';
+    document.getElementById('credName').textContent  = body.fullName;
+    document.getElementById('credPhone').textContent = lastCreated.phone;
     document.getElementById('addFormWrap').style.display = 'none';
     document.getElementById('addSuccessWrap').style.display = 'block';
     loadSubscribers();
@@ -886,11 +937,20 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
   }
 });
 
+function firstName(full) {
+  return (full || '').trim().split(/\s+/)[0] || '';
+}
+
 function buildFullMessage() {
-  const user = document.getElementById('credUser').textContent;
-  const pass = document.getElementById('credPass').textContent;
-  const url  = document.getElementById('credUrl').textContent;
-  return `أهلاً بك في UR PASS
+  const user  = document.getElementById('credUser').textContent;
+  const pass  = document.getElementById('credPass').textContent;
+  const url   = document.getElementById('credUrl').textContent;
+  const name  = firstName(document.getElementById('credName').textContent || lastCreated.fullName);
+  const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
+  return `${greet}
+
+شكراً لاشتراكك معنا في UR PASS.
+تم تجهيز حسابك في منطقة العضو، حيث ستجد جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
 
 بيانات الدخول:
 
@@ -898,7 +958,7 @@ function buildFullMessage() {
 اسم المستخدم: ${user}
 كلمة المرور: ${pass}
 
-نراك في التدريب.`;
+سأتابع معك التقدم أسبوعياً. جاهزون للانطلاق.`;
 }
 
 function copyField(id, btn) {
@@ -921,8 +981,10 @@ function copyFullMessage(btn) {
 }
 
 function shareWhatsapp() {
-  const msg = encodeURIComponent(buildFullMessage());
-  window.open(`https://wa.me/?text=${msg}`, '_blank');
+  const msg   = encodeURIComponent(buildFullMessage());
+  const phone = (document.getElementById('credPhone').textContent || lastCreated.phone || '').replace(/\D/g, '');
+  const url   = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url, '_blank');
 }
 
 /* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */

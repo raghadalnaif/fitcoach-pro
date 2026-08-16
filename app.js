@@ -413,46 +413,46 @@ const EX = {
   bench_press:      { ar: 'بنش برس', en: 'Barbell Bench Press', m: 'صدر', ico: '' },
   db_bench:         { ar: 'بنش دمبل', en: 'Dumbbell Bench Press', m: 'صدر', ico: '' },
   incline_press:    { ar: 'بنش مائل', en: 'Incline Dumbbell Press', m: 'صدر علوي', ico: '' },
-  pushup:           { ar: 'ضغط أرضي', en: 'Push Up', m: 'صدر', ico: '' },
+  pushup:           { ar: 'بوش أب', en: 'Push Up', m: 'صدر', ico: '' },
 
   // Back
-  pullup:           { ar: 'العقلة', en: 'Pull Up', m: 'ظهر', ico: '' },
-  lat_pulldown:     { ar: 'سحب علوي', en: 'Lat Pulldown', m: 'ظهر', ico: '' },
-  bb_row:           { ar: 'تجديف بار', en: 'Barbell Row', m: 'ظهر', ico: '' },
-  db_row:           { ar: 'تجديف دمبل', en: 'Dumbbell Row', m: 'ظهر', ico: '' },
-  cable_row:        { ar: 'تجديف كابل', en: 'Cable Row', m: 'ظهر', ico: '' },
-  face_pull:        { ar: 'شد وجه', en: 'Face Pull', m: 'ظهر علوي', ico: '' },
+  pullup:           { ar: 'بول أب', en: 'Pull Up', m: 'ظهر', ico: '' },
+  lat_pulldown:     { ar: 'لات بولداون', en: 'Lat Pulldown', m: 'ظهر', ico: '' },
+  bb_row:           { ar: 'بار رو', en: 'Barbell Row', m: 'ظهر', ico: '' },
+  db_row:           { ar: 'دمبل رو', en: 'Dumbbell Row', m: 'ظهر', ico: '' },
+  cable_row:        { ar: 'كيبل رو', en: 'Cable Row', m: 'ظهر', ico: '' },
+  face_pull:        { ar: 'فيس بول', en: 'Face Pull', m: 'ظهر علوي', ico: '' },
 
   // Shoulders
-  ohp:              { ar: 'ضغط أكتاف', en: 'Overhead Shoulder Press', m: 'أكتاف', ico: '' },
-  lateral_raise:    { ar: 'رفرفة جانبية', en: 'Lateral Raise', m: 'أكتاف جانبية', ico: '' },
+  ohp:              { ar: 'شولدر برس', en: 'Overhead Shoulder Press', m: 'أكتاف', ico: '' },
+  lateral_raise:    { ar: 'لاترال ريز', en: 'Lateral Raise', m: 'أكتاف جانبية', ico: '' },
 
   // Arms
   bicep_curl:       { ar: 'بايسبس دمبل', en: 'Dumbbell Bicep Curl', m: 'بايسبس', ico: '' },
   hammer_curl:      { ar: 'هامر كيرل', en: 'Hammer Curl', m: 'بايسبس', ico: '' },
   tricep_dip:       { ar: 'ديبس', en: 'Tricep Dips', m: 'ترايسبس', ico: '' },
-  tricep_ext:       { ar: 'تمديد ترايسبس', en: 'Tricep Extension', m: 'ترايسبس', ico: '' },
+  tricep_ext:       { ar: 'ترايسبس إكستنشن', en: 'Tricep Extension', m: 'ترايسبس', ico: '' },
 
   // Legs / Glutes
-  squat:            { ar: 'سكوات بار', en: 'Barbell Squat', m: 'أرجل', ico: '' },
-  goblet_squat:     { ar: 'سكوات دمبل', en: 'Goblet Squat', m: 'أرجل', ico: '' },
-  sumo_squat:       { ar: 'سكوات سومو', en: 'Sumo Squat', m: 'أرجل داخلية + جلوت', ico: '' },
-  bulgarian:        { ar: 'بلغاري سبليت', en: 'Bulgarian Split Squat', m: 'أرجل + جلوت', ico: '' },
-  lunges:           { ar: 'اندفاع', en: 'Walking Lunges', m: 'أرجل', ico: '' },
+  squat:            { ar: 'باربل سكوات', en: 'Barbell Squat', m: 'أرجل', ico: '' },
+  goblet_squat:     { ar: 'جوبلت سكوات', en: 'Goblet Squat', m: 'أرجل', ico: '' },
+  sumo_squat:       { ar: 'سومو سكوات', en: 'Sumo Squat', m: 'أرجل داخلية + جلوت', ico: '' },
+  bulgarian:        { ar: 'بلغاريان سكوات', en: 'Bulgarian Split Squat', m: 'أرجل + جلوت', ico: '' },
+  lunges:           { ar: 'لانجز', en: 'Walking Lunges', m: 'أرجل', ico: '' },
   rdl:              { ar: 'رومانيان ديدلفت', en: 'Romanian Deadlift', m: 'ظهر سفلي + جلوت', ico: '' },
   deadlift:         { ar: 'ديدلفت', en: 'Deadlift', m: 'كامل الجسم', ico: '' },
   hip_thrust:       { ar: 'هيب ثراست', en: 'Hip Thrust', m: 'جلوت', ico: '' },
   glute_bridge:     { ar: 'جلوت بريدج', en: 'Glute Bridge', m: 'جلوت', ico: '' },
-  cable_kickback:   { ar: 'ركلة كابل', en: 'Cable Glute Kickback', m: 'جلوت', ico: '' },
+  cable_kickback:   { ar: 'كيبل كيك باك', en: 'Cable Glute Kickback', m: 'جلوت', ico: '' },
   leg_press:        { ar: 'ليج برس', en: 'Leg Press', m: 'أرجل', ico: '' },
-  leg_curl:         { ar: 'تجعيد أرجل', en: 'Leg Curl', m: 'خلفية الفخذ', ico: '' },
-  leg_ext:          { ar: 'تمديد أرجل', en: 'Leg Extension', m: 'أمامية الفخذ', ico: '' },
-  calf_raise:       { ar: 'رفع سمانة', en: 'Calf Raise', m: 'سمانة', ico: '' },
+  leg_curl:         { ar: 'ليج كيرل', en: 'Leg Curl', m: 'خلفية الفخذ', ico: '' },
+  leg_ext:          { ar: 'ليج إكستنشن', en: 'Leg Extension', m: 'أمامية الفخذ', ico: '' },
+  calf_raise:       { ar: 'كاف ريز', en: 'Calf Raise', m: 'سمانة', ico: '' },
 
   // Core
   plank:            { ar: 'بلانك', en: 'Plank', m: 'كور', ico: '' },
   russian_twist:    { ar: 'روسيان تويست', en: 'Russian Twist', m: 'كور جانبي', ico: '' },
-  leg_raise:        { ar: 'رفع أرجل', en: 'Hanging Leg Raise', m: 'بطن سفلي', ico: '' },
+  leg_raise:        { ar: 'ليج ريز', en: 'Hanging Leg Raise', m: 'بطن سفلي', ico: '' },
 };
 
 // Attach a set scheme: {sets, reps}
@@ -742,6 +742,11 @@ function renderDay(planKey, idx) {
     const e = EX[item.id];
     if (!e) return '';
     const last = state.workoutProgress[item.id]?.slice(-1)[0];
+    // Normalize last session to sets array (handle legacy weight/reps entries)
+    const lastSets = last
+      ? (Array.isArray(last.sets) ? last.sets
+         : (last.weight != null ? [{ w: last.weight, r: last.reps }] : []))
+      : [];
     const videoUrl = state.videos[item.id];
     const ytId     = state.youtube[item.id];
     const hasAny   = videoUrl || ytId;
@@ -756,26 +761,58 @@ function renderDay(planKey, idx) {
     const watchLabel = hasAny
       ? '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> مشاهدة الفيديو'
       : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg> لا يوجد فيديو بعد';
+
+    // Build set input rows
+    const setsCount = parseInt(item.sets) || 3;
+    const setsRows = Array.from({ length: setsCount }).map((_, i) => {
+      const prev = lastSets[i];
+      const prevHint = prev
+        ? `<span class="set-prev">آخر مرة ${arNum(prev.w)}×${arNum(prev.r)}</span>`
+        : `<span class="set-prev muted">— لم يُسجّل</span>`;
+      return `
+        <div class="set-row">
+          <div class="set-num">${arNum(i + 1)}</div>
+          <input type="number" inputmode="decimal" step="0.5" class="set-input" data-ex="${item.id}" data-kind="w" data-i="${i}" placeholder="وزن" value="">
+          <span class="set-x">×</span>
+          <input type="number" inputmode="numeric" class="set-input" data-ex="${item.id}" data-kind="r" data-i="${i}" placeholder="تكرار" value="">
+          ${prevHint}
+        </div>`;
+    }).join('');
+
+    const historyCount = state.workoutProgress[item.id]?.length || 0;
+
     return `
       <div class="ex-card">
-        <div class="ex-img-wrap" onclick="openExVideo('${item.id}')">
-          ${preview}
-          <div class="ex-play"><svg class="ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="ex-head">
+          <div class="ex-img-wrap" onclick="openExVideo('${item.id}')">
+            ${preview}
+            <div class="ex-play"><svg class="ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">${e.ar}</div>
+            <div class="ex-name-en">${e.en}</div>
+            <div class="ex-muscle">${e.m}</div>
+            <div class="ex-scheme">
+              <div>مجموعات: <b>${arNum(item.sets)}</b></div>
+              <div>تكرارات: <b>${arNum(item.reps)}</b></div>
+            </div>
+          </div>
         </div>
-        <div class="ex-info">
-          <div class="ex-name">${e.ar}</div>
-          <div class="ex-muscle">${e.m}</div>
-          <div class="ex-scheme">
-            <div>مجموعات: <b>${arNum(item.sets)}</b></div>
-            <div>تكرارات: <b>${arNum(item.reps)}</b></div>
+        <button class="btn-watch" onclick="openExVideo('${item.id}')">${watchLabel}</button>
+
+        <div class="sets-wrap">
+          <div class="sets-head">
+            <div class="sets-title">سجل جولاتك</div>
+            ${historyCount > 0 ? `<button class="btn-history" onclick="showExHistory('${item.id}')">
+              <svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M3 3v5h5"/><path d="M3.05 13a9 9 0 106.05-8.5"/><path d="M12 8v5l3 2"/></svg>
+              التطور (${arNum(historyCount)})
+            </button>` : ''}
           </div>
-          <button class="btn-watch" onclick="openExVideo('${item.id}')">${watchLabel}</button>
-          <div class="ex-progress">
-            <input type="number" inputmode="decimal" id="w_${item.id}" placeholder="الوزن" value="${last?.weight || ''}">
-            <input type="number" inputmode="numeric" id="r_${item.id}" placeholder="التكرار" value="${last?.reps || ''}">
-            <button class="ex-save" onclick="saveExercise('${item.id}')">حفظ</button>
-          </div>
-          ${last ? `<div class="ex-last"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> آخر تسجيل: ${arNum(last.weight)} كجم × ${arNum(last.reps)}</div>` : ''}
+          ${setsRows}
+          <button class="ex-save" onclick="saveExerciseSets('${item.id}')">
+            <svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            حفظ الجلسة
+          </button>
         </div>
       </div>`;
   }).join('');
@@ -808,20 +845,54 @@ function renderDay(planKey, idx) {
   document.getElementById('exerciseList').innerHTML = exercisesHtml + cardioHtml;
 }
 
-async function saveExercise(exId) {
-  const w = document.getElementById('w_' + exId).value;
-  const r = document.getElementById('r_' + exId).value;
-  if (!w) return toast('أدخل الوزن', 'error');
+async function saveExerciseSets(exId) {
+  const inputs = document.querySelectorAll(`.set-input[data-ex="${exId}"]`);
+  const setsMap = {};
+  inputs.forEach(inp => {
+    const i = inp.dataset.i;
+    if (!setsMap[i]) setsMap[i] = { w: 0, r: 0 };
+    setsMap[i][inp.dataset.kind] = Number(inp.value) || 0;
+  });
+  const sets = Object.values(setsMap).filter(s => s.w > 0 || s.r > 0);
+  if (sets.length === 0) return toast('أدخل وزن أو تكرار في جولة واحدة على الأقل', 'error');
   try {
     await api('/api/me/progress', {
       method: 'POST',
-      body: JSON.stringify({ exerciseId: exId, weight: w, reps: r }),
+      body: JSON.stringify({ exerciseId: exId, sets }),
     });
     if (!state.workoutProgress[exId]) state.workoutProgress[exId] = [];
-    state.workoutProgress[exId].push({ weight: +w, reps: +r, date: new Date().toISOString() });
-    toast('تم الحفظ');
+    state.workoutProgress[exId].push({ date: new Date().toISOString(), sets });
+    toast(`تم حفظ ${arNum(sets.length)} جولات`);
     renderDay(state.selectedPlan, state.currentDay);
   } catch (e) { toast(e.message, 'error'); }
+}
+
+function showExHistory(exId) {
+  const e = EX[exId];
+  const hist = state.workoutProgress[exId] || [];
+  if (hist.length === 0) return toast('لا يوجد تسجيلات بعد');
+  const rows = [...hist].reverse().map(entry => {
+    const sets = Array.isArray(entry.sets) ? entry.sets
+               : (entry.weight != null ? [{ w: entry.weight, r: entry.reps }] : []);
+    const d = new Date(entry.date);
+    const dateStr = d.toLocaleDateString('ar-EG', { day:'numeric', month:'short', year:'numeric' });
+    const setsList = sets.map((s, i) =>
+      `<span class="hist-set">${arNum(i+1)}: <b>${arNum(s.w)}×${arNum(s.r)}</b></span>`
+    ).join('');
+    const total = sets.reduce((a, s) => a + s.w * s.r, 0);
+    return `
+      <div class="hist-row">
+        <div class="hist-date">${dateStr}</div>
+        <div class="hist-sets">${setsList}</div>
+        <div class="hist-total">حجم الرفعة: ${arNumFmt(total)} كجم</div>
+      </div>`;
+  }).join('');
+  const frame = document.getElementById('videoFrame');
+  const title = document.getElementById('videoTitle');
+  const modal = document.getElementById('videoModal');
+  if (title) title.textContent = 'تطور: ' + e.ar;
+  frame.innerHTML = `<div class="history-scroll">${rows}</div>`;
+  modal.classList.add('open');
 }
 
 function openExVideo(exId) {
