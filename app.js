@@ -151,24 +151,16 @@ function fillCalcForm(p) {
 }
 
 function updateEditsBadge() {
-  document.getElementById('editsBadge').textContent = `${arNum(state.editsLeft)}/٣ محاولات متبقية`;
-  const warn = document.getElementById('editsWarning');
-  const locked = document.getElementById('lockedBox');
+  const locked  = document.getElementById('lockedBox');
   const content = document.getElementById('calcContent');
 
   if (state.locked) {
-    lockedBox.style.display = 'block';
+    locked.style.display = 'block';
     content.style.display = 'none';
     return;
   }
-  lockedBox.style.display = 'none';
+  locked.style.display = 'none';
   content.style.display = 'block';
-
-  if (state.editsLeft <= 2) {
-    warn.style.display = 'block';
-    document.getElementById('editsCount').textContent = state.editsLeft;
-    if (state.editsLeft === 1) warn.classList.add('danger');
-  }
 }
 
 /* ═══════════════ CALCULATOR ═══════════════ */
@@ -242,7 +234,7 @@ document.getElementById('calcForm').addEventListener('submit', async (e) => {
     document.getElementById('heroProt').textContent = arNum(protein);
 
     updateEditsBadge();
-    toast('تم الحفظ — المتبقي ' + arNum(state.editsLeft) + ' محاولات');
+    toast('تم حفظ بياناتك بنجاح');
 
     btn.textContent = 'احسب واحفظ';
     btn.disabled = false;

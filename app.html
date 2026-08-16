@@ -109,7 +109,8 @@ button{font-family:inherit}
 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
   padding:22px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
-.card-title{font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title{font-size:15px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px}
 .card-title .ico{color:var(--blue)}
 
 /* ── QUICK ACTIONS ── */
@@ -662,20 +663,20 @@ button{font-family:inherit}
 
   <!-- ─── CALCULATOR ─── -->
   <div class="page" id="pageCalc">
-    <div class="section-title">حاسبة السعرات <span class="badge" id="editsBadge">—</span></div>
+    <div class="section-title">حاسبة السعرات</div>
 
     <div id="lockedBox" style="display:none">
       <div class="locked-overlay">
         <svg class="locked-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        <div class="locked-title">وصلتِ للحد الأقصى من التعديلات</div>
-        <div class="locked-msg">استخدمتِ 3 محاولات في تعديل الحاسبة.<br>يرجى التواصل مع المدرب لإعادة تفعيلها.</div>
+        <div class="locked-title">تعذّر تعديل البيانات</div>
+        <div class="locked-msg">تم إغلاق التعديل على هذه البيانات.<br>للتعديل، يُرجى التواصل مع المدرب.</div>
       </div>
     </div>
 
     <div id="calcContent">
-      <div class="edits-warning" id="editsWarning" style="display:none">
+      <div class="edits-warning" id="editsWarning">
         <svg class="ico" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
-        <div>تنبيه: لديكِ <b id="editsCount">—</b> محاولات فقط لتعديل الحسابة. تأكدي من الأرقام قبل الحفظ.</div>
+        <div>تنبيه: صُمِّمت هذه الحاسبة لضبط قيم برنامجك الغذائي بدقة، ولا يمكن تعديل بياناتك لاحقاً بعد الحفظ. يُرجى التأكد من صحة جميع البيانات قبل الحفظ.</div>
       </div>
 
       <div class="card">
@@ -812,6 +813,7 @@ button{font-family:inherit}
 
     <div class="card">
       <div class="card-title">اختر الجدول الأسبوعي</div>
+      <div class="card-sub">اختر عدد الأيام المناسب لك</div>
       <div class="plan-picker" id="planPicker"></div>
     </div>
 
