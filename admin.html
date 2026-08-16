@@ -80,6 +80,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ex-lib-progress{height:3px;background:var(--surface2);border-radius:2px;margin-top:6px;overflow:hidden;display:none}
 .ex-lib-progress.on{display:block}
 .ex-lib-progress-bar{height:100%;background:var(--blue);width:0%;transition:width .2s}
+/* YouTube URL input */
+.yt-row{display:flex;gap:5px;margin-bottom:8px;align-items:stretch}
+.yt-input{flex:1;min-width:0;padding:7px 10px;border:1px solid var(--border);border-radius:7px;
+  font-family:'Segoe UI',sans-serif;font-size:11px;background:var(--surface);outline:none;color:var(--text)}
+.yt-input:focus{border-color:#FF0000}
+.yt-input::placeholder{color:var(--subtle);font-size:11px}
+.yt-save{padding:7px 12px;background:#FF0000;color:#fff;border:none;border-radius:7px;
+  font-family:var(--font);font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.yt-save:hover{background:#CC0000}
+.yt-del{padding:7px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+  border-radius:7px;cursor:pointer;font-size:16px;line-height:1;font-family:var(--font)}
+.yt-del:hover{border-color:var(--red);color:var(--red)}
 
 /* ── LOGIN GATE ── */
 .login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -470,6 +482,7 @@ const EX_LIB = {
   }},
 };
 let libraryVideos = {};
+let libraryYoutube = {};
 
 function switchAdminTab(tab) {
   document.querySelectorAll('.tab-btn-admin').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
@@ -482,35 +495,53 @@ async function loadLibrary() {
   try {
     const r = await fetch('/api/exercises/videos');
     const data = await r.json();
-    libraryVideos = data.videos || {};
+    libraryVideos  = data.videos  || {};
+    libraryYoutube = data.youtube || {};
     renderLibrary();
   } catch (e) {
     document.getElementById('libraryContainer').innerHTML = '<div style="color:var(--red)">فشل التحميل</div>';
   }
 }
 
+function ytThumb(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+
 function renderLibrary() {
   const container = document.getElementById('libraryContainer');
   container.innerHTML = Object.entries(EX_LIB).map(([groupKey, group]) => {
     const items = Object.entries(group.items).map(([id, ex]) => {
       const videoUrl = libraryVideos[id];
-      const hasVideo = !!videoUrl;
+      const ytId     = libraryYoutube[id];
+      const hasAny   = !!videoUrl || !!ytId;
+      let preview;
+      if (videoUrl) {
+        preview = `<video src="${videoUrl}" muted loop playsinline autoplay></video>`;
+      } else if (ytId) {
+        preview = `<img src="${ytThumb(ytId)}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+      } else {
+        preview = `<svg class="ex-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
+      }
+      const statusLbl = videoUrl ? 'ملف مرفوع' : ytId ? 'يوتيوب' : 'لا فيديو';
       return `
-        <div class="ex-lib-card ${hasVideo ? 'has-video' : ''}">
+        <div class="ex-lib-card ${hasAny ? 'has-video' : ''}">
           <div class="ex-preview">
-            ${hasVideo
-              ? `<video src="${videoUrl}" muted loop playsinline autoplay></video>`
-              : `<svg class="ex-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`}
-            <span class="ex-status-badge ${hasVideo ? 'ok' : 'no'}">${hasVideo ? 'مرفوع' : 'لا فيديو'}</span>
+            ${preview}
+            <span class="ex-status-badge ${hasAny ? 'ok' : 'no'}">${statusLbl}</span>
           </div>
           <div class="ex-lib-name">${ex.ar}</div>
           <div class="ex-lib-en">${ex.en}</div>
+
+          <div class="yt-row">
+            <input type="text" class="yt-input" id="yt_${id}" placeholder="https://youtu.be/..." value="${ytId ? 'https://youtu.be/' + ytId : ''}" dir="ltr">
+            <button class="yt-save" onclick="saveYoutube('${id}')">حفظ</button>
+            ${ytId ? `<button class="yt-del" onclick="deleteYoutube('${id}')" title="حذف">×</button>` : ''}
+          </div>
+
           <div class="ex-lib-actions">
             <label class="ex-lib-btn">
-              <span>${hasVideo ? 'استبدال' : 'رفع فيديو'}</span>
+              <span>${videoUrl ? 'استبدال الملف' : 'رفع ملف'}</span>
               <input type="file" accept="video/mp4,video/webm,video/quicktime" onchange="uploadExVideo('${id}', this)">
             </label>
-            ${hasVideo ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg></button>` : ''}
+            ${videoUrl ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')" title="حذف الملف"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg></button>` : ''}
           </div>
           <div class="ex-lib-progress" id="prog_${id}"><div class="ex-lib-progress-bar" id="progbar_${id}"></div></div>
         </div>`;
@@ -521,6 +552,28 @@ function renderLibrary() {
         <div class="ex-cards">${items}</div>
       </div>`;
   }).join('');
+}
+
+async function saveYoutube(id) {
+  const url = document.getElementById('yt_' + id).value.trim();
+  if (!url) return toast('الصق رابط اليوتيوب أولاً', 'error');
+  try {
+    await api(`/api/admin/exercises/${id}/youtube`, {
+      method: 'POST',
+      body: JSON.stringify({ url }),
+    });
+    toast('تم حفظ الرابط');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteYoutube(id) {
+  if (!confirm('حذف رابط اليوتيوب؟')) return;
+  try {
+    await api(`/api/admin/exercises/${id}/youtube`, { method: 'DELETE' });
+    toast('تم الحذف');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function uploadExVideo(id, input) {

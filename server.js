@@ -368,8 +368,10 @@ app.delete('/api/admin/subscribers/:id', auth, requireAdmin, (req, res) => {
 });
 
 /* ═══════════════════════════════════════
-   EXERCISE VIDEOS — admin upload + public list
+   EXERCISE VIDEOS — uploaded files + YouTube URLs
 ═══════════════════════════════════════ */
+const YT_FILE = path.join(VIDEO_DIR, 'youtube.json');
+
 function findVideo(id) {
   for (const ext of ['.mp4', '.webm', '.mov']) {
     const p = path.join(VIDEO_DIR, `${id}${ext}`);
@@ -378,14 +380,44 @@ function findVideo(id) {
   return null;
 }
 
-// Public: list which exercises have videos
+function readYoutube() {
+  if (!fs.existsSync(YT_FILE)) return {};
+  try { return JSON.parse(fs.readFileSync(YT_FILE, 'utf8')); }
+  catch { return {}; }
+}
+
+function writeYoutube(data) {
+  fs.writeFileSync(YT_FILE, JSON.stringify(data, null, 2));
+}
+
+// Accepts: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/shorts/ID, youtube.com/embed/ID
+function extractYoutubeId(url = '') {
+  const patterns = [
+    /(?:youtu\.be\/)([A-Za-z0-9_-]{11})/,
+    /(?:youtube\.com\/watch\?v=)([A-Za-z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/,
+    /(?:youtube-nocookie\.com\/embed\/)([A-Za-z0-9_-]{11})/,
+  ];
+  for (const re of patterns) {
+    const m = url.match(re);
+    if (m) return m[1];
+  }
+  if (/^[A-Za-z0-9_-]{11}$/.test(url.trim())) return url.trim();
+  return null;
+}
+
+// Public: list uploaded videos + YouTube URLs
 app.get('/api/exercises/videos', (_req, res) => {
   const videos = {};
+  const yt = readYoutube();
+  const youtube = {};
   for (const id of VALID_EXERCISES) {
     const url = findVideo(id);
     if (url) videos[id] = url;
+    if (yt[id]) youtube[id] = yt[id];
   }
-  res.json({ videos });
+  res.json({ videos, youtube });
 });
 
 // Admin: upload video for one exercise
@@ -393,7 +425,6 @@ app.post('/api/admin/exercises/:id/video', auth, requireAdmin, (req, res) => {
   if (!VALID_EXERCISES.has(req.params.id))
     return res.status(400).json({ error: 'invalid exercise id' });
 
-  // Remove any existing file for this id (any ext)
   for (const ext of ['.mp4', '.webm', '.mov']) {
     const p = path.join(VIDEO_DIR, `${req.params.id}${ext}`);
     if (fs.existsSync(p)) fs.unlinkSync(p);
@@ -416,6 +447,47 @@ app.delete('/api/admin/exercises/:id/video', auth, requireAdmin, (req, res) => {
     if (fs.existsSync(p)) { fs.unlinkSync(p); removed = true; }
   }
   res.json({ ok: removed });
+});
+
+// Admin: save YouTube URL for one exercise
+app.post('/api/admin/exercises/:id/youtube', auth, requireAdmin, (req, res) => {
+  if (!VALID_EXERCISES.has(req.params.id))
+    return res.status(400).json({ error: 'invalid exercise id' });
+  const { url } = req.body || {};
+  const vid = extractYoutubeId(url || '');
+  if (!vid) return res.status(400).json({ error: 'رابط يوتيوب غير صحيح' });
+  const yt = readYoutube();
+  yt[req.params.id] = vid;
+  writeYoutube(yt);
+  res.json({ ok: true, videoId: vid });
+});
+
+// Admin: bulk save YouTube URLs
+app.post('/api/admin/exercises/youtube/bulk', auth, requireAdmin, (req, res) => {
+  const { items } = req.body || {};
+  if (!items || typeof items !== 'object') return res.status(400).json({ error: 'items required' });
+  const yt = readYoutube();
+  let saved = 0, skipped = 0;
+  for (const [id, url] of Object.entries(items)) {
+    if (!VALID_EXERCISES.has(id)) { skipped++; continue; }
+    const vid = extractYoutubeId(url || '');
+    if (!vid) { skipped++; continue; }
+    yt[id] = vid;
+    saved++;
+  }
+  writeYoutube(yt);
+  res.json({ ok: true, saved, skipped });
+});
+
+// Admin: delete YouTube URL
+app.delete('/api/admin/exercises/:id/youtube', auth, requireAdmin, (req, res) => {
+  if (!VALID_EXERCISES.has(req.params.id))
+    return res.status(400).json({ error: 'invalid exercise id' });
+  const yt = readYoutube();
+  const existed = !!yt[req.params.id];
+  delete yt[req.params.id];
+  writeYoutube(yt);
+  res.json({ ok: existed });
 });
 
 /* ═══════════════════════════════════════

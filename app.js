@@ -26,6 +26,7 @@ const state = {
   currentDay: 0,
   workoutProgress: {},
   videos: {},
+  youtube: {},
 };
 
 /* ═══════════════ AUTH ═══════════════ */
@@ -92,7 +93,8 @@ async function init() {
     state.locked  = me.locked;
     state.selectedPlan   = me.selectedPlan;
     state.workoutProgress = me.workoutProgress || {};
-    state.videos = vids.videos || {};
+    state.videos  = vids.videos  || {};
+    state.youtube = vids.youtube || {};
 
     // Header
     document.getElementById('daysLeftBadge').textContent = `${arNum(me.daysLeft)} يوم`;
@@ -741,10 +743,17 @@ function renderDay(planKey, idx) {
     if (!e) return '';
     const last = state.workoutProgress[item.id]?.slice(-1)[0];
     const videoUrl = state.videos[item.id];
-    const preview = videoUrl
-      ? `<video class="ex-video-inline" src="${videoUrl}" muted loop playsinline autoplay preload="metadata"></video>`
-      : `<svg class="ex-img-placeholder" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
-    const watchLabel = videoUrl
+    const ytId     = state.youtube[item.id];
+    const hasAny   = videoUrl || ytId;
+    let preview;
+    if (videoUrl) {
+      preview = `<video class="ex-video-inline" src="${videoUrl}" muted loop playsinline autoplay preload="metadata"></video>`;
+    } else if (ytId) {
+      preview = `<img src="https://i.ytimg.com/vi/${ytId}/hqdefault.jpg" class="ex-video-inline" alt="">`;
+    } else {
+      preview = `<svg class="ex-img-placeholder" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
+    }
+    const watchLabel = hasAny
       ? '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> مشاهدة الفيديو'
       : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg> لا يوجد فيديو بعد';
     return `
@@ -817,20 +826,23 @@ async function saveExercise(exId) {
 }
 
 function openExVideo(exId) {
-  const url = state.videos[exId];
-  const e   = EX[exId];
+  const url   = state.videos[exId];
+  const ytId  = state.youtube[exId];
+  const e     = EX[exId];
   const modal = document.getElementById('videoModal');
   const frame = document.getElementById('videoFrame');
   const title = document.getElementById('videoTitle');
   if (title) title.textContent = e ? e.ar : '';
-  if (!url) {
+  if (url) {
+    frame.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>`;
+  } else if (ytId) {
+    frame.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1" style="width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  } else {
     frame.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fff;text-align:center;padding:20px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:56px;height:56px;margin-bottom:14px;opacity:.6"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
       <div style="font-size:16px;font-weight:800;margin-bottom:6px">لم يتم رفع الفيديو بعد</div>
-      <div style="font-size:13px;opacity:.7">تواصلي مع المدرب لرفع فيديو الشرح</div>
+      <div style="font-size:13px;opacity:.7">تواصل مع المدرب لإضافة فيديو الشرح</div>
     </div>`;
-  } else {
-    frame.innerHTML = `<video src="${url}" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>`;
   }
   modal.classList.add('open');
 }
