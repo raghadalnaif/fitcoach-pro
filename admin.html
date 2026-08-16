@@ -189,17 +189,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-form.danger{background:var(--red)}
 .btn-form.danger:hover{background:#c81e2b}
 
-.credentials-box{background:var(--blue-bg);border:1.5px solid var(--blue);border-radius:12px;
-  padding:16px;margin-top:16px}
-.credentials-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:10px;text-align:center}
-.cred-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
-  border-bottom:1px dashed rgba(0,0,255,.15);font-size:14px}
-.cred-row:last-child{border-bottom:none}
-.cred-label{color:var(--muted);font-weight:600}
-.cred-val{font-family:monospace;font-weight:800;color:var(--blue);direction:ltr}
-.btn-copy{padding:9px 16px;background:var(--blue);color:#fff;border:none;border-radius:8px;
-  font-family:var(--font);font-size:12px;font-weight:800;cursor:pointer;margin-top:12px;width:100%}
-.btn-copy:hover{background:var(--blue-d)}
+.credentials-box{background:linear-gradient(135deg,#F5F6FF 0%,#EEF0FF 100%);
+  border:1.5px solid var(--blue);border-radius:14px;padding:18px;margin-top:16px;
+  box-shadow:0 4px 20px rgba(38,38,236,.08)}
+.credentials-title{font-size:14px;font-weight:900;color:var(--blue);margin-bottom:14px;
+  text-align:center;letter-spacing:.3px}
+.cred-field{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.cred-field-info{flex:1;min-width:0}
+.cred-field-label{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:2px;letter-spacing:.3px}
+.cred-field-val{font-family:'Segoe UI Mono',monospace;font-weight:800;color:var(--text);
+  font-size:14px;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cred-field-val.small{font-size:11px}
+.cred-copy-btn{padding:8px 10px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--blue);border-radius:8px;cursor:pointer;transition:all .15s;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cred-copy-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cred-copy-btn.done{background:var(--green);color:#fff;border-color:var(--green)}
+.cred-copy-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+
+.share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.share-btn{padding:12px 14px;border:none;border-radius:10px;font-family:var(--font);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:7px;color:#fff}
+.share-btn svg{width:16px;height:16px;fill:currentColor}
+.share-btn.wa{background:#25D366}
+.share-btn.wa:hover{background:#1DA851;transform:translateY(-1px)}
+.share-btn.copy{background:var(--blue)}
+.share-btn.copy:hover{background:var(--blue-d);transform:translateY(-1px)}
+.share-btn.done{background:var(--green)}
 
 .error-msg{background:#fef1f2;color:var(--red);padding:10px 12px;border-radius:8px;
   font-size:13px;font-weight:600;margin-bottom:14px;display:none}
@@ -371,12 +390,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
       <div class="credentials-box">
         <div class="credentials-title">بيانات الدخول</div>
-        <div class="cred-row"><span class="cred-label">اسم المستخدم</span><span class="cred-val" id="credUser">-</span></div>
-        <div class="cred-row"><span class="cred-label">كلمة المرور</span><span class="cred-val" id="credPass">-</span></div>
-        <div class="cred-row"><span class="cred-label">رابط الدخول</span><span class="cred-val" id="credUrl" style="font-size:11px">-</span></div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">اسم المستخدم</div>
+            <div class="cred-field-val" id="credUser">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credUser', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">كلمة المرور</div>
+            <div class="cred-field-val" id="credPass">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credPass', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">رابط الدخول</div>
+            <div class="cred-field-val small" id="credUrl">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credUrl', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="share-actions">
+          <button class="share-btn wa" onclick="shareWhatsapp()">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            إرسال واتساب
+          </button>
+          <button class="share-btn copy" onclick="copyFullMessage(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            نسخ الرسالة
+          </button>
+        </div>
       </div>
-      <button class="btn-copy" onclick="copyCredentials()">نسخ البيانات كاملة</button>
-      <button class="btn-form" style="margin-top:8px;background:var(--surface2);color:var(--text)" onclick="closeModal('addModal');resetAddForm()">تم — إغلاق</button>
+      <button class="btn-form" style="margin-top:12px;background:var(--surface2);color:var(--text)" onclick="closeModal('addModal');resetAddForm()">تم — إغلاق</button>
     </div>
   </div>
 </div>
@@ -527,8 +583,7 @@ function renderLibrary() {
             ${preview}
             <span class="ex-status-badge ${hasAny ? 'ok' : 'no'}">${statusLbl}</span>
           </div>
-          <div class="ex-lib-name">${ex.ar}</div>
-          <div class="ex-lib-en">${ex.en}</div>
+          <div class="ex-lib-name" style="margin-bottom:8px">${ex.ar}</div>
 
           <div class="yt-row">
             <input type="text" class="yt-input" id="yt_${id}" placeholder="https://youtu.be/..." value="${ytId ? 'https://youtu.be/' + ytId : ''}" dir="ltr">
@@ -831,12 +886,43 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
   }
 });
 
-function copyCredentials() {
+function buildFullMessage() {
   const user = document.getElementById('credUser').textContent;
   const pass = document.getElementById('credPass').textContent;
   const url  = document.getElementById('credUrl').textContent;
-  const text = `مرحباً في UR PASS 💙\n\nبيانات دخولك:\n\n🔗 الرابط: ${url}\n👤 اسم المستخدم: ${user}\n🔑 كلمة المرور: ${pass}\n\nنراك في التدريب!`;
-  navigator.clipboard.writeText(text).then(() => toast('تم نسخ البيانات'));
+  return `أهلاً بك في UR PASS
+
+بيانات الدخول:
+
+الرابط: ${url}
+اسم المستخدم: ${user}
+كلمة المرور: ${pass}
+
+نراك في التدريب.`;
+}
+
+function copyField(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('done');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = orig; }, 1400);
+  });
+}
+
+function copyFullMessage(btn) {
+  navigator.clipboard.writeText(buildFullMessage()).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('done');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> تم النسخ';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = orig; }, 1600);
+  });
+}
+
+function shareWhatsapp() {
+  const msg = encodeURIComponent(buildFullMessage());
+  window.open(`https://wa.me/?text=${msg}`, '_blank');
 }
 
 /* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */

@@ -764,7 +764,6 @@ function renderDay(planKey, idx) {
         </div>
         <div class="ex-info">
           <div class="ex-name">${e.ar}</div>
-          <div class="ex-name-en">${e.en}</div>
           <div class="ex-muscle">${e.m}</div>
           <div class="ex-scheme">
             <div>مجموعات: <b>${arNum(item.sets)}</b></div>
