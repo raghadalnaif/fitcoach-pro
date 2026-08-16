@@ -30,12 +30,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
 .logo-wrap{text-align:center;margin-bottom:36px}
-.logo-mark{width:64px;height:64px;background:var(--blue);border-radius:16px;
-  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
-  box-shadow:0 8px 24px rgba(38,38,236,.28)}
-.logo-mark svg{width:32px;height:32px;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.logo-name{font-size:24px;font-weight:900;color:var(--text);letter-spacing:2px;line-height:1}
-.logo-tag{font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;letter-spacing:2px;text-transform:uppercase}
+.logo-mark{width:96px;height:96px;margin:0 auto 14px;display:block}
+.logo-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-tag{font-size:11px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:2px;text-transform:uppercase}
 
 .title{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
 .subtitle{font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px}
@@ -71,15 +68,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 <div class="login-card">
   <div class="logo-wrap">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M6 3v10a6 6 0 0 0 12 0V3"/><path d="M9 8h6"/></svg>
-    </div>
-    <div class="logo-name">UR PASS</div>
+    <div class="logo-mark"><img src="/logo.png" alt="UR PASS"></div>
     <div class="logo-tag">Fitness &amp; Nutrition</div>
   </div>
 
   <div class="title">تسجيل الدخول</div>
-  <div class="subtitle">أدخلي بيانات الدخول التي زوّدك بها المدرب</div>
+  <div class="subtitle">أدخل بيانات الدخول التي زوّدك بها المدرب</div>
 
   <div class="error-box" id="errorBox"></div>
 
@@ -95,7 +89,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <button type="submit" class="btn-login" id="btnLogin">دخول</button>
   </form>
 
-  <div class="help-note">نسيتِ بياناتك؟ تواصلي مع المدرب لإعادة إرسالها</div>
+  <div class="help-note">نسيت بيانات الدخول؟ تواصل مع المدرب لإعادة إرسالها</div>
 </div>
 
 <a href="/admin" class="admin-link">لوحة المدرب</a>

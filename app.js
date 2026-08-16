@@ -3,6 +3,19 @@
 ═══════════════════════════════════════════════════════════ */
 
 const TOKEN_KEY = 'urpass_token';
+
+/* ═══════════════ ARABIC NUMERAL HELPERS ═══════════════ */
+// عرض الأرقام بالأرقام العربية-الهندية للمشتركين
+const AR_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function arNum(n) {
+  if (n === null || n === undefined || n === '') return '';
+  return String(n).replace(/[0-9]/g, d => AR_DIGITS[+d]);
+}
+// للأرقام الكبيرة مع الفواصل
+function arNumFmt(n) {
+  if (n === null || n === undefined || n === '') return '';
+  return arNum(Number(n).toLocaleString('en-US'));
+}
 const state = {
   user: null,
   profile: null,
@@ -82,20 +95,20 @@ async function init() {
     state.videos = vids.videos || {};
 
     // Header
-    document.getElementById('daysLeftBadge').textContent = `${me.daysLeft} يوم`;
+    document.getElementById('daysLeftBadge').textContent = `${arNum(me.daysLeft)} يوم`;
     if (me.daysLeft <= 7) document.getElementById('daysLeftBadge').classList.add('warn');
 
     // Hero
     document.getElementById('heroName').textContent = me.fullName;
-    document.getElementById('heroDays').textContent = me.daysLeft;
+    document.getElementById('heroDays').textContent = arNum(me.daysLeft);
     if (me.macros) {
-      document.getElementById('heroCal').textContent  = me.macros.cal;
-      document.getElementById('heroProt').textContent = me.macros.protein;
+      document.getElementById('heroCal').textContent  = arNumFmt(me.macros.cal);
+      document.getElementById('heroProt').textContent = arNum(me.macros.protein);
     }
 
     // Print header
     document.getElementById('printName').textContent = me.fullName;
-    document.getElementById('printDate').textContent = new Date().toLocaleDateString('ar-SA');
+    document.getElementById('printDate').textContent = new Date().toLocaleDateString('ar-EG');
 
     // Populate calc form if profile exists
     if (me.profile) fillCalcForm(me.profile);
@@ -120,16 +133,16 @@ function fillCalcForm(p) {
   document.getElementById('activity').value = p.activity;
 
   if (state.macros) {
-    document.getElementById('rCal').textContent  = state.macros.cal;
-    document.getElementById('rProt').textContent = state.macros.protein;
-    document.getElementById('rCarb').textContent = state.macros.carbs;
-    document.getElementById('rFat').textContent  = state.macros.fat;
+    document.getElementById('rCal').textContent  = arNumFmt(state.macros.cal);
+    document.getElementById('rProt').textContent = arNum(state.macros.protein);
+    document.getElementById('rCarb').textContent = arNum(state.macros.carbs);
+    document.getElementById('rFat').textContent  = arNum(state.macros.fat);
     document.getElementById('macrosResult').classList.add('show');
   }
 }
 
 function updateEditsBadge() {
-  document.getElementById('editsBadge').textContent = `${state.editsLeft}/3 محاولات متبقية`;
+  document.getElementById('editsBadge').textContent = `${arNum(state.editsLeft)}/٣ محاولات متبقية`;
   const warn = document.getElementById('editsWarning');
   const locked = document.getElementById('lockedBox');
   const content = document.getElementById('calcContent');
@@ -209,24 +222,24 @@ document.getElementById('calcForm').addEventListener('submit', async (e) => {
     state.editsLeft = r.editsLeft;
     if (state.editsLeft === 0) state.locked = true;
 
-    document.getElementById('rCal').textContent  = cal;
-    document.getElementById('rProt').textContent = protein;
-    document.getElementById('rCarb').textContent = carbs;
-    document.getElementById('rFat').textContent  = fat;
+    document.getElementById('rCal').textContent  = arNumFmt(cal);
+    document.getElementById('rProt').textContent = arNum(protein);
+    document.getElementById('rCarb').textContent = arNum(carbs);
+    document.getElementById('rFat').textContent  = arNum(fat);
     document.getElementById('macrosResult').classList.add('show');
     document.getElementById('macrosResult').scrollIntoView({ behavior:'smooth', block:'center' });
 
-    document.getElementById('heroCal').textContent  = cal;
-    document.getElementById('heroProt').textContent = protein;
+    document.getElementById('heroCal').textContent  = arNumFmt(cal);
+    document.getElementById('heroProt').textContent = arNum(protein);
 
     updateEditsBadge();
-    toast('تم الحفظ لديكِ ' + state.editsLeft + ' محاولات متبقية');
+    toast('تم الحفظ — المتبقي ' + arNum(state.editsLeft) + ' محاولات');
 
-    btn.textContent = 'احسبي وحفظي';
+    btn.textContent = 'احسب واحفظ';
     btn.disabled = false;
   } catch (e) {
     toast(e.message, 'error');
-    btn.textContent = 'احسبي وحفظي';
+    btn.textContent = 'احسب واحفظ';
     btn.disabled = false;
   }
 });
@@ -342,10 +355,10 @@ function renderMeals() {
 
   // Summary
   document.getElementById('mealSummary').innerHTML = `
-    <div class="ms-card"><div class="ms-val">${state.macros.cal}</div><div class="ms-lbl">سعرة/يوم</div></div>
-    <div class="ms-card"><div class="ms-val">${state.macros.protein}غ</div><div class="ms-lbl">بروتين</div></div>
-    <div class="ms-card"><div class="ms-val">${state.macros.carbs}غ</div><div class="ms-lbl">كارب</div></div>
-    <div class="ms-card"><div class="ms-val">${state.macros.fat}غ</div><div class="ms-lbl">دهون</div></div>
+    <div class="ms-card"><div class="ms-val">${arNumFmt(state.macros.cal)}</div><div class="ms-lbl">سعرة/يوم</div></div>
+    <div class="ms-card"><div class="ms-val">${arNum(state.macros.protein)}غ</div><div class="ms-lbl">بروتين</div></div>
+    <div class="ms-card"><div class="ms-val">${arNum(state.macros.carbs)}غ</div><div class="ms-lbl">كارب</div></div>
+    <div class="ms-card"><div class="ms-val">${arNum(state.macros.fat)}غ</div><div class="ms-lbl">دهون</div></div>
   `;
 
   // Meals list
@@ -354,7 +367,7 @@ function renderMeals() {
       const items = opt.items.map(it => {
         if (it.q === 0) return `<li class="opt-item"><span class="opt-item-name">${it.n}</span><span class="opt-item-qty">${it.u}</span></li>`;
         const scaledQ = Math.round(it.q * scale);
-        return `<li class="opt-item"><span class="opt-item-name">${it.n}</span><span class="opt-item-qty">${scaledQ} ${it.u}</span></li>`;
+        return `<li class="opt-item"><span class="opt-item-name">${it.n}</span><span class="opt-item-qty">${arNum(scaledQ)} ${it.u}</span></li>`;
       }).join('');
 
       const p = Math.round(opt.macros.p * scale);
@@ -364,12 +377,12 @@ function renderMeals() {
 
       return `
         <div class="opt-box">
-          <div class="opt-title">${opt.title} <span class="opt-cal">~${cal}ك</span></div>
+          <div class="opt-title">${opt.title} <span class="opt-cal">~${arNum(cal)}ك</span></div>
           <ul class="opt-items">${items}</ul>
           <div class="opt-macros">
-            <div class="opt-macro"><div class="opt-macro-val">${p}غ</div><div class="opt-macro-lbl">بروتين</div></div>
-            <div class="opt-macro"><div class="opt-macro-val">${c}غ</div><div class="opt-macro-lbl">كارب</div></div>
-            <div class="opt-macro"><div class="opt-macro-val">${f}غ</div><div class="opt-macro-lbl">دهون</div></div>
+            <div class="opt-macro"><div class="opt-macro-val">${arNum(p)}غ</div><div class="opt-macro-lbl">بروتين</div></div>
+            <div class="opt-macro"><div class="opt-macro-val">${arNum(c)}غ</div><div class="opt-macro-lbl">كارب</div></div>
+            <div class="opt-macro"><div class="opt-macro-val">${arNum(f)}غ</div><div class="opt-macro-lbl">دهون</div></div>
           </div>
         </div>`;
     }).join('');
@@ -384,7 +397,7 @@ function renderMeals() {
               <div class="meal-time">${meal.time}</div>
             </div>
           </div>
-          <div class="meal-tag">MEAL 0${mi+1}</div>
+          <div class="meal-tag">MEAL ${arNum('0' + (mi+1))}</div>
         </div>
         <div class="options-grid">${opts}</div>
       </div>`;
@@ -696,16 +709,34 @@ function switchDay(i) {
   renderWorkoutDays(state.selectedPlan);
 }
 
+/* الكارديو حسب هدف المشترك */
+function cardioForDay(dayIdx) {
+  const goal = state.profile?.goal || 'maintain';
+  const base = { lose: 25, maintain: 15, gain: 10 }[goal];
+  const options = [
+    { type: 'مشي سريع', pace: 'وتيرة مريحة', icon: 'walk' },
+    { type: 'ركض خفيف', pace: 'وتيرة متوسطة', icon: 'run' },
+    { type: 'دراجة ثابتة', pace: 'مقاومة خفيفة', icon: 'bike' },
+    { type: 'إليبتيكال', pace: 'وتيرة ثابتة', icon: 'ellip' },
+    { type: 'حبل قفز', pace: '30ث نشاط + 30ث راحة', icon: 'rope' },
+  ];
+  const pick = options[dayIdx % options.length];
+  const note = goal === 'lose'   ? 'ضروري لخسارة الوزن'
+             : goal === 'gain'   ? 'اختياري — للتخفيف نصف المدة'
+             : 'موصى به للياقة القلبية';
+  return { ...pick, minutes: base, note, goal };
+}
+
 function renderDay(planKey, idx) {
   const plan = PLANS[planKey];
   const day = plan.days[idx];
   document.getElementById('daySummary').innerHTML = `
     <div>
       <div class="day-title">${day.name}</div>
-      <div class="day-count">${day.list.length} تمارين</div>
+      <div class="day-count">${arNum(day.list.length)} تمارين + كارديو</div>
     </div>
   `;
-  document.getElementById('exerciseList').innerHTML = day.list.map(item => {
+  const exercisesHtml = day.list.map(item => {
     const e = EX[item.id];
     if (!e) return '';
     const last = state.workoutProgress[item.id]?.slice(-1)[0];
@@ -714,7 +745,7 @@ function renderDay(planKey, idx) {
       ? `<video class="ex-video-inline" src="${videoUrl}" muted loop playsinline autoplay preload="metadata"></video>`
       : `<svg class="ex-img-placeholder" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
     const watchLabel = videoUrl
-      ? '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> اضغطي هنا لمشاهدة التمرين'
+      ? '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> مشاهدة الفيديو'
       : '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg> لا يوجد فيديو بعد';
     return `
       <div class="ex-card">
@@ -727,25 +758,52 @@ function renderDay(planKey, idx) {
           <div class="ex-name-en">${e.en}</div>
           <div class="ex-muscle">${e.m}</div>
           <div class="ex-scheme">
-            <div>مجموعات: <b>${item.sets}</b></div>
-            <div>تكرارات: <b>${item.reps}</b></div>
+            <div>مجموعات: <b>${arNum(item.sets)}</b></div>
+            <div>تكرارات: <b>${arNum(item.reps)}</b></div>
           </div>
           <button class="btn-watch" onclick="openExVideo('${item.id}')">${watchLabel}</button>
           <div class="ex-progress">
-            <input type="number" id="w_${item.id}" placeholder="الوزن" value="${last?.weight || ''}">
-            <input type="number" id="r_${item.id}" placeholder="التكرار" value="${last?.reps || ''}">
+            <input type="number" inputmode="decimal" id="w_${item.id}" placeholder="الوزن" value="${last?.weight || ''}">
+            <input type="number" inputmode="numeric" id="r_${item.id}" placeholder="التكرار" value="${last?.reps || ''}">
             <button class="ex-save" onclick="saveExercise('${item.id}')">حفظ</button>
           </div>
-          ${last ? `<div class="ex-last"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> آخر تسجيل: ${last.weight} كجم × ${last.reps}</div>` : ''}
+          ${last ? `<div class="ex-last"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> آخر تسجيل: ${arNum(last.weight)} كجم × ${arNum(last.reps)}</div>` : ''}
         </div>
       </div>`;
   }).join('');
+
+  // Cardio at end of workout
+  const c = cardioForDay(idx);
+  const cardioIcons = {
+    walk:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M4 22l4-9 4 3 3 8M13 10l4 3 3-4 2 3"/></svg>',
+    run:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="4" r="2"/><path d="M3 22l4-8 5 2-2 6M12 16l4-4 3 3 2-4M8 12l2-4 4 1"/></svg>',
+    bike:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/><path d="M6 17l4-9h5l3 9M13 6h3"/></svg>',
+    ellip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="18" rx="8" ry="2"/><path d="M12 16V4M8 8l8 6"/></svg>',
+    rope:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 6v6M4 20c0-6 4-8 8-8s8 2 8 8"/></svg>',
+  };
+  const cardioHtml = `
+    <div class="cardio-card">
+      <div class="cardio-head">
+        <div class="cardio-icon">${cardioIcons[c.icon]}</div>
+        <div style="flex:1">
+          <div class="cardio-title">كارديو بعد التمرين</div>
+          <div class="cardio-note">${c.note}</div>
+        </div>
+        <div class="cardio-duration">${arNum(c.minutes)} <span>دقيقة</span></div>
+      </div>
+      <div class="cardio-body">
+        <div class="cardio-row"><span class="cardio-lbl">النوع</span><span class="cardio-val">${c.type}</span></div>
+        <div class="cardio-row"><span class="cardio-lbl">الوتيرة</span><span class="cardio-val">${c.pace}</span></div>
+      </div>
+    </div>`;
+
+  document.getElementById('exerciseList').innerHTML = exercisesHtml + cardioHtml;
 }
 
 async function saveExercise(exId) {
   const w = document.getElementById('w_' + exId).value;
   const r = document.getElementById('r_' + exId).value;
-  if (!w) return toast('أدخلي الوزن', 'error');
+  if (!w) return toast('أدخل الوزن', 'error');
   try {
     await api('/api/me/progress', {
       method: 'POST',

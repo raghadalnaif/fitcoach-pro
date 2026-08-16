@@ -28,10 +28,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;
   box-shadow:0 1px 4px rgba(0,0,255,.04)}
 .logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:38px;height:38px;background:var(--blue);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;padding:6px;
-  box-shadow:0 4px 12px rgba(38,38,236,.24)}
-.logo-mark svg{width:100%;height:100%;fill:#fff}
+.logo-mark{width:40px;height:40px;display:block}
+.logo-mark img{width:100%;height:100%;object-fit:contain;display:block}
 .logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
 .logo-sub{font-size:11px;color:var(--muted);font-weight:600}
 .header-actions{display:flex;gap:8px;align-items:center}
@@ -219,13 +217,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div id="loginGate" class="login-gate">
   <div class="login-box">
     <div style="text-align:center;margin-bottom:22px">
-      <div class="logo-mark" style="width:56px;height:56px;margin:0 auto 12px;padding:8px">
-        <svg viewBox="0 0 200 200">
-          <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
-          <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
-          <path d="M148 96 l22 42 l-22 42 z"/>
-        </svg>
-      </div>
+      <div class="logo-mark" style="width:72px;height:72px;margin:0 auto 12px"><img src="/logo.png" alt="UR PASS"></div>
       <div class="logo-text">UR PASS</div>
       <div class="logo-sub">لوحة المدرب</div>
     </div>
@@ -249,13 +241,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div id="dashboard" style="display:none">
   <div class="header">
     <div class="logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 200 200">
-          <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
-          <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
-          <path d="M148 96 l22 42 l-22 42 z"/>
-        </svg>
-      </div>
+      <div class="logo-mark"><img src="/logo.png" alt="UR PASS"></div>
       <div>
         <div class="logo-text">UR PASS</div>
         <div class="logo-sub">لوحة المدرب</div>

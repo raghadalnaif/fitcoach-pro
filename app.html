@@ -2,7 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2626EC">
+<meta name="apple-mobile-web-app-title" content="UR PASS">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="icon" type="image/png" href="/logo.png">
 <title>UR PASS — منطقة العضو</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -19,8 +25,13 @@
   --font:'Tajawal',system-ui,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
-  direction:rtl;padding-bottom:82px;-webkit-font-smoothing:antialiased}
+  direction:rtl;padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:contain;overflow-x:hidden}
+button,a,input,select{-webkit-tap-highlight-color:transparent}
+button{font-family:inherit}
 
 /* Icons — universal */
 .ico{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;
@@ -29,14 +40,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ico-xl{width:32px;height:32px}
 
 /* ── HEADER ── */
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;
+.header{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 18px calc(12px);
+  padding-top:calc(12px + env(safe-area-inset-top));
   display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;
-  box-shadow:var(--shadow-sm)}
+  box-shadow:var(--shadow-sm);backdrop-filter:saturate(180%) blur(20px);
+  background:rgba(255,255,255,.92)}
 .brand{display:flex;align-items:center;gap:10px}
-.brand-mark{width:38px;height:38px;background:var(--blue);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;padding:6px;
-  box-shadow:0 4px 12px rgba(38,38,236,.24)}
-.brand-mark svg{width:100%;height:100%;fill:#fff}
+.brand-mark{width:36px;height:36px;display:block}
+.brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
 .brand-name{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
 
 .header-actions{display:flex;align-items:center;gap:10px}
@@ -48,15 +60,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-icon:hover{border-color:var(--red);color:var(--red);background:#FEF2F2}
 
 /* ── BOTTOM NAV ── */
-.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
-  padding:6px 4px;display:flex;justify-content:space-around;z-index:20;
-  box-shadow:0 -4px 20px rgba(15,23,42,.04)}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  display:flex;justify-content:space-around;z-index:20;
+  box-shadow:0 -4px 20px rgba(15,23,42,.06)}
 .tab-btn{flex:1;background:none;border:none;padding:10px 4px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:var(--muted);font-family:var(--font);transition:color .15s;border-radius:10px}
+  color:var(--muted);font-family:var(--font);transition:all .15s;border-radius:10px;
+  min-height:52px;position:relative}
 .tab-btn.active{color:var(--blue)}
+.tab-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:24px;height:3px;background:var(--blue);border-radius:0 0 3px 3px}
+.tab-btn:active{transform:scale(.94)}
 .tab-btn:hover:not(.active){color:var(--text)}
-.tab-ico{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;
+.tab-ico{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;
   stroke-linecap:round;stroke-linejoin:round;display:block}
 .tab-lbl{font-size:11px;font-weight:700}
 
@@ -274,6 +293,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .day-title{font-size:16px;font-weight:900;color:var(--blue)}
 .day-count{font-size:12px;color:var(--muted);font-weight:700}
 
+/* ── CARDIO CARD ── */
+.cardio-card{background:linear-gradient(135deg,#FFF7ED 0%,#FFEDD5 100%);
+  border:1.5px solid #FDBA74;border-radius:14px;padding:16px;margin-top:14px;
+  box-shadow:0 4px 16px rgba(251,146,60,.10)}
+.cardio-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cardio-icon{width:44px;height:44px;background:rgba(251,146,60,.15);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;color:#EA580C;flex-shrink:0}
+.cardio-icon svg{width:24px;height:24px}
+.cardio-title{font-size:15px;font-weight:900;color:#7C2D12;margin-bottom:2px}
+.cardio-note{font-size:11px;color:#9A3412;font-weight:600}
+.cardio-duration{font-size:22px;font-weight:900;color:#EA580C;text-align:center;line-height:1;letter-spacing:-.5px}
+.cardio-duration span{font-size:11px;font-weight:700;display:block;margin-top:3px;color:#9A3412}
+.cardio-body{background:rgba(255,255,255,.6);border-radius:10px;padding:10px 14px}
+.cardio-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+.cardio-row:not(:last-child){border-bottom:1px dashed rgba(154,52,18,.15)}
+.cardio-lbl{color:#9A3412;font-weight:700}
+.cardio-val{color:#7C2D12;font-weight:800}
+
 /* ── VIDEO MODAL ── */
 .video-modal{position:fixed;inset:0;background:rgba(15,23,42,.9);z-index:100;
   display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
@@ -324,12 +361,42 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 }
 .print-header{display:none}
 
+/* ── MOBILE-FIRST APP FEEL ── */
 @media(max-width:640px){
+  .container{padding:16px 14px}
   .form-row{grid-template-columns:1fr}
-  .hero-name{font-size:19px}
-  .macros-cal{font-size:36px}
-  .ex-card{flex-direction:column}
-  .ex-img-wrap{width:100%;height:180px}
+  .hero-name{font-size:20px}
+  .hero-card{padding:22px 20px;border-radius:18px}
+  .macros-cal{font-size:38px}
+  .section-title{font-size:17px}
+  .card{padding:18px;border-radius:14px}
+  .ex-card{flex-direction:column;padding:14px}
+  .ex-img-wrap{width:100%;height:200px;border-radius:14px}
+  .ex-play{width:44px;height:44px;bottom:12px;right:12px}
+  .ex-play .ico{width:14px;height:14px}
+  .btn-primary,.btn-outline{padding:14px 20px;font-size:15px;min-height:48px;width:100%}
+  .form-input,.form-select{padding:14px 15px;font-size:16px;min-height:48px}
+  .chip{padding:12px 18px;font-size:14px;min-height:44px;display:flex;align-items:center}
+  .ex-progress input{padding:12px 10px;font-size:15px;min-height:44px}
+  .ex-save{padding:12px 18px;min-height:44px}
+  .qa-btn{padding:24px 12px;min-height:120px}
+  .qa-ico{width:36px;height:36px}
+  .day-tab{padding:12px 20px;min-height:44px;font-size:14px}
+  .plan-card{padding:24px 14px;min-height:120px}
+  .plan-card-days{font-size:36px}
+  .meal-block{padding:18px 16px;border-radius:14px}
+  .cardio-card{padding:18px 16px}
+  .cardio-duration{font-size:24px}
+  .badge-days{font-size:12px;padding:7px 14px}
+  .btn-icon{width:40px;height:40px}
+  .video-modal{padding:16px}
+  .video-frame{border-radius:14px}
+  .video-close{top:-40px;font-size:15px}
+}
+
+/* touch device polish */
+@media(hover:none){
+  .qa-btn:hover,.card:hover,.plan-card:hover,.ex-card:hover{transform:none;box-shadow:var(--shadow-sm)}
 }
 </style>
 </head>
@@ -337,13 +404,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 <div class="header">
   <div class="brand">
-    <div class="brand-mark">
-      <svg viewBox="0 0 200 200">
-        <path d="M42 22 h32 v96 c0 22 12 34 26 34 s26 -12 26 -34 v-96 h32 v102 c0 42 -22 62 -58 62 s-58 -20 -58 -62 z"/>
-        <path d="M72 92 h48 c26 0 42 16 42 42 s-16 42 -42 42 h-22 v58 h-26 v-58 z m26 25 h22 c8 0 13 6 13 17 s-5 17 -13 17 h-22 z"/>
-        <path d="M148 96 l22 42 l-22 42 z"/>
-      </svg>
-    </div>
+    <div class="brand-mark"><img src="/logo.png" alt="UR PASS"></div>
     <div class="brand-name">UR PASS</div>
   </div>
   <div class="header-actions">
@@ -359,7 +420,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <!-- ─── HOME ─── -->
   <div class="page active" id="pageHome">
     <div class="hero-card">
-      <div class="hero-greeting">مرحباً بكِ</div>
+      <div class="hero-greeting">أهلاً بك</div>
       <div class="hero-name" id="heroName">—</div>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -377,7 +438,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
 
-    <div class="section-title">ابدئي من هنا</div>
+    <div class="section-title">ابدأ من هنا</div>
     <div class="quick-actions">
       <div class="qa-btn" onclick="switchTab('calc')">
         <svg class="qa-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
@@ -399,8 +460,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         نصائح سريعة
       </div>
       <ul class="tips-list">
-        <li>ابدئي بحساب سعراتك من تبويب <b>الحاسبة</b> — البرنامج الغذائي يتكيّف تلقائياً</li>
-        <li>اختاري جدول تمارين مناسب لجدولك من <b>جدول التمارين</b> (3, 4, أو 5 أيام)</li>
+        <li>ابدأ بحساب السعرات من تبويب <b>الحاسبة</b> — البرنامج الغذائي يتكيّف تلقائياً</li>
+        <li>اختر جدول تمارين مناسب من <b>جدول التمارين</b> (3, 4, أو 5 أيام)</li>
         <li>سجّلي وزنك في كل تمرين لتتبعي تطوّرك أسبوعياً</li>
         <li>البرنامج قابل للطباعة من زر <b>طباعة</b> في صفحة الغذاء</li>
       </ul>
@@ -473,7 +534,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
           <button type="submit" class="btn-primary" id="calcBtn" style="width:100%">
             <svg class="ico" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-            احسبي وحفظي
+            احسب واحفظ
           </button>
         </form>
 
@@ -510,8 +571,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div id="mealsEmpty" class="card empty-state" style="display:none">
       <svg class="empty-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
       <div class="empty-title">لم تحسبي سعراتك بعد</div>
-      <div class="empty-sub">احسبي سعراتك أولاً ليتكيّف البرنامج معكِ</div>
-      <button class="btn-primary" onclick="switchTab('calc')">اذهبي للحاسبة</button>
+      <div class="empty-sub">احسب سعراتك أولاً ليتكيّف البرنامج معك</div>
+      <button class="btn-primary" onclick="switchTab('calc')">الانتقال للحاسبة</button>
     </div>
 
     <div id="mealsContent" style="display:none">
@@ -558,7 +619,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="section-title">جدول التمارين</div>
 
     <div class="card">
-      <div class="card-title">اختاري جدولك الأسبوعي</div>
+      <div class="card-title">اختر الجدول الأسبوعي</div>
       <div class="plan-picker" id="planPicker"></div>
     </div>
 
