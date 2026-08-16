@@ -234,7 +234,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="logo-sub">لوحة المدرب</div>
     </div>
     <div class="login-title">تسجيل دخول المدرب</div>
-    <div class="login-sub">أدخلي كلمة المرور الخاصة بلوحة التحكم</div>
+    <div class="login-sub">أدخل كلمة مرور لوحة التحكم</div>
     <div class="error-msg" id="adminLoginError"></div>
     <form id="adminLoginForm">
       <div class="form-group">
@@ -297,7 +297,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
     <div id="tabLibrary" style="display:none">
       <div class="page-title">مكتبة التمارين</div>
-      <div class="page-sub">ارفعي فيديو لكل تمرين — يظهر للمشتركين عند التدريب</div>
+      <div class="page-sub">أضف فيديو لكل تمرين — يظهر للمشتركين عند التدريب</div>
 
       <div class="library-info">
         <div style="font-weight:800;margin-bottom:8px">📌 ملاحظات مهمة</div>
@@ -367,7 +367,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div style="text-align:center;margin-bottom:16px">
         <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;margin:0 auto"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
         <div style="font-size:16px;font-weight:800;margin-top:8px">تم إنشاء الحساب</div>
-        <div style="font-size:13px;color:var(--muted);margin-top:4px">أرسلي هذه البيانات للمشترك</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">أرسل هذه البيانات للمشترك</div>
       </div>
       <div class="credentials-box">
         <div class="credentials-title">بيانات الدخول</div>
@@ -407,7 +407,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="form-group">
       <label class="form-label">كلمة مرور جديدة (اختياري)</label>
       <div style="display:flex;gap:8px">
-        <input type="text" class="form-input ltr" id="editPassword" placeholder="اتركيها فارغة للإبقاء">
+        <input type="text" class="form-input ltr" id="editPassword" placeholder="اترك الحقل فارغ للإبقاء">
         <button type="button" class="sub-btn" onclick="document.getElementById('editPassword').value=randomPassword()">توليد</button>
       </div>
     </div>
@@ -744,7 +744,7 @@ function renderSubs() {
       <div class="empty">
         <svg style="width:52px;height:52px;stroke:var(--subtle);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         <div class="empty-title">${search ? 'لا نتائج' : 'لا يوجد مشتركين بعد'}</div>
-        <div class="empty-sub">${search ? 'جرّبي بحث آخر' : 'ابدئي بإضافة أول مشترك'}</div>
+        <div class="empty-sub">${search ? 'جرّب بحث آخر' : 'ابدأ بإضافة أول مشترك'}</div>
         ${!search ? '<button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>' : ''}
       </div>`;
     return;
