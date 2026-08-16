@@ -81,12 +81,21 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_username ON subscribers(username);
 `);
 
-// Migration: add phone column if missing on existing DB
+// Migrations: add columns if missing on existing DB
 try {
   const cols = db.prepare("PRAGMA table_info(subscribers)").all();
-  if (!cols.some(c => c.name === 'phone')) {
+  const names = cols.map(c => c.name);
+  if (!names.includes('phone')) {
     db.exec("ALTER TABLE subscribers ADD COLUMN phone TEXT");
     console.log('✅ Migration: added phone column');
+  }
+  if (!names.includes('current_day')) {
+    db.exec("ALTER TABLE subscribers ADD COLUMN current_day INTEGER DEFAULT 0");
+    console.log('✅ Migration: added current_day column');
+  }
+  if (!names.includes('completed_days')) {
+    db.exec("ALTER TABLE subscribers ADD COLUMN completed_days TEXT DEFAULT '[]'");
+    console.log('✅ Migration: added completed_days column');
   }
 } catch (e) { console.warn('migration skipped:', e.message); }
 
@@ -175,8 +184,9 @@ const stmts = {
   updateEndDate:     db.prepare('UPDATE subscribers SET end_date = ?, active = 1 WHERE id = ?'),
   resetEdits:        db.prepare('UPDATE subscribers SET profile_edits = 0 WHERE id = ?'),
   saveProfile:       db.prepare('UPDATE subscribers SET profile = ?, macros = ?, profile_edits = profile_edits + 1 WHERE id = ?'),
-  savePlan:          db.prepare('UPDATE subscribers SET selected_plan = ? WHERE id = ?'),
+  savePlan:          db.prepare('UPDATE subscribers SET selected_plan = ?, current_day = 0, completed_days = ? WHERE id = ?'),
   saveProgress:      db.prepare('UPDATE subscribers SET workout_progress = ? WHERE id = ?'),
+  saveCurrentDay:    db.prepare('UPDATE subscribers SET current_day = ?, completed_days = ? WHERE id = ?'),
   delete:            db.prepare('DELETE FROM subscribers WHERE id = ?'),
 };
 
@@ -245,6 +255,8 @@ app.get('/api/me', auth, requireSubscriber, (req, res) => {
     locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
     workoutProgress: parseJson(sub.workout_progress, {}),
     selectedPlan: sub.selected_plan || null,
+    currentDay: sub.current_day || 0,
+    completedDays: parseJson(sub.completed_days, []),
   });
 });
 
@@ -266,8 +278,25 @@ app.post('/api/me/profile', auth, requireSubscriber, (req, res) => {
 
 app.post('/api/me/plan', auth, requireSubscriber, (req, res) => {
   const { selectedPlan } = req.body || {};
-  stmts.savePlan.run(selectedPlan || null, req.user.sub);
+  stmts.savePlan.run(selectedPlan || null, '[]', req.user.sub);
   res.json({ ok: true });
+});
+
+// Mark today's workout as complete → advance current_day (cycles through the plan)
+app.post('/api/me/complete-day', auth, requireSubscriber, (req, res) => {
+  const { totalDays } = req.body || {};
+  const total = Math.max(1, parseInt(totalDays) || 3);
+  const sub = stmts.findById.get(req.user.sub);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+  const curr = sub.current_day || 0;
+  const next = (curr + 1) % total;
+  // Record completion timestamp for the day just finished
+  const completed = parseJson(sub.completed_days, []);
+  completed.push({ dayIdx: curr, date: new Date().toISOString() });
+  // Keep only last 60 completions
+  const trimmed = completed.slice(-60);
+  stmts.saveCurrentDay.run(next, JSON.stringify(trimmed), sub.id);
+  res.json({ ok: true, currentDay: next, previousDay: curr });
 });
 
 app.post('/api/me/progress', auth, requireSubscriber, (req, res) => {

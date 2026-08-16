@@ -24,6 +24,7 @@ const state = {
   locked: false,
   selectedPlan: null,
   currentDay: 0,
+  completedDays: [],
   workoutProgress: {},
   videos: {},
   youtube: {},
@@ -92,6 +93,8 @@ async function init() {
     state.editsLeft = me.editsLeft;
     state.locked  = me.locked;
     state.selectedPlan   = me.selectedPlan;
+    state.currentDay     = me.currentDay || 0;
+    state.completedDays  = me.completedDays || [];
     state.workoutProgress = me.workoutProgress || {};
     state.videos  = vids.videos  || {};
     state.youtube = vids.youtube || {};
@@ -119,6 +122,10 @@ async function init() {
     // Select prior plan if any
     if (me.selectedPlan) renderPlanPicker(me.selectedPlan);
     else renderPlanPicker();
+
+    // Render home widgets
+    renderTodayCard();
+    renderProgressCard();
   } catch (e) {
     console.error('init error:', e);
   }
@@ -262,20 +269,20 @@ const MEAL_PLAN = [
     id: 'breakfast', name: 'الفطور', time: 'صباحاً — بعد الاستيقاظ',
     options: [
       { title: 'خيار 1', items: [
-          { n: 'بيضة كاملة + بياضتان', q: 140, u: 'غ' },
-          { n: 'توست أسمر', q: 30, u: 'غ' },
+          { n: '١ بيضة كاملة + ٢ بياض بيض', q: 115, u: 'غ (تقريباً)' },
+          { n: 'خبز توست أسمر', q: 30, u: 'غ (شريحة)' },
           { n: 'طماطم + خيار', q: 0, u: 'بلا حد' },
         ], macros: { p: 24, c: 18, f: 10 } },
       { title: 'خيار 2', items: [
-          { n: 'شوفان حبة كاملة (جاف)', q: 45, u: 'غ' },
+          { n: 'شوفان حبة كاملة — وزن جاف قبل الطبخ', q: 45, u: 'غ' },
           { n: 'زبادي يوناني خالي الدسم', q: 170, u: 'غ' },
-          { n: 'توت مجمد / طازج', q: 60, u: 'غ' },
-          { n: 'قرفة', q: 0, u: 'صفر سعرات' },
+          { n: 'توت مجمد أو طازج', q: 60, u: 'غ' },
+          { n: 'قرفة للتحلية', q: 0, u: 'صفر سعرات' },
         ], macros: { p: 22, c: 45, f: 5 } },
       { title: 'خيار 3', items: [
-          { n: 'بيضتان + بياض بيض', q: 130, u: 'غ' },
-          { n: 'فلفل + سبانخ + بصل', q: 0, u: 'بلا حد' },
-          { n: 'زيت زيتون', q: 5, u: 'ملعقة صغيرة' },
+          { n: '٢ بيضة كاملة + ١ بياض بيض', q: 130, u: 'غ (تقريباً)' },
+          { n: 'فلفل + سبانخ + بصل (للعجة)', q: 0, u: 'بلا حد' },
+          { n: 'زيت زيتون للطبخ', q: 5, u: 'مل — ملعقة صغيرة' },
         ], macros: { p: 21, c: 5, f: 14 } },
     ]
   },
@@ -283,21 +290,22 @@ const MEAL_PLAN = [
     id: 'lunch', name: 'الغداء — الوجبة الكبرى', time: 'ظهراً — أهم وجبة',
     options: [
       { title: 'خيار 1', items: [
-          { n: 'صدر دجاج مشوي بالبهارات', q: 120, u: 'غ' },
-          { n: 'أرز بني مطبوخ', q: 130, u: 'غ' },
-          { n: 'زيت زيتون', q: 5, u: 'ملعقة صغيرة' },
-          { n: 'سلطة خضراء / خضار مشوية', q: 0, u: 'بلا حد' },
+          { n: 'صدر دجاج مشوي — وزن بعد الطبخ', q: 120, u: 'غ' },
+          { n: 'أرز بني — وزن بعد الطبخ', q: 130, u: 'غ' },
+          { n: 'زيت زيتون للطبخ', q: 5, u: 'مل — ملعقة صغيرة' },
+          { n: 'سلطة خضراء أو خضار مشوية', q: 0, u: 'بلا حد' },
         ], macros: { p: 39, c: 42, f: 12 } },
       { title: 'خيار 2', items: [
-          { n: 'سلمون مشوي بالليمون والثوم', q: 110, u: 'غ' },
-          { n: 'برغل مطبوخ', q: 130, u: 'غ' },
+          { n: 'سلمون مشوي — وزن بعد الطبخ', q: 110, u: 'غ' },
+          { n: 'برغل — وزن بعد الطبخ', q: 130, u: 'غ' },
+          { n: 'ليمون + ثوم + بهارات', q: 0, u: 'صفر سعرات' },
           { n: 'طماطم + خيار + بقدونس', q: 0, u: 'بلا حد' },
         ], macros: { p: 30, c: 40, f: 16 } },
       { title: 'خيار 3', items: [
-          { n: 'صدر دجاج مسلوق بالبهارات', q: 120, u: 'غ' },
-          { n: 'بطاطس مسلوقة بالكمون', q: 170, u: 'غ' },
-          { n: 'زيت زيتون + ليمون', q: 8, u: 'ملعقة كبيرة' },
-          { n: 'خضار مشوية / سلطة', q: 0, u: 'بلا حد' },
+          { n: 'صدر دجاج مسلوق — وزن بعد الطبخ', q: 120, u: 'غ' },
+          { n: 'بطاطس مسلوقة بالكمون — بعد الطبخ', q: 170, u: 'غ' },
+          { n: 'زيت زيتون + ليمون', q: 8, u: 'مل — ملعقة كبيرة' },
+          { n: 'خضار مشوية أو سلطة', q: 0, u: 'بلا حد' },
         ], macros: { p: 32, c: 32, f: 12 } },
     ]
   },
@@ -309,12 +317,12 @@ const MEAL_PLAN = [
           { n: 'تفاحة صغيرة أو توت', q: 90, u: 'غ' },
         ], macros: { p: 19, c: 22, f: 0 } },
       { title: 'خيار 2', items: [
-          { n: 'تمر', q: 24, u: '2 حبات' },
-          { n: 'لوز نيء', q: 12, u: '6 حبات' },
+          { n: 'تمر (حبات صغيرة)', q: 24, u: '٢ حبة' },
+          { n: 'لوز نيء', q: 12, u: '٦ حبة' },
         ], macros: { p: 4, c: 22, f: 8 } },
       { title: 'خيار 3', items: [
-          { n: 'حليب قليل الدسم', q: 250, u: 'مل' },
-          { n: 'موزة صغيرة', q: 90, u: 'غ' },
+          { n: 'حليب قليل الدسم', q: 250, u: 'مل — كوب' },
+          { n: 'موزة صغيرة', q: 90, u: 'غ (حبة صغيرة)' },
         ], macros: { p: 12, c: 32, f: 4 } },
     ]
   },
@@ -322,19 +330,19 @@ const MEAL_PLAN = [
     id: 'dinner', name: 'العشاء', time: 'مساءً — قبل النوم بساعتين',
     options: [
       { title: 'خيار 1', items: [
-          { n: 'لحم مفروم خالي أو قليل الشحوم (نيء)', q: 110, u: 'غ' },
-          { n: 'بطاطس حلوة مطبوخة', q: 130, u: 'غ' },
-          { n: 'بهارات: كمون، كركم، ثوم بودرة', q: 0, u: 'صفر سعرات' },
+          { n: 'لحم بقر مفروم خالي الدهون — وزن نيء', q: 110, u: 'غ' },
+          { n: 'بطاطس حلوة مشوية — بعد الطبخ', q: 130, u: 'غ' },
+          { n: 'بهارات: كمون + كركم + ثوم', q: 0, u: 'صفر سعرات' },
         ], macros: { p: 29, c: 30, f: 12 } },
       { title: 'خيار 2', items: [
-          { n: 'صدر دجاج مشوي أو مسلوق', q: 110, u: 'غ' },
-          { n: 'برغل مطبوخ', q: 100, u: 'غ' },
-          { n: 'زيت زيتون + ليمون', q: 5, u: 'ملعقة صغيرة' },
+          { n: 'صدر دجاج مشوي أو مسلوق — بعد الطبخ', q: 110, u: 'غ' },
+          { n: 'برغل — وزن بعد الطبخ', q: 100, u: 'غ' },
+          { n: 'زيت زيتون + ليمون', q: 5, u: 'مل — ملعقة صغيرة' },
           { n: 'طماطم + خيار + بقدونس', q: 0, u: 'بلا حد' },
         ], macros: { p: 32, c: 27, f: 8 } },
       { title: 'خيار 3', items: [
-          { n: 'تونة بالماء (مصفاة)', q: 110, u: 'غ' },
-          { n: 'شريحة توست أسمر', q: 30, u: 'غ' },
+          { n: 'تونة بالماء — بعد التصفية من الماء', q: 110, u: 'غ' },
+          { n: 'خبز توست أسمر', q: 30, u: 'غ (شريحة)' },
           { n: 'أفوكادو', q: 45, u: 'غ' },
           { n: 'طماطم + خيار + بقدونس', q: 0, u: 'بلا حد' },
         ], macros: { p: 30, c: 18, f: 14 } },
@@ -699,9 +707,17 @@ function renderWorkoutPage() {
 function renderWorkoutDays(planKey) {
   const plan = PLANS[planKey];
   if (!plan) return;
-  const tabs = plan.days.map((d, i) =>
-    `<div class="day-tab ${i === state.currentDay ? 'on' : ''}" onclick="switchDay(${i})">${i+1}</div>`
-  ).join('');
+  // Ensure currentDay is within bounds
+  if (state.currentDay >= plan.days.length) state.currentDay = 0;
+  const tabs = plan.days.map((d, i) => {
+    const doneToday = state.completedDays.some(cd => {
+      if (cd.dayIdx !== i) return false;
+      const t = new Date();
+      return new Date(cd.date).toDateString() === t.toDateString();
+    });
+    return `<div class="day-tab ${i === state.currentDay ? 'on' : ''} ${doneToday ? 'done' : ''}"
+             onclick="switchDay(${i})">يوم ${arNum(i+1)}${doneToday ? ' ✓' : ''}</div>`;
+  }).join('');
   document.getElementById('dayTabs').innerHTML = tabs;
   renderDay(planKey, state.currentDay);
 }
@@ -842,7 +858,27 @@ function renderDay(planKey, idx) {
       </div>
     </div>`;
 
-  document.getElementById('exerciseList').innerHTML = exercisesHtml + cardioHtml;
+  // Check if this day was already completed today
+  const doneToday = state.completedDays.some(cd => {
+    if (cd.dayIdx !== idx) return false;
+    return new Date(cd.date).toDateString() === new Date().toDateString();
+  });
+
+  const completeBtn = doneToday
+    ? `<div class="complete-day-wrap" style="background:var(--surface2);color:var(--text);border:1.5px solid var(--green);box-shadow:none">
+         <div class="complete-day-title" style="color:var(--green)">أنجزت تمرين اليوم</div>
+         <div class="complete-day-sub" style="color:var(--muted);opacity:1">التمرين التالي سيظهر تلقائياً غداً</div>
+       </div>`
+    : `<div class="complete-day-wrap">
+         <div class="complete-day-title">هل أنهيت التمرين؟</div>
+         <div class="complete-day-sub">اضغط لتسجيل الإنجاز والانتقال لليوم التالي</div>
+         <button class="btn-complete-day" onclick="completeToday()">
+           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+           تم إنجاز التمرين
+         </button>
+       </div>`;
+
+  document.getElementById('exerciseList').innerHTML = exercisesHtml + cardioHtml + completeBtn;
 }
 
 async function saveExerciseSets(exId) {
@@ -915,11 +951,219 @@ function openExVideo(exId) {
     </div>`;
   }
   modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ═══════════════ TODAY'S WORKOUT ═══════════════ */
+function renderTodayCard() {
+  const el = document.getElementById('todayCard');
+  if (!el) return;
+
+  if (!state.selectedPlan) {
+    el.innerHTML = `
+      <div class="today-card empty">
+        <div class="today-empty-title">لم تختر جدولاً بعد</div>
+        <div class="today-empty-sub">اختر جدول التمارين المناسب لك للبدء</div>
+        <button class="btn-primary" onclick="switchTab('workout')">اختيار جدول</button>
+      </div>`;
+    return;
+  }
+
+  const plan = PLANS[state.selectedPlan];
+  if (!plan) { el.innerHTML = ''; return; }
+
+  const idx  = state.currentDay % plan.days.length;
+  const day  = plan.days[idx];
+  const c    = cardioForDay(idx);
+  const completedToday = state.completedDays.some(cd => {
+    if (cd.dayIdx !== idx) return false;
+    const d = new Date(cd.date);
+    const t = new Date();
+    return d.toDateString() === t.toDateString();
+  });
+
+  el.innerHTML = `
+    <div class="today-card ${completedToday ? 'done' : ''}">
+      <div class="today-head">
+        <div>
+          <div class="today-eyebrow">تمرين اليوم</div>
+          <div class="today-title">${day.name}</div>
+        </div>
+        <div class="today-day-badge">يوم ${arNum(idx + 1)} / ${arNum(plan.days.length)}</div>
+      </div>
+      <div class="today-meta">
+        <div class="today-meta-item">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
+          ${arNum(day.list.length)} تمارين
+        </div>
+        <div class="today-meta-item">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          كارديو ${arNum(c.minutes)} دقيقة
+        </div>
+      </div>
+      ${completedToday
+        ? `<div class="today-done-note">
+             <svg class="ico" viewBox="0 0 24 24" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>
+             أنجزت تمرين اليوم — عمل ممتاز
+           </div>
+           <button class="btn-outline" onclick="switchTab('workout')" style="width:100%">مراجعة التمرين</button>`
+        : `<button class="btn-primary" onclick="startTodayWorkout()" style="width:100%">
+             <svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg>
+             بدء التمرين
+           </button>`
+      }
+    </div>`;
+}
+
+function startTodayWorkout() {
+  if (!state.selectedPlan) return switchTab('workout');
+  const plan = PLANS[state.selectedPlan];
+  state.currentDay = state.currentDay % plan.days.length;
+  switchTab('workout');
+}
+
+async function completeToday() {
+  if (!state.selectedPlan) return;
+  const plan = PLANS[state.selectedPlan];
+  const totalDays = plan.days.length;
+  try {
+    const r = await api('/api/me/complete-day', {
+      method: 'POST',
+      body: JSON.stringify({ totalDays }),
+    });
+    // Record locally
+    const prevIdx = state.currentDay;
+    state.currentDay = r.currentDay;
+    state.completedDays.push({ dayIdx: prevIdx, date: new Date().toISOString() });
+    toast('أُنجز التمرين — التالي: يوم ' + arNum(r.currentDay + 1));
+    renderTodayCard();
+    renderProgressCard();
+    switchTab('home');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ═══════════════ PROGRESS REPORT ═══════════════ */
+function computeStats() {
+  const now = Date.now();
+  const weekAgo = now - 7 * 86400000;
+  const prev14 = now - 14 * 86400000;
+
+  let weekSessions = 0, weekVolume = 0, prevWeekVolume = 0;
+  const prs = {}; // exId → best weight ever
+  const prevBest = {}; // exId → best weight before last session
+
+  for (const [exId, entries] of Object.entries(state.workoutProgress)) {
+    if (!Array.isArray(entries)) continue;
+    let bestEver = 0, bestPrev = 0;
+    entries.forEach((entry, i) => {
+      const t = new Date(entry.date).getTime();
+      const sets = Array.isArray(entry.sets) ? entry.sets
+                 : (entry.weight != null ? [{ w: entry.weight, r: entry.reps }] : []);
+      const vol = sets.reduce((a, s) => a + (Number(s.w)||0) * (Number(s.r)||0), 0);
+      const maxW = sets.reduce((m, s) => Math.max(m, Number(s.w)||0), 0);
+
+      if (t >= weekAgo) { weekSessions++; weekVolume += vol; }
+      else if (t >= prev14) { prevWeekVolume += vol; }
+
+      if (i < entries.length - 1) bestPrev = Math.max(bestPrev, maxW);
+      bestEver = Math.max(bestEver, maxW);
+    });
+    if (bestEver > 0) prs[exId] = bestEver;
+    if (bestPrev > 0) prevBest[exId] = bestPrev;
+  }
+
+  // Recent PR gains (current PR - previous best)
+  const gains = Object.entries(prs)
+    .map(([id, curr]) => ({ id, curr, prev: prevBest[id] || 0, diff: curr - (prevBest[id] || 0) }))
+    .filter(g => g.diff > 0)
+    .sort((a, b) => b.diff - a.diff)
+    .slice(0, 3);
+
+  const volumeChange = prevWeekVolume > 0
+    ? Math.round(((weekVolume - prevWeekVolume) / prevWeekVolume) * 100)
+    : (weekVolume > 0 ? 100 : 0);
+
+  return { weekSessions, weekVolume, volumeChange, gains, totalExercises: Object.keys(prs).length };
+}
+
+function renderProgressCard() {
+  const el = document.getElementById('progressCard');
+  if (!el) return;
+  const s = computeStats();
+
+  if (s.weekSessions === 0 && s.totalExercises === 0) {
+    el.innerHTML = `
+      <div class="progress-card empty">
+        <div class="progress-empty-title">لا يوجد تسجيلات بعد</div>
+        <div class="progress-empty-sub">سجّل أوزانك في التمرين وستظهر إحصائياتك هنا</div>
+      </div>`;
+    return;
+  }
+
+  const changeIco = s.volumeChange >= 0
+    ? '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>'
+    : '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 18l-9.5-9.5-5 5L1 6"/><path d="M17 18h6v-6"/></svg>';
+  const changeSign = s.volumeChange >= 0 ? '+' : '';
+
+  const gainsHtml = s.gains.length > 0
+    ? `<div class="progress-gains">
+         <div class="progress-gains-title">أفضل تقدم</div>
+         ${s.gains.map(g => {
+           const e = EX[g.id];
+           if (!e) return '';
+           return `<div class="gain-row">
+             <span class="gain-name">${e.ar}</span>
+             <span class="gain-diff">+ ${arNum(g.diff)} كجم</span>
+           </div>`;
+         }).join('')}
+       </div>`
+    : '';
+
+  el.innerHTML = `
+    <div class="progress-card">
+      <div class="progress-head">
+        <div>
+          <div class="progress-eyebrow">متابعة تطورك</div>
+          <div class="progress-title">هذا الأسبوع</div>
+        </div>
+      </div>
+      <div class="progress-stats">
+        <div class="p-stat">
+          <div class="p-stat-val">${arNum(s.weekSessions)}</div>
+          <div class="p-stat-lbl">جلسة</div>
+        </div>
+        <div class="p-stat">
+          <div class="p-stat-val">${arNumFmt(s.weekVolume)}</div>
+          <div class="p-stat-lbl">كجم إجمالي</div>
+        </div>
+        <div class="p-stat ${s.volumeChange >= 0 ? 'up' : 'down'}">
+          <div class="p-stat-val" style="display:flex;align-items:center;justify-content:center;gap:4px">
+            <span style="width:14px;height:14px;display:inline-block">${changeIco}</span>
+            ${changeSign}${arNum(Math.abs(s.volumeChange))}٪
+          </div>
+          <div class="p-stat-lbl">مقارنة بالأسبوع الماضي</div>
+        </div>
+      </div>
+      ${gainsHtml}
+    </div>`;
 }
 
 function closeVideo() {
-  document.getElementById('videoFrame').innerHTML = '';
+  const frame = document.getElementById('videoFrame');
+  if (frame) frame.innerHTML = '';
   document.getElementById('videoModal').classList.remove('open');
+  document.body.style.overflow = '';
 }
+
+function videoBackdropClick(e) {
+  if (e.target.id === 'videoModal') closeVideo();
+}
+
+// Esc to close video
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('videoModal')?.classList.contains('open')) {
+    closeVideo();
+  }
+});
 
 init();

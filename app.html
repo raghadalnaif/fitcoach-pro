@@ -328,6 +328,76 @@ button{font-family:inherit}
 .day-title{font-size:16px;font-weight:900;color:var(--blue)}
 .day-count{font-size:12px;color:var(--muted);font-weight:700}
 
+/* ── TODAY'S WORKOUT CARD ── */
+.today-card{background:linear-gradient(135deg,#EEF0FF 0%,#F5F6FF 100%);
+  border:1.5px solid var(--blue);border-radius:18px;padding:22px;margin-bottom:16px;
+  box-shadow:0 8px 30px -8px rgba(38,38,236,.18);position:relative;overflow:hidden}
+.today-card::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;
+  background:radial-gradient(circle,rgba(38,38,236,.08),transparent 65%);pointer-events:none}
+.today-card.done{background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);border-color:var(--green)}
+.today-card.empty{background:var(--surface);border:1.5px dashed var(--border);text-align:center;padding:32px 20px}
+.today-empty-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.today-empty-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.today-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px;position:relative}
+.today-eyebrow{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:4px}
+.today-card.done .today-eyebrow{color:var(--green)}
+.today-title{font-size:19px;font-weight:900;color:var(--text);line-height:1.3}
+.today-day-badge{background:var(--blue);color:#fff;padding:6px 12px;border-radius:20px;
+  font-size:11px;font-weight:800;white-space:nowrap;letter-spacing:.3px}
+.today-card.done .today-day-badge{background:var(--green)}
+.today-meta{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.today-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:700}
+.today-meta-item .ico{width:16px;height:16px;color:var(--blue)}
+.today-card.done .today-meta-item .ico{color:var(--green)}
+.today-done-note{background:rgba(16,185,129,.12);color:#065F46;
+  padding:12px 14px;border-radius:12px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+.today-done-note .ico{color:var(--green);width:18px;height:18px;stroke-width:3}
+
+/* ── PROGRESS CARD ── */
+.progress-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.progress-card.empty{text-align:center;padding:28px 20px;background:var(--surface2);border-style:dashed}
+.progress-empty-title{font-size:14px;font-weight:800;margin-bottom:4px}
+.progress-empty-sub{font-size:12px;color:var(--muted)}
+.progress-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.progress-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:3px}
+.progress-title{font-size:17px;font-weight:900;color:var(--text)}
+.progress-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.p-stat{background:var(--surface2);border-radius:12px;padding:14px 8px;text-align:center;
+  border:1px solid var(--border)}
+.p-stat-val{font-size:20px;font-weight:900;color:var(--blue);letter-spacing:-.5px;margin-bottom:3px}
+.p-stat.up .p-stat-val{color:var(--green)}
+.p-stat.down .p-stat-val{color:var(--red)}
+.p-stat-lbl{font-size:10px;color:var(--muted);font-weight:700;line-height:1.3}
+
+.progress-gains{background:var(--blue-bg2);border:1px solid var(--blue-bg);
+  border-radius:12px;padding:14px}
+.progress-gains-title{font-size:12px;font-weight:800;color:var(--blue);
+  margin-bottom:10px;letter-spacing:.3px}
+.gain-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px dashed rgba(38,38,236,.15);font-size:13px}
+.gain-row:last-child{border-bottom:none}
+.gain-name{font-weight:700;color:var(--text)}
+.gain-diff{color:var(--green);font-weight:900;background:rgba(16,185,129,.12);
+  padding:3px 10px;border-radius:12px;font-size:12px}
+
+/* ── COMPLETE DAY BUTTON (in workout) ── */
+.complete-day-wrap{background:linear-gradient(135deg,var(--green) 0%,#059669 100%);
+  border-radius:16px;padding:22px;margin-top:14px;text-align:center;color:#fff;
+  box-shadow:0 12px 30px -10px rgba(16,185,129,.4)}
+.complete-day-title{font-size:16px;font-weight:900;margin-bottom:6px}
+.complete-day-sub{font-size:13px;opacity:.9;margin-bottom:14px}
+.btn-complete-day{background:#fff;color:var(--green);border:none;
+  padding:14px 28px;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:900;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.14)}
+.btn-complete-day:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.btn-complete-day:active{transform:translateY(0)}
+.btn-complete-day .ico{width:18px;height:18px;stroke-width:3}
+
 /* ── CARDIO CARD ── */
 .cardio-card{background:linear-gradient(135deg,#FFF7ED 0%,#FFEDD5 100%);
   border:1.5px solid #FDBA74;border-radius:14px;padding:16px;margin-top:14px;
@@ -347,16 +417,27 @@ button{font-family:inherit}
 .cardio-val{color:#7C2D12;font-weight:800}
 
 /* ── VIDEO MODAL ── */
-.video-modal{position:fixed;inset:0;background:rgba(15,23,42,.9);z-index:100;
-  display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.video-modal{position:fixed;inset:0;background:rgba(15,23,42,.92);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);
+  padding-top:calc(16px + env(safe-area-inset-top));
+  padding-bottom:calc(16px + env(safe-area-inset-bottom))}
 .video-modal.open{display:flex}
 .video-frame{width:100%;max-width:800px;aspect-ratio:16/9;background:#000;border-radius:16px;
   overflow:hidden;position:relative;box-shadow:var(--shadow-lg)}
-.video-frame video{width:100%;height:100%;background:#000}
-.video-close{position:absolute;top:-44px;left:0;background:none;border:none;color:#fff;
-  font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);
-  display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px}
-.video-close:hover{background:rgba(255,255,255,.1)}
+.video-frame video,.video-frame iframe{width:100%;height:100%;background:#000;display:block;border:0}
+.video-close{position:absolute;top:12px;right:12px;background:rgba(15,23,42,.75);
+  border:1.5px solid rgba(255,255,255,.2);color:#fff;
+  width:44px;height:44px;border-radius:50%;cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;
+  z-index:5;backdrop-filter:blur(10px);transition:all .15s;padding:0}
+.video-close:hover{background:rgba(239,68,68,.9);border-color:transparent;transform:scale(1.06)}
+.video-close:active{transform:scale(.94)}
+.video-close svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+#videoTitle{position:absolute;top:16px;left:16px;color:#fff;font-weight:800;font-size:15px;
+  background:rgba(15,23,42,.6);backdrop-filter:blur(10px);
+  padding:8px 14px;border-radius:20px;max-width:calc(100% - 80px);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:4}
 
 /* ── LOCKED ── */
 .locked-overlay{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:16px;padding:32px 24px;
@@ -396,42 +477,122 @@ button{font-family:inherit}
 }
 .print-header{display:none}
 
+/* Day-tab done marker */
+.day-tab.done{border-color:var(--green);color:var(--green)}
+.day-tab.on.done{background:var(--green);color:#fff;border-color:var(--green)}
+
 /* ── MOBILE-FIRST APP FEEL ── */
 @media(max-width:640px){
-  .container{padding:16px 14px}
+  html,body{font-size:15px}
+  .container{padding:14px 14px}
   .form-row{grid-template-columns:1fr}
-  .hero-name{font-size:20px}
-  .hero-card{padding:22px 20px;border-radius:18px}
-  .macros-cal{font-size:38px}
-  .section-title{font-size:17px}
-  .card{padding:18px;border-radius:14px}
-  .ex-card{flex-direction:column;padding:14px}
-  .ex-img-wrap{width:100%;height:200px;border-radius:14px}
-  .ex-play{width:44px;height:44px;bottom:12px;right:12px}
-  .ex-play .ico{width:14px;height:14px}
-  .btn-primary,.btn-outline{padding:14px 20px;font-size:15px;min-height:48px;width:100%}
-  .form-input,.form-select{padding:14px 15px;font-size:16px;min-height:48px}
-  .chip{padding:12px 18px;font-size:14px;min-height:44px;display:flex;align-items:center}
-  .ex-progress input{padding:12px 10px;font-size:15px;min-height:44px}
-  .ex-save{padding:12px 18px;min-height:44px}
-  .qa-btn{padding:24px 12px;min-height:120px}
-  .qa-ico{width:36px;height:36px}
-  .day-tab{padding:12px 20px;min-height:44px;font-size:14px}
-  .plan-card{padding:24px 14px;min-height:120px}
-  .plan-card-days{font-size:36px}
-  .meal-block{padding:18px 16px;border-radius:14px}
-  .cardio-card{padding:18px 16px}
-  .cardio-duration{font-size:24px}
-  .badge-days{font-size:12px;padding:7px 14px}
+
+  /* Hero */
+  .hero-name{font-size:22px}
+  .hero-card{padding:22px 20px;border-radius:20px;margin-bottom:16px}
+  .hero-stat{padding:11px 12px;border-radius:12px}
+  .hero-stat-val{font-size:17px}
+  .hero-stat-lbl{font-size:10px}
+
+  /* Sections */
+  .macros-cal{font-size:40px}
+  .section-title{font-size:17px;margin-bottom:12px}
+  .card{padding:18px;border-radius:16px;margin-bottom:12px}
+
+  /* Today + Progress cards on mobile */
+  .today-card{padding:20px 18px;border-radius:20px}
+  .today-title{font-size:17px}
+  .today-day-badge{font-size:10px;padding:5px 10px}
+  .progress-card{padding:18px 16px;border-radius:16px}
+  .p-stat{padding:12px 6px}
+  .p-stat-val{font-size:17px}
+  .p-stat-lbl{font-size:9px}
+
+  /* Exercise cards */
+  .ex-card{padding:14px;border-radius:16px}
+  .ex-head{gap:12px;margin-bottom:10px}
+  .ex-img-wrap{width:100px;height:100px;border-radius:12px}
+  .ex-play{width:34px;height:34px;bottom:6px;right:6px}
+  .ex-play .ico{width:12px;height:12px}
+  .ex-name{font-size:15px}
+  .ex-name-en{font-size:11px}
+  .ex-muscle{font-size:10px;padding:2px 8px}
+
+  /* Sets — extra-friendly for touch */
+  .sets-wrap{padding:12px;margin-top:10px;border-radius:14px}
+  .set-row{padding:9px 0;gap:6px}
+  .set-num{width:26px;height:26px;font-size:12px}
+  .set-input{width:68px;padding:11px 6px;font-size:15px;min-height:44px;border-radius:10px}
+  .set-prev{font-size:10px}
+
+  /* Buttons min-touch-target */
+  .btn-primary,.btn-outline,.btn-form,.ex-save,.btn-complete-day{
+    padding:14px 20px;font-size:15px;min-height:50px;width:100%}
+  .btn-complete-day{padding:15px 28px}
+  .btn-watch{padding:12px;min-height:46px;font-size:13px}
+  .btn-history{padding:8px 12px;min-height:34px}
+
+  /* Inputs */
+  .form-input,.form-select{padding:14px 15px;font-size:16px;min-height:50px}
+  .chip{padding:12px 18px;font-size:14px;min-height:46px;display:flex;align-items:center}
+
+  /* Quick actions */
+  .quick-actions{gap:10px}
+  .qa-btn{padding:22px 10px;min-height:118px;border-radius:16px}
+  .qa-ico{width:34px;height:34px}
+  .qa-lbl{font-size:13px}
+
+  /* Day tabs */
+  .day-tab{padding:12px 20px;min-height:44px;font-size:13px;border-radius:12px}
+
+  /* Plans */
+  .plan-card{padding:22px 12px;min-height:120px;border-radius:16px}
+  .plan-card-days{font-size:34px}
+
+  /* Meals */
+  .meal-block{padding:16px 14px;border-radius:16px;margin-bottom:12px}
+  .meal-head{gap:10px}
+  .meal-icon{width:36px;height:36px;border-radius:10px}
+  .meal-name{font-size:15px}
+  .meal-tag{font-size:9px;padding:3px 8px}
+  .options-grid{grid-template-columns:1fr}
+  .opt-box{padding:14px}
+
+  .cardio-card{padding:16px 14px;border-radius:14px}
+  .cardio-duration{font-size:22px}
+
+  /* Header */
+  .badge-days{font-size:11px;padding:6px 12px}
   .btn-icon{width:40px;height:40px}
-  .video-modal{padding:16px}
+  .brand-name{font-size:16px}
+  .brand-mark{width:32px;height:32px}
+
+  /* Video modal on mobile */
+  .video-modal{padding:12px}
   .video-frame{border-radius:14px}
-  .video-close{top:-40px;font-size:15px}
+  .video-close{width:42px;height:42px;top:10px;right:10px}
+  .video-close svg{width:18px;height:18px}
+  #videoTitle{font-size:13px;top:10px;left:10px;padding:6px 12px}
+
+  /* Toast rides higher above nav */
+  .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 }
 
-/* touch device polish */
+/* touch device polish — remove hover-based transforms on tap devices */
 @media(hover:none){
-  .qa-btn:hover,.card:hover,.plan-card:hover,.ex-card:hover{transform:none;box-shadow:var(--shadow-sm)}
+  .qa-btn:hover,.card:hover,.plan-card:hover,.ex-card:hover,
+  .today-card:hover,.progress-card:hover{transform:none;box-shadow:var(--shadow-sm)}
+  .btn-primary:hover,.btn-outline:hover,.btn-watch:hover,
+  .ex-save:hover,.btn-complete-day:hover{transform:none;box-shadow:inherit}
+  /* Add "pressed" feedback on tap for buttons */
+  .btn-primary:active,.btn-outline:active,.btn-watch:active,
+  .ex-save:active,.btn-complete-day:active,.qa-btn:active,
+  .plan-card:active,.chip:active,.day-tab:active{transform:scale(.97);transition:transform .1s}
+}
+
+/* Standalone mode (added to home screen) */
+@media(display-mode:standalone){
+  .header{padding-top:calc(20px + env(safe-area-inset-top))}
 }
 </style>
 </head>
@@ -473,7 +634,13 @@ button{font-family:inherit}
       </div>
     </div>
 
-    <div class="section-title">ابدأ من هنا</div>
+    <!-- تمرين اليوم -->
+    <div id="todayCard"></div>
+
+    <!-- متابعة تطورك -->
+    <div id="progressCard"></div>
+
+    <div class="section-title">اختصارات سريعة</div>
     <div class="quick-actions">
       <div class="qa-btn" onclick="switchTab('calc')">
         <svg class="qa-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
@@ -485,21 +652,8 @@ button{font-family:inherit}
       </div>
       <div class="qa-btn" onclick="switchTab('workout')">
         <svg class="qa-ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
-        <div class="qa-lbl">جدول التمارين</div>
+        <div class="qa-lbl">كل الجداول</div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        نصائح سريعة
-      </div>
-      <ul class="tips-list">
-        <li>ابدأ بحساب السعرات من تبويب <b>الحاسبة</b> — البرنامج الغذائي يتكيّف تلقائياً</li>
-        <li>اختر جدول تمارين مناسب من <b>جدول التمارين</b> (3, 4, أو 5 أيام)</li>
-        <li>سجّل وزنك في كل تمرين لتتبع تطوّرك أسبوعياً</li>
-        <li>البرنامج قابل للطباعة من زر <b>طباعة</b> في صفحة الغذاء</li>
-      </ul>
     </div>
   </div>
 
@@ -668,14 +822,13 @@ button{font-family:inherit}
 </div>
 
 <!-- ─── VIDEO MODAL ─── -->
-<div class="video-modal" id="videoModal">
-  <div class="video-frame">
-    <button class="video-close" onclick="closeVideo()">
-      <svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      إغلاق
+<div class="video-modal" id="videoModal" onclick="videoBackdropClick(event)">
+  <div class="video-frame" onclick="event.stopPropagation()">
+    <div id="videoTitle"></div>
+    <button class="video-close" onclick="closeVideo()" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div id="videoTitle" style="position:absolute;top:-40px;right:80px;color:#fff;font-weight:800;font-size:15px"></div>
-    <div id="videoFrame" style="width:100%;height:100%"></div>
+    <div id="videoFrame"></div>
   </div>
 </div>
 
