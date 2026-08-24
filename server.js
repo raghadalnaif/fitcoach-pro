@@ -167,6 +167,69 @@ function normalizePhone(raw, defaultCC = '966') {
   return d;
 }
 
+function firstNameOf(full) {
+  return (full || '').trim().split(/\s+/)[0] || '';
+}
+
+/* ═══════════════════════════════════════
+   WHATSAPP BUSINESS CLOUD API  (Meta)
+   إرسال تلقائي لبيانات الدخول دون تدخل يدوي.
+   يتطلب: WHATSAPP_API_TOKEN, WHATSAPP_PHONE_NUMBER_ID
+   وقالب رسالة معتمد من Meta (WHATSAPP_TEMPLATE_NAME).
+═══════════════════════════════════════ */
+const WA_TOKEN     = process.env.WHATSAPP_API_TOKEN      || '';
+const WA_PHONE_ID  = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+const WA_TEMPLATE  = process.env.WHATSAPP_TEMPLATE_NAME   || 'ur_pass_welcome';
+const WA_LANG      = process.env.WHATSAPP_TEMPLATE_LANG   || 'ar';
+const PUBLIC_URL   = (process.env.PUBLIC_URL || '').replace(/\/$/, '') || null;
+const WA_ENABLED   = !!(WA_TOKEN && WA_PHONE_ID);
+
+if (WA_ENABLED) console.log('✅ WhatsApp Business API configured — auto-send enabled');
+else console.warn('⚠️  WhatsApp Business API not configured — falling back to manual wa.me links');
+
+async function sendWhatsAppWelcome({ phone, fullName, username, password, loginUrl }) {
+  if (!WA_ENABLED)  return { sent: false, reason: 'not_configured' };
+  if (!phone)       return { sent: false, reason: 'no_phone' };
+
+  const url = `https://graph.facebook.com/v21.0/${WA_PHONE_ID}/messages`;
+  const body = {
+    messaging_product: 'whatsapp',
+    to: phone,
+    type: 'template',
+    template: {
+      name: WA_TEMPLATE,
+      language: { code: WA_LANG },
+      components: [{
+        type: 'body',
+        parameters: [
+          { type: 'text', text: firstNameOf(fullName) || 'عزيزنا' },
+          { type: 'text', text: loginUrl || (PUBLIC_URL ? PUBLIC_URL + '/' : '') },
+          { type: 'text', text: username },
+          { type: 'text', text: password },
+        ],
+      }],
+    },
+  };
+
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${WA_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const reason = data?.error?.message || `HTTP ${r.status}`;
+      console.error('WhatsApp send failed:', reason);
+      return { sent: false, reason };
+    }
+    return { sent: true, id: data?.messages?.[0]?.id };
+  } catch (e) {
+    console.error('WhatsApp send error:', e.message);
+    return { sent: false, reason: e.message };
+  }
+}
+
 /* ═══════════════════════════════════════
    PREPARED STATEMENTS
 ═══════════════════════════════════════ */
@@ -390,11 +453,59 @@ app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
       normPhone || null,
       now, now, end
     );
-    res.json({ ok: true, id, phone: normPhone });
+
+    // Auto-send welcome message via WhatsApp Business API if configured
+    let wa = { sent: false, reason: 'not_configured' };
+    if (normPhone) {
+      wa = await sendWhatsAppWelcome({
+        phone: normPhone,
+        fullName: fullName.trim(),
+        username: uname,
+        password,
+      });
+    }
+
+    res.json({ ok: true, id, phone: normPhone, waSent: wa.sent, waReason: wa.reason });
   } catch (e) {
     console.error('create error:', e);
     res.status(500).json({ error: 'حدث خطأ في إنشاء الحساب' });
   }
+});
+
+// Send (or resend) the welcome message via WhatsApp Business API to an existing subscriber.
+// Optionally resets the password first so the sent credentials are valid.
+app.post('/api/admin/subscribers/:id/send-whatsapp', auth, requireAdmin, async (req, res) => {
+  const sub = stmts.findById.get(req.params.id);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+  if (!sub.phone) return res.status(400).json({ error: 'لا يوجد رقم جوال لهذا المشترك' });
+
+  const { newPassword } = req.body || {};
+  let plainPassword = newPassword;
+
+  try {
+    if (newPassword) {
+      if (String(newPassword).length < 4)
+        return res.status(400).json({ error: 'كلمة المرور: 4 أحرف على الأقل' });
+      const hash = await bcrypt.hash(newPassword, 10);
+      stmts.updatePassword.run(hash, sub.id);
+    }
+
+    const wa = await sendWhatsAppWelcome({
+      phone: sub.phone,
+      fullName: sub.full_name,
+      username: sub.username,
+      password: plainPassword || '(كلمة المرور الحالية — لم تتغيّر)',
+    });
+
+    res.json({ ok: true, waSent: wa.sent, waReason: wa.reason });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Lets the admin dashboard know whether auto-send is configured, to tailor the UI.
+app.get('/api/admin/whatsapp-status', auth, requireAdmin, (_req, res) => {
+  res.json({ enabled: WA_ENABLED });
 });
 
 app.patch('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => {
