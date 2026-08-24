@@ -911,6 +911,10 @@ async function confirmSendWa() {
     return;
   }
 
+  // Open the tab SYNCHRONOUSLY (before any await) so browsers don't block it as a popup.
+  // We navigate it to the real wa.me URL once the password update succeeds.
+  const waTab = window.open('about:blank', '_blank');
+
   btn.disabled = true;
   btn.textContent = 'جاري تحديث كلمة المرور...';
   err.classList.remove('show');
@@ -922,6 +926,7 @@ async function confirmSendWa() {
       body: JSON.stringify({ newPassword: newPass }),
     });
   } catch (e) {
+    if (waTab) waTab.close();
     err.textContent = 'فشل تحديث كلمة المرور: ' + e.message;
     err.classList.add('show');
     btn.disabled = false;
@@ -945,7 +950,10 @@ async function confirmSendWa() {
 
 جاهزون للانطلاق.`;
 
-  window.open(`https://wa.me/${sub.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+  const waUrl = `https://wa.me/${sub.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
+  if (waTab) waTab.location.href = waUrl;
+  else window.open(waUrl, '_blank'); // fallback if the pre-opened tab was blocked anyway
+
   closeModal('waModal');
   btn.disabled = false;
   btn.textContent = 'إرسال واتساب';
