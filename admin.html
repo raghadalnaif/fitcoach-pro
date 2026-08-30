@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UR PASS — لوحة المدرب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#2626EC; --blue-d:#1E1EC7; --blue-l:#5252F1; --blue-bg:#EEF0FF; --blue-bg2:#F5F6FF;
+  --text:#0F172A; --muted:#64748B; --subtle:#94A3B8; --border:#E5E7EB;
+  --bg:#F8FAFC; --surface:#ffffff; --surface2:#F8FAFC;
+  --red:#EF4444; --green:#10B981; --amber:#F59E0B; --pink:#EC4899;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.04);
+  --shadow:0 4px 20px rgba(38,38,236,.06);
+  --shadow-lg:0 20px 60px rgba(38,38,236,.14);
+  --r:14px;
+  --font:'Tajawal',system-ui,sans-serif;
+}
+.ico{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+
+/* ── HEADER ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;
+  box-shadow:0 1px 4px rgba(0,0,255,.04)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:40px;height:40px;display:block}
+.logo-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-text{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
+.logo-sub{font-size:11px;color:var(--muted);font-weight:600}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn-logout{padding:9px 16px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);border-radius:10px;font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+.btn-primary{display:inline-flex}
+.sub-btn{display:inline-flex;align-items:center;gap:6px}
+
+/* ── SHELL + SIDEBAR ── */
+.shell{display:flex;align-items:flex-start}
+.btn-burger{display:none;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);width:38px;height:38px;border-radius:10px;cursor:pointer;
+  align-items:center;justify-content:center;margin-left:4px}
+.btn-burger:hover{border-color:var(--blue);color:var(--blue)}
+.sidebar{width:248px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);
+  min-height:calc(100vh - 73px);position:sticky;top:73px;padding:18px 12px;overflow-y:auto;
+  max-height:calc(100vh - 73px)}
+.sidebar-backdrop{display:none}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;
+  background:none;border:none;border-radius:10px;cursor:pointer;text-align:right;
+  font-family:var(--font);font-size:14px;font-weight:700;color:var(--muted);transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.on{background:var(--blue);color:#fff}
+.nav-item.on .ico{color:#fff}
+.nav-item .ico{width:18px;height:18px;flex-shrink:0}
+.nav-item span{flex:1}
+.nav-parent .nav-caret{width:15px;height:15px;transition:transform .2s;opacity:.7}
+.nav-group.open .nav-caret{transform:rotate(180deg)}
+.nav-sub{display:none;flex-direction:column;gap:2px;padding:4px 0 6px 0;margin-right:14px;
+  border-right:2px solid var(--border)}
+.nav-group.open .nav-sub{display:flex}
+.nav-child{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 14px;background:none;border:none;border-radius:8px;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:600;color:var(--muted);
+  text-align:right;transition:all .15s}
+.nav-child:hover{background:var(--surface2);color:var(--text)}
+.nav-child.on{background:var(--blue-bg);color:var(--blue);font-weight:800}
+.nav-count{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:800;
+  padding:2px 8px;border-radius:20px;min-width:24px;text-align:center}
+.nav-child.on .nav-count{background:var(--blue);color:#fff}
+.nav-count.amber{background:#FEF3C7;color:#92400E}
+.nav-count.red{background:#FEE2E2;color:#991B1B}
+
+.btn-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--muted);padding:9px 15px;border-radius:10px;
+  font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:18px;
+  transition:all .15s}
+.btn-back:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── ENGAGEMENT STATUS ── */
+.eng{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;
+  padding:3px 10px;border-radius:20px;white-space:nowrap}
+.eng::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.eng.green {background:#DCFCE7;color:#166534}
+.eng.amber {background:#FEF3C7;color:#92400E}
+.eng.orange{background:#FFEDD5;color:#9A3412}
+.eng.red   {background:#FEE2E2;color:#991B1B}
+.eng.slate {background:#F1F5F9;color:#475569}
+.eng.grey  {background:#F3F4F6;color:#6B7280}
+
+.metric-row{display:flex;gap:14px;font-size:11px;color:var(--muted);
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap}
+.metric-row b{color:var(--text);font-weight:800}
+.trend-up{color:var(--green);font-weight:800}
+.trend-down{color:var(--red);font-weight:800}
+
+/* ── OVERVIEW / REPORTS ── */
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.ov-val{font-size:28px;font-weight:900;color:var(--blue);letter-spacing:-.5px;line-height:1}
+.ov-val.green{color:var(--green)} .ov-val.amber{color:var(--amber)} .ov-val.red{color:var(--red)}
+.ov-lbl{font-size:12px;color:var(--muted);font-weight:700;margin-top:6px}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;margin-bottom:16px}
+.panel-title{font-size:16px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.panel-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+
+.rowlist{display:flex;flex-direction:column}
+.rowitem{display:flex;align-items:center;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.rowitem:last-child{border-bottom:none}
+.rowitem:hover{background:var(--surface2)}
+.rowitem-main{flex:1;min-width:0}
+.rowitem-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.rowitem-meta{font-size:11px;color:var(--muted)}
+.rowitem-side{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+.bar{height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;min-width:70px;width:70px}
+.bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width .3s}
+.bar-fill.green{background:var(--green)} .bar-fill.amber{background:var(--amber)} .bar-fill.red{background:var(--red)}
+.bar-fill.orange{background:#EA580C} .bar-fill.slate{background:#94A3B8} .bar-fill.grey{background:#CBD5E1}
+
+.empty-note{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+
+/* ── CLIENT FILE ── */
+.client-hero{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);color:#fff;
+  border-radius:18px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden;
+  box-shadow:0 16px 36px -14px rgba(38,38,236,.4)}
+.client-hero::before{content:'';position:absolute;top:-50px;left:-50px;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(255,255,255,.15),transparent 68%)}
+.ch-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  margin-bottom:18px;position:relative;flex-wrap:wrap}
+.ch-name{font-size:22px;font-weight:900;margin-bottom:4px}
+.ch-meta{font-size:12px;opacity:.9;font-family:monospace;direction:ltr;text-align:right}
+.ch-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;position:relative}
+.ch-stat{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;padding:12px}
+.ch-stat-val{font-size:19px;font-weight:900;line-height:1}
+.ch-stat-lbl{font-size:10px;opacity:.88;font-weight:700;margin-top:4px}
+
+.ctabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ctab{padding:11px 16px;background:none;border:none;border-bottom:3px solid transparent;
+  color:var(--muted);font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;
+  margin-bottom:-1px;transition:all .15s}
+.ctab:hover{color:var(--blue)}
+.ctab.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+.tl{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:30px;height:30px;border-radius:9px;background:var(--blue-bg);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-dot .ico{width:15px;height:15px}
+.tl-body{flex:1;min-width:0}
+.tl-title{font-size:13px;font-weight:700}
+.tl-time{font-size:11px;color:var(--muted);margin-top:2px}
+
+.exrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.exrow:last-child{border-bottom:none}
+.exrow-name{flex:1;font-size:13px;font-weight:800;min-width:0}
+.exrow-en{font-size:11px;color:var(--muted);direction:ltr;text-align:right;font-weight:500}
+.exrow-stat{text-align:center;min-width:62px}
+.exrow-val{font-size:14px;font-weight:900;color:var(--blue)}
+.exrow-lbl{font-size:10px;color:var(--muted);font-weight:700}
+
+@media(max-width:900px){
+  .btn-burger{display:flex}
+  .sidebar{position:fixed;top:0;right:0;bottom:0;z-index:60;max-height:100vh;min-height:100vh;
+    transform:translateX(100%);transition:transform .25s cubic-bezier(.16,1,.3,1);
+    box-shadow:var(--shadow-lg);padding-top:22px}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:55;
+    backdrop-filter:blur(3px)}
+  .sidebar-backdrop.show{display:block}
+  .container{width:100%;min-width:0}
+}
+
+/* Library */
+.library-info{background:#eef7ff;border:1px solid #b8dcff;color:#0c4a80;
+  padding:14px 18px;border-radius:var(--r);margin-bottom:20px}
+.ex-groups{display:flex;flex-direction:column;gap:22px}
+.ex-group-title{font-size:16px;font-weight:900;margin-bottom:10px;color:var(--text);
+  display:flex;align-items:center;gap:8px}
+.ex-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.ex-lib-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px;transition:all .2s}
+.ex-lib-card.has-video{border-color:var(--green)}
+.ex-lib-card:hover{box-shadow:var(--shadow)}
+.ex-preview{width:100%;height:130px;border-radius:8px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:10px;overflow:hidden;position:relative}
+.ex-preview video{width:100%;height:100%;object-fit:cover}
+.ex-preview .ex-icon{width:40px;height:40px;stroke:var(--subtle);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
+.ex-status-badge{position:absolute;top:6px;left:6px;padding:3px 8px;border-radius:20px;
+  font-size:10px;font-weight:800;color:#fff}
+.ex-status-badge.ok{background:var(--green)}
+.ex-status-badge.no{background:var(--muted)}
+.ex-lib-name{font-size:13px;font-weight:800;margin-bottom:3px}
+.ex-lib-en{font-size:11px;color:var(--muted);direction:ltr;text-align:right;margin-bottom:8px;
+  font-family:'Segoe UI',sans-serif}
+.ex-lib-actions{display:flex;gap:6px}
+.ex-lib-btn{flex:1;padding:7px;font-family:var(--font);font-size:11px;font-weight:800;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.ex-lib-btn:hover{border-color:var(--blue);color:var(--blue)}
+.ex-lib-btn.delete:hover{border-color:var(--red);color:var(--red)}
+.ex-lib-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ex-lib-progress{height:3px;background:var(--surface2);border-radius:2px;margin-top:6px;overflow:hidden;display:none}
+.ex-lib-progress.on{display:block}
+.ex-lib-progress-bar{height:100%;background:var(--blue);width:0%;transition:width .2s}
+/* YouTube URL input */
+.yt-row{display:flex;gap:5px;margin-bottom:8px;align-items:stretch}
+.yt-input{flex:1;min-width:0;padding:7px 10px;border:1px solid var(--border);border-radius:7px;
+  font-family:'Segoe UI',sans-serif;font-size:11px;background:var(--surface);outline:none;color:var(--text)}
+.yt-input:focus{border-color:#FF0000}
+.yt-input::placeholder{color:var(--subtle);font-size:11px}
+.yt-save{padding:7px 12px;background:#FF0000;color:#fff;border:none;border-radius:7px;
+  font-family:var(--font);font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.yt-save:hover{background:#CC0000}
+.yt-del{padding:7px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+  border-radius:7px;cursor:pointer;font-size:16px;line-height:1;font-family:var(--font)}
+.yt-del:hover{border-color:var(--red);color:var(--red)}
+
+/* ── LOGIN GATE ── */
+.login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--surface);border-radius:20px;padding:36px 30px;width:100%;max-width:380px;
+  box-shadow:var(--shadow-lg)}
+.login-title{font-size:20px;font-weight:900;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px}
+
+/* ── MAIN LAYOUT ── */
+.container{flex:1;min-width:0;max-width:1240px;padding:24px 22px 60px}
+.page-title{font-size:26px;font-weight:900;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:900;color:var(--blue)}
+.stat-val.green{color:var(--green)}
+.stat-val.red{color:var(--red)}
+.stat-val.amber{color:var(--amber)}
+
+/* Toolbar */
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:var(--font);font-size:14px;background:var(--surface);outline:none}
+.search-input:focus{border-color:var(--blue)}
+.btn-primary{padding:11px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:7px}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+
+/* Subscriber cards grid */
+.subs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.sub-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;transition:all .2s;position:relative}
+.sub-card:hover{border-color:var(--blue-l);box-shadow:var(--shadow)}
+.sub-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sub-avatar{width:44px;height:44px;border-radius:12px;background:var(--blue-bg);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--blue)}
+.sub-avatar.female{background:#fef1f4;color:#e63946}
+.sub-info{flex:1;min-width:0}
+.sub-name{font-size:15px;font-weight:800;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-user{font-size:12px;color:var(--muted);font-family:monospace;direction:ltr;text-align:right}
+.sub-status{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.sub-status.active{background:#dcfce7;color:#166534}
+.sub-status.warn{background:#fef3c7;color:#92400e}
+.sub-status.expired{background:#fee2e2;color:#991b1b}
+.sub-meta{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+.sub-meta-item{display:flex;align-items:center;gap:5px}
+.sub-actions{display:flex;gap:6px;flex-wrap:wrap}
+.sub-btn{padding:7px 12px;font-family:var(--font);font-size:12px;font-weight:700;
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;cursor:pointer;transition:all .2s}
+.sub-btn:hover{border-color:var(--blue);color:var(--blue)}
+.sub-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.sub-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sub-btn.primary:hover{background:var(--blue-d);color:#fff}
+.sub-btn.wa{background:#25D366;color:#fff;border-color:#25D366;display:inline-flex;align-items:center;gap:5px}
+.sub-btn.wa:hover{background:#1DA851;color:#fff;border-color:#1DA851}
+
+/* Empty state */
+.empty{background:var(--surface);border:2px dashed var(--border);border-radius:var(--r);
+  padding:60px 20px;text-align:center;color:var(--muted)}
+.empty-icon{font-size:52px;margin-bottom:14px;opacity:.5}
+.empty-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:13px;margin-bottom:20px}
+
+/* Modals */
+.modal-bg{position:fixed;inset:0;background:rgba(10,10,40,.5);backdrop-filter:blur(6px);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:20px;padding:26px;width:100%;max-width:440px;
+  max-height:90vh;overflow-y:auto;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:900}
+.modal-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;
+  width:32px;height:32px;border-radius:8px;font-family:var(--font);line-height:1;
+  display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-family:var(--font);font-size:14px;background:var(--surface);
+  outline:none;transition:all .2s;direction:rtl;text-align:right}
+.form-input:focus,.form-select:focus{border-color:var(--blue)}
+.form-input.ltr{direction:ltr;text-align:left}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:5px}
+
+.btn-form{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-form:hover{background:var(--blue-d)}
+.btn-form:disabled{opacity:.55;cursor:not-allowed}
+.btn-form.danger{background:var(--red)}
+.btn-form.danger:hover{background:#c81e2b}
+
+.credentials-box{background:linear-gradient(135deg,#F5F6FF 0%,#EEF0FF 100%);
+  border:1.5px solid var(--blue);border-radius:14px;padding:18px;margin-top:16px;
+  box-shadow:0 4px 20px rgba(38,38,236,.08)}
+.credentials-title{font-size:14px;font-weight:900;color:var(--blue);margin-bottom:14px;
+  text-align:center;letter-spacing:.3px}
+.wa-status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;
+  font-size:12px;font-weight:700;margin-bottom:12px}
+.wa-status.ok{background:#DCFCE7;color:#166534}
+.wa-status.fail{background:#FEF3C7;color:#92400E}
+.wa-status svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.cred-field{background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.cred-field-info{flex:1;min-width:0}
+.cred-field-label{font-size:10px;color:var(--muted);font-weight:700;margin-bottom:2px;letter-spacing:.3px}
+.cred-field-val{font-family:'Segoe UI Mono',monospace;font-weight:800;color:var(--text);
+  font-size:14px;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cred-field-val.small{font-size:11px}
+.cred-copy-btn{padding:8px 10px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--blue);border-radius:8px;cursor:pointer;transition:all .15s;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cred-copy-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cred-copy-btn.done{background:var(--green);color:#fff;border-color:var(--green)}
+.cred-copy-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+
+.share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.share-btn{padding:12px 14px;border:none;border-radius:10px;font-family:var(--font);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:7px;color:#fff}
+.share-btn svg{width:16px;height:16px;fill:currentColor}
+.share-btn.wa{background:#25D366}
+.share-btn.wa:hover{background:#1DA851;transform:translateY(-1px)}
+.share-btn.copy{background:var(--blue)}
+.share-btn.copy:hover{background:var(--blue-d);transform:translateY(-1px)}
+.share-btn.done{background:var(--green)}
+
+.error-msg{background:#fef1f2;color:var(--red);padding:10px 12px;border-radius:8px;
+  font-size:13px;font-weight:600;margin-bottom:14px;display:none}
+.error-msg.show{display:block}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:12px 22px;border-radius:12px;
+  font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow-lg);
+  animation:slideUp .3s ease}
+.toast.show{display:block}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+
+@media(max-width:640px){
+  .container{padding:16px 12px 40px}
+  .page-title{font-size:22px}
+  .subs-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="loginGate" class="login-gate">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:22px">
+      <div class="logo-mark" style="width:72px;height:72px;margin:0 auto 12px"><img src="/logo.png" alt="UR PASS"></div>
+      <div class="logo-text">UR PASS</div>
+      <div class="logo-sub">لوحة المدرب</div>
+    </div>
+    <div class="login-title">تسجيل دخول المدرب</div>
+    <div class="login-sub">أدخل كلمة مرور لوحة التحكم</div>
+    <div class="error-msg" id="adminLoginError"></div>
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-input" id="adminPassword" placeholder="••••••••" required autofocus>
+      </div>
+      <button type="submit" class="btn-form" id="adminLoginBtn">دخول</button>
+    </form>
+    <div style="text-align:center;margin-top:16px">
+      <a href="/" style="font-size:12px;color:var(--muted);text-decoration:none">→ عودة لصفحة المشتركين</a>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD (hidden until logged in) -->
+<div id="dashboard" style="display:none">
+  <div class="header">
+    <div class="logo">
+      <button class="btn-burger" onclick="toggleSidebar()" aria-label="القائمة">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="logo-mark"><img src="/logo.png" alt="UR PASS"></div>
+      <div>
+        <div class="logo-text">UR PASS</div>
+        <div class="logo-sub">لوحة المدرب</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <nav class="nav">
+
+        <button class="nav-item" data-nav="overview" onclick="switchAdminTab('overview')">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>نظرة عامة</span>
+        </button>
+
+        <div class="nav-group" id="grpSubs">
+          <button class="nav-item nav-parent" onclick="toggleNavGroup('grpSubs')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>الاشتراكات</span>
+            <svg class="ico nav-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="nav-sub">
+            <button class="nav-child" data-nav="subs:all"      onclick="switchAdminTab('subs','all')">كل المشتركين <span class="nav-count" id="cntAll">0</span></button>
+            <button class="nav-child" data-nav="subs:active"   onclick="switchAdminTab('subs','active')">نشطة <span class="nav-count" id="cntActive">0</span></button>
+            <button class="nav-child" data-nav="subs:expiring" onclick="switchAdminTab('subs','expiring')">تنتهي قريباً <span class="nav-count amber" id="cntExpiring">0</span></button>
+            <button class="nav-child" data-nav="subs:expired"  onclick="switchAdminTab('subs','expired')">منتهية <span class="nav-count red" id="cntExpired">0</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" id="grpReports">
+          <button class="nav-item nav-parent" onclick="toggleNavGroup('grpReports')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg>
+            <span>التقارير</span>
+            <svg class="ico nav-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="nav-sub">
+            <button class="nav-child" data-nav="reports:engagement" onclick="switchAdminTab('reports','engagement')">الالتزام والنشاط</button>
+            <button class="nav-child" data-nav="reports:progress"   onclick="switchAdminTab('reports','progress')">التقدّم في الأوزان</button>
+            <button class="nav-child" data-nav="reports:revenue"    onclick="switchAdminTab('reports','revenue')">ملخص الاشتراكات</button>
+          </div>
+        </div>
+
+        <button class="nav-item" data-nav="library" onclick="switchAdminTab('library')">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
+          <span>مكتبة التمارين</span>
+        </button>
+
+      </nav>
+    </aside>
+
+  <div class="container">
+    <!-- ═══ OVERVIEW ═══ -->
+    <div id="tabOverview" style="display:none">
+      <div class="page-title">نظرة عامة</div>
+      <div class="page-sub">ملخص النادي ومن يحتاج متابعة اليوم</div>
+      <div id="overviewContent">جاري التحميل...</div>
+    </div>
+
+    <!-- ═══ SUBSCRIBERS ═══ -->
+    <div id="tabSubs">
+    <div class="page-title" id="subsTitle">المشتركين</div>
+    <div class="page-sub" id="subsSubtitle">إدارة اشتراكات النادي</div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">إجمالي المشتركين</div><div class="stat-val" id="statTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">اشتراكات فعّالة</div><div class="stat-val green" id="statActive">0</div></div>
+      <div class="stat-card"><div class="stat-label">تنتهي قريباً (7 أيام)</div><div class="stat-val amber" id="statWarn">0</div></div>
+      <div class="stat-card"><div class="stat-label">منتهية</div><div class="stat-val red" id="statExpired">0</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" class="search-input" id="searchInput" placeholder="بحث بالاسم أو اسم المستخدم...">
+      <button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>
+    </div>
+
+    <div id="subsContainer"></div>
+    </div><!-- /tabSubs -->
+
+    <!-- ═══ CLIENT FILE ═══ -->
+    <div id="tabClient" style="display:none">
+      <button class="btn-back" onclick="switchAdminTab('subs')">
+        <svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M9 18l6-6-6-6"/></svg>
+        رجوع للمشتركين
+      </button>
+      <div id="clientContent">جاري التحميل...</div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div id="tabReports" style="display:none">
+      <div class="page-title" id="reportTitle">التقارير</div>
+      <div class="page-sub" id="reportSubtitle">—</div>
+      <div id="reportContent">جاري التحميل...</div>
+    </div>
+
+    <div id="tabLibrary" style="display:none">
+      <div class="page-title">مكتبة التمارين</div>
+      <div class="page-sub">أضف فيديو لكل تمرين — يظهر للمشتركين عند التدريب</div>
+
+      <div class="library-info">
+        <div style="font-weight:800;margin-bottom:8px">📌 ملاحظات مهمة</div>
+        <ul style="padding-right:20px;line-height:1.9;font-size:13px">
+          <li>الفيديوهات المدعومة: <b>MP4, WebM, MOV</b> — الحد الأقصى <b>30 ميجا</b> لكل فيديو</li>
+          <li>يفضّل: فيديو قصير (10-30 ثانية) يعرض التمرين من زاوية واضحة</li>
+          <li>الفيديوهات محفوظة على السيرفر عندك (خارج قاعدة البيانات)</li>
+          <li>التمارين اللي بلا فيديو تظهر بأيقونة افتراضية</li>
+        </ul>
+      </div>
+
+      <div class="ex-groups" id="libraryContainer">جاري التحميل...</div>
+    </div>
+  </div><!-- /container -->
+  </div><!-- /shell -->
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="addModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">إضافة مشترك جديد</div>
+      <button class="modal-close" onclick="closeModal('addModal')"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="error-msg" id="addError"></div>
+    <div id="addFormWrap">
+      <form id="addForm">
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input type="text" class="form-input" id="addFullName" placeholder="فاطمة أحمد" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رقم الجوال (واتساب)</label>
+          <input type="tel" class="form-input ltr" id="addPhone" placeholder="0501234567 أو 966501234567" required>
+          <div class="form-hint">يُستخدم لإرسال بيانات الدخول عبر واتساب مباشرة</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">الجنس</label>
+            <select class="form-select" id="addGender" required>
+              <option value="female">أنثى</option>
+              <option value="male">ذكر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">مدة الاشتراك</label>
+            <select class="form-select" id="addMonths" required>
+              <option value="1">شهر</option>
+              <option value="2">شهرين</option>
+              <option value="3">3 أشهر</option>
+              <option value="6">6 أشهر</option>
+              <option value="12">سنة</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">اسم المستخدم</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input ltr" id="addUsername" placeholder="يُملأ تلقائياً من رقم الجوال" required
+              pattern="[a-z0-9_.-]{3,30}" inputmode="numeric" autocapitalize="off" autocomplete="off">
+            <button type="button" class="sub-btn" onclick="genUsername()">من الجوال</button>
+          </div>
+          <div class="form-hint">يُملأ تلقائياً برقم الجوال — يمكنك تعديله يدوياً</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input ltr" id="addPassword" placeholder="مثال: ur1234" required minlength="4">
+            <button type="button" class="sub-btn" onclick="genPassword()">توليد</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-form" id="addBtn">إنشاء الحساب</button>
+      </form>
+    </div>
+    <div id="addSuccessWrap" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;margin:0 auto"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        <div style="font-size:16px;font-weight:800;margin-top:8px">تم إنشاء الحساب</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">أرسل هذه البيانات للمشترك</div>
+      </div>
+      <div class="credentials-box">
+        <div class="credentials-title">بيانات الدخول</div>
+
+        <div id="waAutoStatus" style="display:none"></div>
+
+        <div style="display:none">
+          <span id="credName"></span>
+          <span id="credPhone"></span>
+        </div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">اسم المستخدم</div>
+            <div class="cred-field-val" id="credUser">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credUser', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">كلمة المرور</div>
+            <div class="cred-field-val" id="credPass">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credPass', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="cred-field">
+          <div class="cred-field-info">
+            <div class="cred-field-label">رابط الدخول</div>
+            <div class="cred-field-val small" id="credUrl">-</div>
+          </div>
+          <button class="cred-copy-btn" onclick="copyField('credUrl', this)" title="نسخ">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+
+        <div class="share-actions">
+          <button class="share-btn wa" onclick="shareWhatsapp()">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            إرسال واتساب
+          </button>
+          <button class="share-btn copy" onclick="copyFullMessage(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            نسخ الرسالة
+          </button>
+        </div>
+      </div>
+      <button class="btn-form" style="margin-top:12px;background:var(--surface2);color:var(--text)" onclick="closeModal('addModal');resetAddForm()">تم — إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">تعديل مشترك</div>
+      <button class="modal-close" onclick="closeModal('editModal')"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="error-msg" id="editError"></div>
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800" id="editName">-</div>
+      <div style="font-size:12px;color:var(--muted);font-family:monospace;direction:ltr" id="editUser">-</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">تمديد الاشتراك</label>
+      <select class="form-select" id="editExtend">
+        <option value="">— لا تمديد —</option>
+        <option value="1">+ شهر</option>
+        <option value="2">+ شهرين</option>
+        <option value="3">+ 3 أشهر</option>
+        <option value="6">+ 6 أشهر</option>
+        <option value="12">+ سنة</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">كلمة مرور جديدة (اختياري)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-input ltr" id="editPassword" placeholder="اترك الحقل فارغ للإبقاء">
+        <button type="button" class="sub-btn" onclick="document.getElementById('editPassword').value=randomPassword()">توليد</button>
+      </div>
+    </div>
+    <div class="form-group" id="resetEditsGroup">
+      <label style="display:flex;gap:10px;align-items:center;cursor:pointer">
+        <input type="checkbox" id="editResetEdits" style="width:18px;height:18px;accent-color:var(--blue)">
+        <span style="font-size:14px;font-weight:700">إعادة تفعيل حاسبة السعرات (3 محاولات جديدة)</span>
+      </label>
+    </div>
+    <button class="btn-form" onclick="saveEdit()">حفظ التعديلات</button>
+    <button class="btn-form danger" style="margin-top:10px" onclick="confirmDelete()">حذف الحساب نهائياً</button>
+  </div>
+</div>
+
+<!-- WHATSAPP SEND MODAL -->
+<div class="modal-bg" id="waModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">إرسال بيانات الدخول</div>
+      <button class="modal-close" onclick="closeModal('waModal')"><svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="error-msg" id="waError"></div>
+
+    <div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:4px" id="waName">-</div>
+      <div style="font-size:12px;color:var(--muted);direction:ltr;text-align:right;font-family:monospace" id="waPhone">-</div>
+      <div style="font-size:12px;color:var(--muted);direction:ltr;text-align:right;font-family:monospace" id="waUser">-</div>
+    </div>
+
+    <div style="background:#FEFCE8;border:1px solid #FDE68A;color:#854D0E;padding:11px 14px;border-radius:10px;font-size:12px;font-weight:600;margin-bottom:14px;line-height:1.6">
+      لأمان المشترك، لا نستطيع استعادة كلمة المرور القديمة. سيتم تعيين كلمة مرور جديدة وإرسالها في الرسالة.
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">كلمة المرور الجديدة</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="form-input ltr" id="waPassword" placeholder="اكتب كلمة مرور" minlength="4">
+        <button type="button" class="sub-btn" onclick="document.getElementById('waPassword').value=randomPassword()">توليد</button>
+      </div>
+    </div>
+
+    <button class="btn-form" id="waSendBtn" onclick="confirmSendWa()" style="background:#25D366;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg>
+      إرسال واتساب
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════ AUTH ═══════════════════ */
+const ADMIN_TOKEN_KEY = 'urpass_admin_token';
+
+let subscribers = [];
+let editingId = null;
+
+/* ═══════════════════ EXERCISE LIBRARY ═══════════════════ */
+const EX_LIB = {
+  chest: { name: 'صدر', items: {
+    bench_press:   { ar:'بنش برس', en:'Barbell Bench Press' },
+    db_bench:      { ar:'بنش دمبل', en:'Dumbbell Bench Press' },
+    incline_press: { ar:'بنش مائل', en:'Incline Dumbbell Press' },
+    pushup:        { ar:'بوش أب', en:'Push Up' },
+  }},
+  back: { name: 'ظهر', items: {
+    pullup:       { ar:'بول أب', en:'Pull Up' },
+    lat_pulldown: { ar:'لات بولداون', en:'Lat Pulldown' },
+    bb_row:       { ar:'بار رو', en:'Barbell Row' },
+    db_row:       { ar:'دمبل رو', en:'Dumbbell Row' },
+    cable_row:    { ar:'كيبل رو', en:'Cable Row' },
+    face_pull:    { ar:'فيس بول', en:'Face Pull' },
+  }},
+  shoulders: { name: 'أكتاف', items: {
+    ohp:           { ar:'شولدر برس', en:'Overhead Press' },
+    lateral_raise: { ar:'لاترال ريز', en:'Lateral Raise' },
+  }},
+  arms: { name: 'أذرع', items: {
+    bicep_curl:  { ar:'بايسبس دمبل', en:'Bicep Curl' },
+    hammer_curl: { ar:'هامر كيرل', en:'Hammer Curl' },
+    tricep_dip:  { ar:'ديبس', en:'Tricep Dips' },
+    tricep_ext:  { ar:'ترايسبس إكستنشن', en:'Tricep Extension' },
+  }},
+  legs: { name: 'أرجل', items: {
+    squat:        { ar:'باربل سكوات', en:'Barbell Squat' },
+    goblet_squat: { ar:'جوبلت سكوات', en:'Goblet Squat' },
+    sumo_squat:   { ar:'سومو سكوات', en:'Sumo Squat' },
+    bulgarian:    { ar:'بلغاريان سكوات', en:'Bulgarian Split Squat' },
+    lunges:       { ar:'لانجز', en:'Walking Lunges' },
+    rdl:          { ar:'رومانيان ديدلفت', en:'Romanian Deadlift' },
+    deadlift:     { ar:'ديدلفت', en:'Deadlift' },
+    leg_press:    { ar:'ليج برس', en:'Leg Press' },
+    leg_curl:     { ar:'ليج كيرل', en:'Leg Curl' },
+    leg_ext:      { ar:'ليج إكستنشن', en:'Leg Extension' },
+    calf_raise:   { ar:'كاف ريز', en:'Calf Raise' },
+  }},
+  glutes: { name: 'جلوت', items: {
+    hip_thrust:     { ar:'هيب ثراست', en:'Hip Thrust' },
+    glute_bridge:   { ar:'جلوت بريدج', en:'Glute Bridge' },
+    cable_kickback: { ar:'كيبل كيك باك', en:'Cable Glute Kickback' },
+  }},
+  core: { name: 'كور', items: {
+    plank:         { ar:'بلانك', en:'Plank' },
+    russian_twist: { ar:'روسيان تويست', en:'Russian Twist' },
+    leg_raise:     { ar:'ليج ريز', en:'Hanging Leg Raise' },
+  }},
+};
+// Flat exerciseId → Arabic name lookup, derived from EX_LIB.
+const EX_NAME = {};
+Object.values(EX_LIB).forEach(g =>
+  Object.entries(g.items).forEach(([id, ex]) => { EX_NAME[id] = ex.ar; }));
+
+const PLAN_LABEL = {
+  'female-3': 'جدول ٣ أيام', 'female-4': 'جدول ٤ أيام', 'female-5': 'جدول ٥ أيام',
+  'male-3':   'جدول ٣ أيام', 'male-4':   'جدول ٤ أيام', 'male-5':   'جدول ٥ أيام',
+};
+
+let libraryVideos = {};
+let libraryYoutube = {};
+
+/* ═══════════════════ NAVIGATION ═══════════════════ */
+let subsFilter = 'all';   // all | active | expiring | expired
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+}
+function toggleNavGroup(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function switchAdminTab(tab, sub) {
+  const panels = { overview:'tabOverview', subs:'tabSubs', client:'tabClient',
+                   reports:'tabReports', library:'tabLibrary' };
+  Object.entries(panels).forEach(([k, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = (k === tab) ? 'block' : 'none';
+  });
+
+  // Highlight the matching nav entry (parent items and children alike).
+  const key = sub ? `${tab}:${sub}` : tab;
+  document.querySelectorAll('[data-nav]').forEach(b =>
+    b.classList.toggle('on', b.dataset.nav === key));
+
+  if (tab === 'subs') {
+    subsFilter = sub || 'all';
+    document.getElementById('grpSubs').classList.add('open');
+    renderSubs();
+    updateSubsHeading();
+  }
+  if (tab === 'reports') {
+    document.getElementById('grpReports').classList.add('open');
+    loadReport(sub || 'engagement');
+  }
+  if (tab === 'overview') loadOverview();
+  if (tab === 'library')  loadLibrary();
+
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSubsHeading() {
+  const meta = {
+    all:      ['كل المشتركين', 'إدارة اشتراكات النادي'],
+    active:   ['الاشتراكات النشطة', 'المشتركون الذين لا يزال اشتراكهم سارياً'],
+    expiring: ['تنتهي قريباً', 'اشتراكات تنتهي خلال ٧ أيام — وقت التجديد'],
+    expired:  ['الاشتراكات المنتهية', 'انتهى اشتراكهم ولا يمكنهم الدخول'],
+  }[subsFilter] || ['المشتركين', ''];
+  document.getElementById('subsTitle').textContent    = meta[0];
+  document.getElementById('subsSubtitle').textContent = meta[1];
+}
+
+async function loadLibrary() {
+  try {
+    const r = await fetch('/api/exercises/videos');
+    const data = await r.json();
+    libraryVideos  = data.videos  || {};
+    libraryYoutube = data.youtube || {};
+    renderLibrary();
+  } catch (e) {
+    document.getElementById('libraryContainer').innerHTML = '<div style="color:var(--red)">فشل التحميل</div>';
+  }
+}
+
+function ytThumb(id) { return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+
+function renderLibrary() {
+  const container = document.getElementById('libraryContainer');
+  container.innerHTML = Object.entries(EX_LIB).map(([groupKey, group]) => {
+    const items = Object.entries(group.items).map(([id, ex]) => {
+      const videoUrl = libraryVideos[id];
+      const ytId     = libraryYoutube[id];
+      const hasAny   = !!videoUrl || !!ytId;
+      let preview;
+      if (videoUrl) {
+        preview = `<video src="${videoUrl}" muted loop playsinline autoplay></video>`;
+      } else if (ytId) {
+        preview = `<img src="${ytThumb(ytId)}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+      } else {
+        preview = `<svg class="ex-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>`;
+      }
+      const statusLbl = videoUrl ? 'ملف مرفوع' : ytId ? 'يوتيوب' : 'لا فيديو';
+      return `
+        <div class="ex-lib-card ${hasAny ? 'has-video' : ''}">
+          <div class="ex-preview">
+            ${preview}
+            <span class="ex-status-badge ${hasAny ? 'ok' : 'no'}">${statusLbl}</span>
+          </div>
+          <div class="ex-lib-name">${ex.ar}</div>
+          <div class="ex-lib-en">${ex.en}</div>
+
+          <div class="yt-row">
+            <input type="text" class="yt-input" id="yt_${id}" placeholder="https://youtu.be/..." value="${ytId ? 'https://youtu.be/' + ytId : ''}" dir="ltr">
+            <button class="yt-save" onclick="saveYoutube('${id}')">حفظ</button>
+            ${ytId ? `<button class="yt-del" onclick="deleteYoutube('${id}')" title="حذف">×</button>` : ''}
+          </div>
+
+          <div class="ex-lib-actions">
+            <label class="ex-lib-btn">
+              <span>${videoUrl ? 'استبدال الملف' : 'رفع ملف'}</span>
+              <input type="file" accept="video/mp4,video/webm,video/quicktime" onchange="uploadExVideo('${id}', this)">
+            </label>
+            ${videoUrl ? `<button class="ex-lib-btn delete" onclick="deleteExVideo('${id}')" title="حذف الملف"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg></button>` : ''}
+          </div>
+          <div class="ex-lib-progress" id="prog_${id}"><div class="ex-lib-progress-bar" id="progbar_${id}"></div></div>
+        </div>`;
+    }).join('');
+    return `
+      <div>
+        <div class="ex-group-title">${group.name}</div>
+        <div class="ex-cards">${items}</div>
+      </div>`;
+  }).join('');
+}
+
+async function saveYoutube(id) {
+  const url = document.getElementById('yt_' + id).value.trim();
+  if (!url) return toast('الصق رابط اليوتيوب أولاً', 'error');
+  try {
+    await api(`/api/admin/exercises/${id}/youtube`, {
+      method: 'POST',
+      body: JSON.stringify({ url }),
+    });
+    toast('تم حفظ الرابط');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteYoutube(id) {
+  if (!confirm('حذف رابط اليوتيوب؟')) return;
+  try {
+    await api(`/api/admin/exercises/${id}/youtube`, { method: 'DELETE' });
+    toast('تم الحذف');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function uploadExVideo(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 30 * 1024 * 1024) {
+    toast('الفيديو أكبر من 30 ميجا', 'error');
+    input.value = '';
+    return;
+  }
+  const prog    = document.getElementById('prog_' + id);
+  const progBar = document.getElementById('progbar_' + id);
+  prog.classList.add('on');
+  const fd = new FormData();
+  fd.append('video', file);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `/api/admin/exercises/${id}/video`);
+  xhr.setRequestHeader('Authorization', `Bearer ${adminToken()}`);
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) progBar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+  };
+  xhr.onload = () => {
+    prog.classList.remove('on');
+    if (xhr.status >= 200 && xhr.status < 300) {
+      toast('تم رفع الفيديو');
+      loadLibrary();
+    } else {
+      let err = 'فشل الرفع';
+      try { err = JSON.parse(xhr.responseText).error || err; } catch {}
+      toast(err, 'error');
+    }
+    input.value = '';
+  };
+  xhr.onerror = () => {
+    prog.classList.remove('on');
+    toast('خطأ في الاتصال', 'error');
+  };
+  xhr.send(fd);
+}
+
+async function deleteExVideo(id) {
+  if (!confirm('حذف الفيديو؟')) return;
+  try {
+    await api(`/api/admin/exercises/${id}/video`, { method: 'DELETE' });
+    toast('تم الحذف');
+    loadLibrary();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function isAdminLoggedIn() { return !!localStorage.getItem(ADMIN_TOKEN_KEY); }
+function adminToken() { return localStorage.getItem(ADMIN_TOKEN_KEY); }
+function saveAdminToken(t) { localStorage.setItem(ADMIN_TOKEN_KEY, t); }
+function logout() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  location.reload();
+}
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${adminToken()}`,
+      ...(opts.headers || {}),
+    },
+  });
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401 || r.status === 403) {
+    logout();
+    throw new Error('unauthorized');
+  }
+  if (!r.ok) throw new Error(data.error || 'خطأ');
+  return data;
+}
+
+function toast(msg, kind = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + kind;
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════ INIT ═══════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  if (isAdminLoggedIn()) showDashboard();
+  else showLoginGate();
+});
+
+function showLoginGate() {
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+async function showDashboard() {
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('grpSubs').classList.add('open');
+  await loadSubscribers();     // fills sidebar counters before the first paint
+  switchAdminTab('overview');  // land on the action list, not a raw table
+}
+
+/* ═══════════════════ ADMIN LOGIN ═══════════════════ */
+document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const pw = document.getElementById('adminPassword').value;
+  const btn = document.getElementById('adminLoginBtn');
+  const err = document.getElementById('adminLoginError');
+  btn.disabled = true; btn.textContent = 'جاري الدخول...';
+  err.classList.remove('show');
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'كلمة مرور خاطئة');
+    saveAdminToken(data.token);
+    showDashboard();
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'دخول';
+  }
+});
+
+/* ═══════════════════ LOAD SUBSCRIBERS ═══════════════════ */
+async function loadSubscribers() {
+  try {
+    const data = await api('/api/admin/subscribers');
+    subscribers = data.subscribers || [];
+    renderStats();
+    renderSubs();
+  } catch (e) {
+    if (e.message !== 'unauthorized') toast('فشل تحميل المشتركين: ' + e.message, 'error');
+  }
+}
+
+function renderStats() {
+  const total = subscribers.length;
+  const active = subscribers.filter(s => s.active).length;
+  const warn = subscribers.filter(s => s.active && s.daysLeft <= 7).length;
+  const expired = subscribers.filter(s => !s.active).length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statWarn').textContent = warn;
+  document.getElementById('statExpired').textContent = expired;
+  // Sidebar counters
+  document.getElementById('cntAll').textContent      = total;
+  document.getElementById('cntActive').textContent   = active;
+  document.getElementById('cntExpiring').textContent = warn;
+  document.getElementById('cntExpired').textContent  = expired;
+}
+
+// Applies the sidebar filter on top of the search box.
+function filteredSubs() {
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  return subscribers.filter(s => {
+    if (subsFilter === 'active'   && !s.active) return false;
+    if (subsFilter === 'expired'  &&  s.active) return false;
+    if (subsFilter === 'expiring' && !(s.active && s.daysLeft <= 7)) return false;
+    if (search && !s.username.includes(search) && !s.fullName.toLowerCase().includes(search)) return false;
+    return true;
+  });
+}
+
+function initials(name = '') {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
+}
+
+function fmtDate(ms) {
+  if (!ms) return '-';
+  // Gregorian ('ar-SA' would render Hijri, which is confusing for subscription dates)
+  return new Date(ms).toLocaleDateString('ar-EG', { year:'numeric', month:'short', day:'numeric' });
+}
+
+function renderSubs() {
+  const container = document.getElementById('subsContainer');
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const list = filteredSubs();
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <svg style="width:52px;height:52px;stroke:var(--subtle);stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <div class="empty-title">${search ? 'لا نتائج' : 'لا يوجد مشتركين بعد'}</div>
+        <div class="empty-sub">${search ? 'جرّب بحث آخر' : 'ابدأ بإضافة أول مشترك'}</div>
+        ${!search ? '<button class="btn-primary" onclick="openAddModal()">+ إضافة مشترك</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="subs-grid">${list.map(sub => {
+    const statusCls = !sub.active ? 'expired' : sub.daysLeft <= 7 ? 'warn' : 'active';
+    const statusTxt = !sub.active ? 'منتهي' : sub.daysLeft <= 7 ? `${sub.daysLeft} يوم متبقي` : 'فعّال';
+    const hasPhone = !!sub.phone;
+    return `
+      <div class="sub-card">
+        <div class="sub-head">
+          <div class="sub-avatar ${sub.gender}">${initials(sub.fullName)}</div>
+          <div class="sub-info">
+            <div class="sub-name">${sub.fullName}</div>
+            <div class="sub-user">@${sub.username}</div>
+          </div>
+          <span class="sub-status ${statusCls}">${statusTxt}</span>
+        </div>
+        <div class="sub-meta">
+          <div class="sub-meta-item">${fmtDate(sub.endDate)}</div>
+          ${sub.status ? `<span class="eng ${sub.status.tone}">${sub.status.label}</span>` : ''}
+          ${hasPhone ? `<div class="sub-meta-item" style="direction:ltr;font-family:monospace">${sub.phone}</div>` : ''}
+        </div>
+        ${sub.status ? `<div class="metric-row">
+          <span>آخر نشاط: <b>${sub.daysSinceActivity === null ? '—' : (sub.daysSinceActivity === 0 ? 'اليوم' : sub.daysSinceActivity + ' يوم')}</b></span>
+          <span>تمارين: <b>${sub.completed30 || 0}</b> / ٣٠ يوم</span>
+          ${sub.adherencePct !== null && sub.adherencePct !== undefined ? `<span>التزام: <b>${sub.adherencePct}٪</b></span>` : ''}
+          ${sub.totalVolume ? `<span class="${sub.volumeTrendPct >= 0 ? 'trend-up' : 'trend-down'}">${sub.volumeTrendPct >= 0 ? '▲' : '▼'} ${Math.abs(sub.volumeTrendPct)}٪</span>` : ''}
+        </div>` : ''}
+        <div class="sub-actions">
+          <button class="sub-btn primary" onclick="openClient('${sub.id}')">الملف</button>
+          <button class="sub-btn" onclick="openEditModal('${sub.id}')">تعديل</button>
+          ${hasPhone ? `<button class="sub-btn wa" onclick="sendWaToSub('${sub.id}')" title="إرسال واتساب">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487 2.981 1.287 2.981.859 3.518.804.537-.055 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+            واتساب</button>` : ''}
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
+let currentWaSubId = null;
+
+function sendWaToSub(id) {
+  const sub = subscribers.find(s => s.id === id);
+  if (!sub || !sub.phone) return;
+  currentWaSubId = id;
+  document.getElementById('waName').textContent = sub.fullName;
+  document.getElementById('waPhone').textContent = '+' + sub.phone.replace(/\D/g,'');
+  document.getElementById('waUser').textContent = sub.username;
+  document.getElementById('waPassword').value = randomPassword();
+  document.getElementById('waError').classList.remove('show');
+  document.getElementById('waModal').classList.add('open');
+}
+
+// Builds the welcome message sent to a subscriber.
+function welcomeMessage({ fullName, username, password }) {
+  const name  = firstName(fullName);
+  const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
+  const url   = location.origin + '/';
+  return `${greet}
+
+شكراً لاشتراكك معنا في UR PASS.
+لقد تم إنشاء حسابك في بوابة التدريب. ستجد بها جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
+
+بيانات الدخول:
+
+الرابط: ${url}
+اسم المستخدم: ${username}
+كلمة المرور: ${password}
+
+جاهزون للانطلاق.`;
+}
+
+// On desktop open WhatsApp Web directly (skips the wa.me redirect page).
+// On phones use wa.me so the native app opens instead.
+function waLink(phone, text) {
+  const p = String(phone || '').replace(/\D/g, '');
+  const t = encodeURIComponent(text);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return isMobile
+    ? `https://wa.me/${p}?text=${t}`
+    : `https://web.whatsapp.com/send?phone=${p}&text=${t}`;
+}
+
+async function confirmSendWa() {
+  const id = currentWaSubId;
+  if (!id) return;
+  const sub = subscribers.find(s => s.id === id);
+  if (!sub) return;
+
+  const newPass = document.getElementById('waPassword').value.trim();
+  const err = document.getElementById('waError');
+  const btn = document.getElementById('waSendBtn');
+
+  if (newPass.length < 4) {
+    err.textContent = 'كلمة المرور: 4 أحرف على الأقل';
+    err.classList.add('show');
+    return;
+  }
+
+  // Open the tab SYNCHRONOUSLY (before any await) so the browser doesn't block it
+  // as a popup — we navigate it once the password update succeeds.
+  const waTab = window.open('about:blank', '_blank');
+
+  btn.disabled = true;
+  btn.textContent = 'جاري التحديث...';
+  err.classList.remove('show');
+
+  try {
+    await api('/api/admin/subscribers/' + id, {
+      method: 'PATCH',
+      body: JSON.stringify({ newPassword: newPass }),
+    });
+  } catch (e) {
+    if (waTab) waTab.close();
+    err.textContent = 'فشل تحديث كلمة المرور: ' + e.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'إرسال واتساب';
+    return;
+  }
+
+  const url = waLink(sub.phone, welcomeMessage({
+    fullName: sub.fullName,
+    username: sub.username,
+    password: newPass,
+  }));
+  if (waTab) waTab.location.href = url;
+  else window.open(url, '_blank');
+
+  closeModal('waModal');
+  btn.disabled = false;
+  btn.textContent = 'إرسال واتساب';
+  toast('تم فتح واتساب — اضغط إرسال');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderSubs);
+
+/* ═══════════════════ OVERVIEW ═══════════════════ */
+function fmtWhen(ts) {
+  if (!ts) return '—';
+  const d = Math.floor((Date.now() - ts) / 86400000);
+  if (d <= 0) return 'اليوم';
+  if (d === 1) return 'أمس';
+  if (d < 30) return `قبل ${d} يوم`;
+  return fmtDate(ts);
+}
+
+function attentionRow(s) {
+  const why = {
+    stalled:         'متوقف عن التمرين',
+    never_logged_in: 'لم يفتح الموقع إطلاقاً',
+    at_risk:         'على وشك الانقطاع',
+    not_started:     'دخل ولم يبدأ التمرين',
+  }[s.status.key] || '';
+  // Only mention last activity when there actually was some.
+  const bits = [why];
+  if (s.daysSinceActivity !== null && s.daysSinceActivity !== undefined)
+    bits.push('آخر نشاط ' + fmtWhen(Date.now() - s.daysSinceActivity * 86400000));
+  bits.push(`${s.daysLeft} يوم متبقي`);
+  return `
+    <div class="rowitem" onclick="openClient('${s.id}')">
+      <div class="rowitem-main">
+        <div class="rowitem-name">${s.fullName}</div>
+        <div class="rowitem-meta">${bits.filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="rowitem-side">
+        <span class="eng ${s.status.tone}">${s.status.label}</span>
+      </div>
+    </div>`;
+}
+
+async function loadOverview() {
+  const el = document.getElementById('overviewContent');
+  try {
+    const r = await api('/api/admin/reports');
+    const t = r.totals;
+    const att = r.needsAttention;
+    const top = r.topPerformers;
+
+    el.innerHTML = `
+      <div class="ov-grid">
+        <div class="ov-card"><div class="ov-val">${t.subscribers}</div><div class="ov-lbl">إجمالي المشتركين</div></div>
+        <div class="ov-card"><div class="ov-val green">${t.active}</div><div class="ov-lbl">اشتراكات نشطة</div></div>
+        <div class="ov-card"><div class="ov-val amber">${t.expiringSoon}</div><div class="ov-lbl">تنتهي خلال ٧ أيام</div></div>
+        <div class="ov-card"><div class="ov-val">${t.sessions30}</div><div class="ov-lbl">جلسة خلال ٣٠ يوم</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          يحتاجون متابعة
+          ${att.length ? `<span class="nav-count red">${att.length}</span>` : ''}
+        </div>
+        <div class="panel-sub">مشتركون نشطون توقّف نشاطهم — تواصل معهم اليوم</div>
+        ${att.length
+          ? `<div class="rowlist">${att.map(attentionRow).join('')}</div>`
+          : `<div class="empty-note">لا أحد يحتاج متابعة — كل المشتركين على المسار الصحيح</div>`}
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">الأكثر التزاماً</div>
+        <div class="panel-sub">حسب عدد التمارين المكتملة خلال ٣٠ يوم</div>
+        ${top.length
+          ? `<div class="rowlist">${top.map(s => `
+              <div class="rowitem" onclick="openClient('${s.id}')">
+                <div class="rowitem-main">
+                  <div class="rowitem-name">${s.fullName}</div>
+                  <div class="rowitem-meta">${s.completed30} تمرين · التزام ${s.adherencePct ?? '—'}٪</div>
+                </div>
+                <div class="rowitem-side"><span class="eng ${s.status.tone}">${s.status.label}</span></div>
+              </div>`).join('')}</div>`
+          : `<div class="empty-note">لا توجد تمارين مسجّلة بعد</div>`}
+      </div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════ CLIENT FILE ═══════════════════ */
+let clientData = null;
+
+async function openClient(id) {
+  switchAdminTab('client');
+  const el = document.getElementById('clientContent');
+  el.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+  try {
+    clientData = await api(`/api/admin/subscribers/${id}/profile`);
+    renderClient('overview');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+const EVENT_LABEL = {
+  login:            ['فتح الموقع',        '<path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>'],
+  workout_complete: ['أنهى تمرين اليوم',  '<path d="M5 12l5 5L20 7"/>'],
+  set_logged:       ['سجّل جولات تمرين',  '<path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/>'],
+  calc_saved:       ['حفظ حاسبة السعرات', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01"/>'],
+  meal_print:       ['طبع البرنامج الغذائي', '<path d="M6 9V2h12v7"/><rect x="6" y="14" width="12" height="8"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>'],
+};
+
+function renderClient(tab) {
+  const d = clientData;
+  if (!d) return;
+  const s = d.subscriber, m = d.metrics;
+
+  const head = `
+    <div class="client-hero">
+      <div class="ch-top">
+        <div>
+          <div class="ch-name">${s.fullName}</div>
+          <div class="ch-meta">@${s.username}${s.phone ? ' · +' + s.phone : ''}</div>
+        </div>
+        <span class="eng ${m.status.tone}" style="background:rgba(255,255,255,.9)">${m.status.label}</span>
+      </div>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-val">${s.daysLeft}</div><div class="ch-stat-lbl">يوم متبقي</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${m.completedCount}</div><div class="ch-stat-lbl">تمرين مكتمل</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${m.adherencePct ?? '—'}${m.adherencePct !== null ? '٪' : ''}</div><div class="ch-stat-lbl">الالتزام</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${(m.totalVolume||0).toLocaleString('en-US')}</div><div class="ch-stat-lbl">كجم إجمالي</div></div>
+      </div>
+    </div>
+
+    <div class="ctabs">
+      <button class="ctab ${tab==='overview'?'on':''}" onclick="renderClient('overview')">نظرة عامة</button>
+      <button class="ctab ${tab==='activity'?'on':''}" onclick="renderClient('activity')">سجل النشاط</button>
+      <button class="ctab ${tab==='exercises'?'on':''}" onclick="renderClient('exercises')">التمارين</button>
+    </div>`;
+
+  let body = '';
+
+  if (tab === 'overview') {
+    const p = d.profile, mac = d.macros;
+    const goalLbl = { lose:'خسارة وزن', maintain:'ثبات', gain:'زيادة عضل' }[p?.goal] || '—';
+    body = `
+      <div class="panel">
+        <div class="panel-title">الاشتراك</div>
+        <div class="rowlist">
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">البداية</div><div class="rowitem-name">${fmtDate(s.startDate)}</div></div>
+            <div class="rowitem-side"><div style="text-align:left"><div class="rowitem-meta">النهاية</div><div class="rowitem-name">${fmtDate(s.endDate)}</div></div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">الجدول المختار</div>
+            <div class="rowitem-name">${s.selectedPlan ? (PLAN_LABEL[s.selectedPlan] || s.selectedPlan) : 'لم يختر جدولاً'}</div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">آخر دخول</div>
+            <div class="rowitem-name">${fmtWhen(m.lastLogin)} · ${m.loginCount} مرة إجمالاً</div></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">الحاسبة والأهداف</div>
+        ${p ? `<div class="rowlist">
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">الهدف</div><div class="rowitem-name">${goalLbl}</div></div>
+            <div class="rowitem-side"><div style="text-align:left"><div class="rowitem-meta">الوزن</div><div class="rowitem-name">${p.weight} كجم</div></div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">السعرات اليومية</div>
+            <div class="rowitem-name">${(mac?.cal||0).toLocaleString('en-US')} سعرة · بروتين ${mac?.protein||0}غ · كارب ${mac?.carbs||0}غ · دهون ${mac?.fat||0}غ</div></div></div>
+        </div>` : `<div class="empty-note">لم يحسب سعراته بعد</div>`}
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">أفضل تقدّم</div>
+        <div class="panel-sub">زيادة الأوزان مقارنة بأفضل رقم سابق</div>
+        ${m.topGains.length ? `<div class="rowlist">${m.topGains.map(g => `
+          <div class="rowitem" style="cursor:default">
+            <div class="rowitem-main"><div class="rowitem-name">${EX_NAME[g.exId] || g.exId}</div>
+              <div class="rowitem-meta">من ${g.prevBest} إلى ${g.best} كجم</div></div>
+            <div class="rowitem-side"><span class="eng green">+ ${g.gain} كجم</span></div>
+          </div>`).join('')}</div>`
+          : `<div class="empty-note">لا توجد زيادات مسجّلة بعد</div>`}
+      </div>`;
+  }
+
+  if (tab === 'activity') {
+    body = `
+      <div class="panel">
+        <div class="panel-title">سجل النشاط</div>
+        <div class="panel-sub">آخر ${d.activity.length} حدث</div>
+        ${d.activity.length ? `<div class="tl">${d.activity.map(a => {
+          const [label, icon] = EVENT_LABEL[a.event] || [a.event, '<circle cx="12" cy="12" r="9"/>'];
+          let extra = '';
+          if (a.event === 'set_logged' && a.meta)      extra = ` — ${EX_NAME[a.meta.exerciseId] || a.meta.exerciseId} (${a.meta.sets} جولات · ${a.meta.volume} كجم)`;
+          if (a.event === 'calc_saved' && a.meta)      extra = ` — ${a.meta.cal} سعرة`;
+          if (a.event === 'workout_complete' && a.meta) extra = ` — يوم ${(a.meta.dayIdx ?? 0) + 1}`;
+          return `<div class="tl-item">
+            <div class="tl-dot"><svg class="ico" viewBox="0 0 24 24">${icon}</svg></div>
+            <div class="tl-body"><div class="tl-title">${label}${extra}</div>
+              <div class="tl-time">${new Date(a.at).toLocaleString('ar-EG',{dateStyle:'medium',timeStyle:'short'})}</div></div>
+          </div>`;
+        }).join('')}</div>` : `<div class="empty-note">لا يوجد نشاط مسجّل</div>`}
+      </div>`;
+  }
+
+  if (tab === 'exercises') {
+    body = `
+      <div class="panel">
+        <div class="panel-title">التمارين المسجّلة</div>
+        <div class="panel-sub">${d.exercises.length} تمرين · مرتّبة حسب عدد الجلسات</div>
+        ${d.exercises.length ? d.exercises.map(e => `
+          <div class="exrow">
+            <div class="exrow-name">${EX_NAME[e.exerciseId] || e.exerciseId}
+              <div class="exrow-en">${e.exerciseId}</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.sessions}</div><div class="exrow-lbl">جلسة</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.best}</div><div class="exrow-lbl">أعلى وزن</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.last ? fmtWhen(e.last.at) : '—'}</div><div class="exrow-lbl">آخر مرة</div></div>
+          </div>`).join('')
+          : `<div class="empty-note">لم يسجّل أي تمرين بعد</div>`}
+      </div>`;
+  }
+
+  document.getElementById('clientContent').innerHTML = head + body;
+}
+
+/* ═══════════════════ REPORTS ═══════════════════ */
+const STATUS_ORDER = ['committed','wobbly','at_risk','stalled','not_started','never_logged_in'];
+const STATUS_META = {
+  committed:      ['ملتزم','green'],  wobbly:      ['متذبذب','amber'],
+  at_risk:        ['معرّض للانقطاع','orange'], stalled: ['متوقف','red'],
+  not_started:    ['لم يبدأ','slate'], never_logged_in: ['لم يدخل','grey'],
+};
+
+async function loadReport(kind) {
+  const el = document.getElementById('reportContent');
+  const meta = {
+    engagement: ['الالتزام والنشاط', 'كيف يتفاعل المشتركون مع البرنامج'],
+    progress:   ['التقدّم في الأوزان', 'من يزيد أوزانه ومن يتراجع'],
+    revenue:    ['ملخص الاشتراكات', 'حالة الاشتراكات والتجديدات القادمة'],
+  }[kind] || ['التقارير',''];
+  document.getElementById('reportTitle').textContent    = meta[0];
+  document.getElementById('reportSubtitle').textContent = meta[1];
+  el.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+
+  try {
+    const r = await api('/api/admin/reports');
+
+    if (kind === 'engagement') {
+      const total = r.totals.subscribers || 1;
+      el.innerHTML = `
+        <div class="panel">
+          <div class="panel-title">توزيع الحالات</div>
+          <div class="panel-sub">كل مشترك مصنّف حسب آخر نشاط له</div>
+          <div class="rowlist">
+            ${STATUS_ORDER.map(k => {
+              const n = r.byStatus[k] || 0;
+              const [label, tone] = STATUS_META[k];
+              const pct = Math.round((n / total) * 100);
+              return `<div class="rowitem" style="cursor:default">
+                <div class="rowitem-main"><div class="rowitem-name"><span class="eng ${tone}">${label}</span></div></div>
+                <div class="rowitem-side">
+                  <div class="bar"><div class="bar-fill ${tone}" style="width:${pct}%"></div></div>
+                  <div style="min-width:52px;text-align:left"><b>${n}</b> <span style="color:var(--muted);font-size:11px">${pct}٪</span></div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">يحتاجون متابعة</div>
+          <div class="panel-sub">اضغط على أي اسم لفتح ملفه</div>
+          ${r.needsAttention.length
+            ? `<div class="rowlist">${r.needsAttention.map(attentionRow).join('')}</div>`
+            : `<div class="empty-note">لا أحد يحتاج متابعة</div>`}
+        </div>`;
+    }
+
+    if (kind === 'progress') {
+      const withVol = subscribers.filter(s => s.totalVolume > 0)
+        .sort((a,b) => (b.volumeTrendPct||0) - (a.volumeTrendPct||0));
+      el.innerHTML = `
+        <div class="ov-grid">
+          <div class="ov-card"><div class="ov-val">${r.totals.sessions30}</div><div class="ov-lbl">جلسة خلال ٣٠ يوم</div></div>
+          <div class="ov-card"><div class="ov-val">${(r.totals.volume7||0).toLocaleString('en-US')}</div><div class="ov-lbl">كجم مرفوعة هذا الأسبوع</div></div>
+          <div class="ov-card"><div class="ov-val green">${withVol.filter(s=>s.volumeTrendPct>0).length}</div><div class="ov-lbl">في تحسّن</div></div>
+          <div class="ov-card"><div class="ov-val red">${withVol.filter(s=>s.volumeTrendPct<0).length}</div><div class="ov-lbl">في تراجع</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">اتجاه الأحمال</div>
+          <div class="panel-sub">مقارنة آخر ٧ أيام بالأسبوع السابق</div>
+          ${withVol.length ? `<div class="rowlist">${withVol.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">${(s.totalVolume||0).toLocaleString('en-US')} كجم إجمالاً · ${s.completed30||0} تمرين/٣٠ يوم</div></div>
+              <div class="rowitem-side">
+                <span class="${s.volumeTrendPct >= 0 ? 'trend-up' : 'trend-down'}">${s.volumeTrendPct >= 0 ? '▲' : '▼'} ${Math.abs(s.volumeTrendPct)}٪</span>
+              </div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد أوزان مسجّلة بعد</div>`}
+        </div>`;
+    }
+
+    if (kind === 'revenue') {
+      const expiring = subscribers.filter(s => s.active && s.daysLeft <= 14)
+        .sort((a,b) => a.daysLeft - b.daysLeft);
+      const expired = subscribers.filter(s => !s.active);
+      el.innerHTML = `
+        <div class="ov-grid">
+          <div class="ov-card"><div class="ov-val">${r.totals.subscribers}</div><div class="ov-lbl">إجمالي المشتركين</div></div>
+          <div class="ov-card"><div class="ov-val green">${r.totals.active}</div><div class="ov-lbl">نشطة</div></div>
+          <div class="ov-card"><div class="ov-val amber">${r.totals.expiringSoon}</div><div class="ov-lbl">تنتهي خلال ٧ أيام</div></div>
+          <div class="ov-card"><div class="ov-val red">${r.totals.expired}</div><div class="ov-lbl">منتهية</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">تجديدات قادمة</div>
+          <div class="panel-sub">اشتراكات تنتهي خلال ١٤ يوم</div>
+          ${expiring.length ? `<div class="rowlist">${expiring.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">ينتهي ${fmtDate(s.endDate)}</div></div>
+              <div class="rowitem-side"><span class="eng ${s.daysLeft<=7?'red':'amber'}">${s.daysLeft} يوم</span></div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد اشتراكات تنتهي قريباً</div>`}
+        </div>
+        <div class="panel">
+          <div class="panel-title">اشتراكات منتهية</div>
+          <div class="panel-sub">فرص إعادة تفعيل</div>
+          ${expired.length ? `<div class="rowlist">${expired.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">انتهى ${fmtDate(s.endDate)}</div></div>
+              <div class="rowitem-side"><span class="eng grey">منتهي</span></div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد اشتراكات منتهية</div>`}
+        </div>`;
+    }
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════ ADD SUBSCRIBER ═══════════════════ */
+function openAddModal() {
+  resetAddForm();
+  document.getElementById('addModal').classList.add('open');
+}
+
+function resetAddForm() {
+  document.getElementById('addForm').reset();
+  usernameEditedManually = false;
+  document.getElementById('addFormWrap').style.display = 'block';
+  document.getElementById('addSuccessWrap').style.display = 'none';
+  document.getElementById('addError').classList.remove('show');
+  document.getElementById('addBtn').disabled = false;
+  document.getElementById('addBtn').textContent = 'إنشاء الحساب';
+}
+
+function randomPassword() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  let p = '';
+  for (let i=0; i<7; i++) p += chars[Math.floor(Math.random()*chars.length)];
+  return p;
+}
+
+function genPassword() {
+  document.getElementById('addPassword').value = randomPassword();
+}
+
+/* Username = the subscriber's phone number: unique, and easy for them to remember.
+   Auto-fills as the phone is typed, unless the admin has typed a username manually. */
+let usernameEditedManually = false;
+
+document.getElementById('addUsername').addEventListener('input', function () {
+  usernameEditedManually = this.value.trim() !== '';
+});
+
+document.getElementById('addPhone').addEventListener('input', function () {
+  if (usernameEditedManually) return;
+  document.getElementById('addUsername').value = this.value.replace(/\D/g, '');
+});
+
+function genUsername() {
+  const phone = document.getElementById('addPhone').value.replace(/\D/g, '');
+  if (!phone) return toast('أدخل رقم الجوال أولاً', 'error');
+  document.getElementById('addUsername').value = phone;
+  usernameEditedManually = false;
+}
+
+// Track last-created subscriber's details for share buttons
+let lastCreated = { fullName: '', phone: '', username: '', password: '' };
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('addBtn');
+  const err = document.getElementById('addError');
+  btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+  err.classList.remove('show');
+  const body = {
+    fullName: document.getElementById('addFullName').value.trim(),
+    phone:    document.getElementById('addPhone').value.trim(),
+    gender:   document.getElementById('addGender').value,
+    months:   document.getElementById('addMonths').value,
+    username: document.getElementById('addUsername').value.trim().toLowerCase(),
+    password: document.getElementById('addPassword').value,
+  };
+  try {
+    const r = await api('/api/admin/subscribers', { method:'POST', body:JSON.stringify(body) });
+    lastCreated = {
+      fullName: body.fullName,
+      phone:    r.phone || body.phone,
+      username: body.username,
+      password: body.password,
+    };
+    document.getElementById('credUser').textContent  = body.username;
+    document.getElementById('credPass').textContent  = body.password;
+    document.getElementById('credUrl').textContent   = location.origin + '/';
+    document.getElementById('credName').textContent  = body.fullName;
+    document.getElementById('credPhone').textContent = lastCreated.phone;
+
+    const statusEl = document.getElementById('waAutoStatus');
+    if (r.waSent) {
+      statusEl.className = 'wa-status ok';
+      statusEl.style.display = 'flex';
+      statusEl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg> تم الإرسال تلقائياً عبر واتساب بزنس';
+    } else if (r.waReason && r.waReason !== 'not_configured') {
+      statusEl.className = 'wa-status fail';
+      statusEl.style.display = 'flex';
+      statusEl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg> تعذّر الإرسال التلقائي — استخدم الزر أدناه';
+    } else {
+      statusEl.style.display = 'none';
+    }
+
+    document.getElementById('addFormWrap').style.display = 'none';
+    document.getElementById('addSuccessWrap').style.display = 'block';
+    loadSubscribers();
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'إنشاء الحساب';
+  }
+});
+
+function firstName(full) {
+  return (full || '').trim().split(/\s+/)[0] || '';
+}
+
+function buildFullMessage() {
+  return welcomeMessage({
+    fullName: document.getElementById('credName').textContent || lastCreated.fullName,
+    username: document.getElementById('credUser').textContent,
+    password: document.getElementById('credPass').textContent,
+  });
+}
+
+function copyField(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('done');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = orig; }, 1400);
+  });
+}
+
+function copyFullMessage(btn) {
+  navigator.clipboard.writeText(buildFullMessage()).then(() => {
+    const orig = btn.innerHTML;
+    btn.classList.add('done');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"/></svg> تم النسخ';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = orig; }, 1600);
+  });
+}
+
+function shareWhatsapp() {
+  const phone = document.getElementById('credPhone').textContent || lastCreated.phone || '';
+  window.open(waLink(phone, buildFullMessage()), '_blank');
+}
+
+/* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */
+function openEditModal(id) {
+  const sub = subscribers.find(s => s.id === id);
+  if (!sub) return;
+  editingId = id;
+  document.getElementById('editName').textContent = sub.fullName;
+  document.getElementById('editUser').textContent = '@' + sub.username;
+  document.getElementById('editExtend').value = '';
+  document.getElementById('editPassword').value = '';
+  document.getElementById('editResetEdits').checked = false;
+  document.getElementById('editError').classList.remove('show');
+  document.getElementById('editModal').classList.add('open');
+}
+
+async function saveEdit() {
+  const body = {};
+  const ext = document.getElementById('editExtend').value;
+  const pw  = document.getElementById('editPassword').value.trim();
+  const reset = document.getElementById('editResetEdits').checked;
+  if (ext) body.extendMonths = parseInt(ext);
+  if (pw)  body.newPassword  = pw;
+  if (reset) body.resetEdits = true;
+  if (Object.keys(body).length === 0) {
+    const err = document.getElementById('editError');
+    err.textContent = 'لم تختاري أي تعديل';
+    err.classList.add('show');
+    return;
+  }
+  try {
+    await api('/api/admin/subscribers/' + editingId, { method:'PATCH', body:JSON.stringify(body) });
+    closeModal('editModal');
+    toast('تم الحفظ');
+    loadSubscribers();
+  } catch (e) {
+    const err = document.getElementById('editError');
+    err.textContent = e.message;
+    err.classList.add('show');
+  }
+}
+
+function confirmDelete() {
+  const sub = subscribers.find(s => s.id === editingId);
+  if (!sub) return;
+  if (!confirm(`حذف نهائي للمشترك "${sub.fullName}"؟\nلا يمكن التراجع.`)) return;
+  api('/api/admin/subscribers/' + editingId, { method:'DELETE' })
+    .then(() => { closeModal('editModal'); toast('تم الحذف'); loadSubscribers(); })
+    .catch(e => toast(e.message, 'error'));
+}
+
+/* ═══════════════════ HELPERS ═══════════════════ */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(el => {
+  el.addEventListener('click', (e) => { if (e.target === el) el.classList.remove('open'); });
+});
+</script>
+</body>
+</html>

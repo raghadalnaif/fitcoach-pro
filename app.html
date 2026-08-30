@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2626EC">
+<meta name="apple-mobile-web-app-title" content="UR PASS">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="icon" type="image/png" href="/logo.png">
+<title>UR PASS — بوابة التدريب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#2626EC; --blue-d:#1E1EC7; --blue-l:#5252F1; --blue-bg:#EEF0FF; --blue-bg2:#F5F6FF;
+  --text:#0F172A; --muted:#64748B; --subtle:#94A3B8; --border:#E5E7EB;
+  --bg:#F8FAFC; --surface:#ffffff; --surface2:#F8FAFC;
+  --red:#EF4444; --green:#10B981; --amber:#F59E0B;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.04);
+  --shadow:0 4px 20px rgba(38,38,236,.06);
+  --shadow-lg:0 20px 60px rgba(38,38,236,.14);
+  --r:16px; --r-sm:10px;
+  --font:'Tajawal',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
+  direction:rtl;padding-bottom:calc(78px + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:contain;overflow-x:hidden}
+button,a,input,select{-webkit-tap-highlight-color:transparent}
+button{font-family:inherit}
+
+/* Icons — universal */
+.ico{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ico-lg{width:24px;height:24px}
+.ico-xl{width:32px;height:32px}
+
+/* ── HEADER ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 18px calc(12px);
+  padding-top:calc(12px + env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;
+  box-shadow:var(--shadow-sm);backdrop-filter:saturate(180%) blur(20px);
+  background:rgba(255,255,255,.92)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:36px;height:36px;display:block}
+.brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.brand-name{font-size:17px;font-weight:900;color:var(--text);letter-spacing:1.5px}
+
+.header-actions{display:flex;align-items:center;gap:10px}
+.badge-days{padding:6px 12px;background:var(--green);color:#fff;border-radius:20px;
+  font-size:11px;font-weight:800;letter-spacing:.3px}
+.badge-days.warn{background:var(--amber)}
+.btn-icon{background:var(--surface2);border:1px solid var(--border);padding:8px;cursor:pointer;color:var(--muted);
+  border-radius:10px;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.btn-icon:hover{border-color:var(--red);color:var(--red);background:#FEF2F2}
+
+/* ── BOTTOM NAV ── */
+.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  display:flex;justify-content:space-around;z-index:20;
+  box-shadow:0 -4px 20px rgba(15,23,42,.06)}
+.tab-btn{flex:1;background:none;border:none;padding:10px 4px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--muted);font-family:var(--font);transition:all .15s;border-radius:10px;
+  min-height:52px;position:relative}
+.tab-btn.active{color:var(--blue)}
+.tab-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:24px;height:3px;background:var(--blue);border-radius:0 0 3px 3px}
+.tab-btn:active{transform:scale(.94)}
+.tab-btn:hover:not(.active){color:var(--text)}
+.tab-ico{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
+.tab-lbl{font-size:11px;font-weight:700}
+
+/* ── LAYOUT ── */
+.container{max-width:1000px;margin:0 auto;padding:24px 16px}
+.page{display:none;animation:fadeIn .3s cubic-bezier(.16,1,.3,1)}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero-card{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);
+  color:#fff;border-radius:20px;padding:28px 26px;margin-bottom:24px;position:relative;overflow:hidden;
+  box-shadow:0 20px 40px -12px rgba(38,38,236,.32)}
+.hero-card::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%)}
+.hero-card::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;
+  background:radial-gradient(circle,rgba(255,255,255,.08),transparent 65%)}
+.hero-greeting{font-size:13px;font-weight:600;opacity:.85;margin-bottom:6px;position:relative;letter-spacing:.3px}
+.hero-name{font-size:22px;font-weight:900;margin-bottom:20px;position:relative}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;position:relative}
+.hero-stat{background:rgba(255,255,255,.14);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px 14px}
+.hero-stat-lbl{font-size:11px;font-weight:600;opacity:.85;margin-bottom:3px}
+.hero-stat-val{font-size:19px;font-weight:900;letter-spacing:-.3px}
+
+/* ── SECTIONS ── */
+.section-title{font-size:19px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.section-title .badge{font-size:11px;background:var(--blue-bg);color:var(--blue);
+  padding:4px 10px;border-radius:20px;font-weight:800}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:15px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:14px}
+.card-title .ico{color:var(--blue)}
+
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.qa-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:22px 14px;
+  cursor:pointer;transition:all .2s;text-align:center;font-family:var(--font);
+  display:flex;flex-direction:column;align-items:center}
+.qa-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow)}
+.qa-ico{width:32px;height:32px;stroke:var(--muted);stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px;transition:stroke .2s}
+.qa-btn:hover .qa-ico{stroke:var(--blue)}
+.qa-lbl{font-size:13px;font-weight:800;color:var(--text)}
+
+/* ── TIPS LIST ── */
+.tips-list{list-style:none;padding:0}
+.tips-list li{padding:11px 0;padding-right:32px;position:relative;color:var(--muted);
+  font-size:14px;line-height:1.7;border-bottom:1px solid var(--border)}
+.tips-list li:last-child{border-bottom:none}
+.tips-list li::before{content:'';position:absolute;right:0;top:19px;width:6px;height:6px;
+  border-radius:50%;background:var(--blue)}
+.tips-list li b{color:var(--blue);font-weight:800}
+
+/* ── FORMS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+.form-input,.form-select{width:100%;padding:13px 15px;border:1.5px solid var(--border);border-radius:11px;
+  font-family:var(--font);font-size:14px;background:var(--surface);outline:none;transition:all .2s;
+  direction:rtl;text-align:right;color:var(--text)}
+.form-input.ltr{direction:ltr;text-align:center}
+.form-input:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(38,38,236,.08)}
+.form-hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+.chip-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:11px 16px;border:1.5px solid var(--border);background:var(--surface);border-radius:11px;
+  font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--blue-l)}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+.btn-primary{padding:14px 24px;background:var(--blue);color:#fff;border:none;border-radius:12px;
+  font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 16px rgba(38,38,236,.2)}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 24px rgba(38,38,236,.32)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{padding:12px 20px;background:var(--surface);color:var(--blue);border:1.5px solid var(--blue);
+  border-radius:11px;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-outline:hover{background:var(--blue-bg)}
+
+.edits-warning{background:#FEFCE8;border:1px solid #FDE68A;color:#854D0E;padding:14px 16px;
+  border-radius:12px;font-size:13px;font-weight:600;margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:10px}
+.edits-warning.danger{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+.edits-warning .ico{color:currentColor;flex-shrink:0;margin-top:1px}
+
+/* ── MACROS RESULT ── */
+.macros-result{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);color:#fff;
+  border-radius:18px;padding:26px;margin-top:22px;display:none;
+  box-shadow:0 20px 40px -12px rgba(38,38,236,.32)}
+.macros-result.show{display:block;animation:fadeIn .4s}
+.macros-title{font-size:14px;font-weight:800;opacity:.9;margin-bottom:6px}
+.macros-cal{font-size:44px;font-weight:900;margin-bottom:18px;line-height:1;letter-spacing:-1px}
+.macros-cal span{font-size:16px;font-weight:600;opacity:.8;margin-right:6px}
+.macros-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.macro-card{background:rgba(255,255,255,.18);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px 10px;text-align:center}
+.macro-val{font-size:22px;font-weight:900;margin-bottom:3px;letter-spacing:-.5px}
+.macro-lbl{font-size:11px;font-weight:700;opacity:.85}
+
+/* ── MEAL PLAN ── */
+.meal-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:22px}
+.ms-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 12px;text-align:center;box-shadow:var(--shadow-sm)}
+.ms-val{font-size:22px;font-weight:900;color:var(--blue);letter-spacing:-.5px}
+.ms-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:3px}
+
+.meal-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.meal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);gap:12px}
+.meal-head-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.meal-icon{width:40px;height:40px;background:var(--blue-bg);color:var(--blue);border-radius:11px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.meal-icon .ico{width:22px;height:22px}
+.meal-name{font-size:16px;font-weight:900;margin-bottom:2px}
+.meal-time{font-size:12px;color:var(--muted);font-weight:600}
+.meal-tag{font-size:10px;background:var(--surface2);color:var(--muted);padding:4px 10px;
+  border-radius:20px;font-weight:800;letter-spacing:.6px;border:1px solid var(--border);
+  align-self:flex-start;white-space:nowrap}
+
+.options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.opt-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.opt-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.opt-cal{background:var(--blue);color:#fff;padding:4px 10px;border-radius:20px;font-weight:900;font-size:11px}
+.opt-items{list-style:none;margin-bottom:12px}
+.opt-item{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;
+  border-bottom:1px dashed var(--border);gap:8px}
+.opt-item:last-child{border-bottom:none}
+.opt-item-name{color:var(--text);font-weight:600;flex:1}
+.opt-item-qty{color:var(--muted);font-family:'Segoe UI Mono',monospace;font-weight:700;font-size:12px;white-space:nowrap;direction:ltr}
+.opt-macros{display:flex;justify-content:space-between;padding-top:10px;border-top:1.5px solid var(--border);font-size:11px}
+.opt-macro{text-align:center;flex:1}
+.opt-macro-val{font-size:13px;font-weight:900;color:var(--blue)}
+.opt-macro-lbl{font-size:10px;color:var(--muted);font-weight:700;margin-top:1px}
+
+.free-list{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px;margin-top:14px}
+.free-list-title{font-size:13px;font-weight:800;color:#166534;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px}
+.free-list-title .ico{color:#166534}
+.free-items{display:flex;gap:8px;flex-wrap:wrap}
+.free-item{background:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;color:#166534}
+
+.meal-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+
+/* ── WORKOUT ── */
+.plan-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.plan-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:22px 14px;
+  cursor:pointer;transition:all .2s;text-align:center;position:relative;font-family:var(--font)}
+.plan-card:hover{border-color:var(--blue-l);transform:translateY(-2px)}
+.plan-card.on{border-color:var(--blue);background:var(--blue-bg2)}
+.plan-card-days{font-size:32px;font-weight:900;color:var(--blue);margin-bottom:2px;letter-spacing:-1px}
+.plan-card-lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.plan-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;
+  background:var(--blue);color:#fff;display:none;align-items:center;justify-content:center}
+.plan-check .ico{width:14px;height:14px;stroke-width:3}
+.plan-card.on .plan-check{display:flex}
+
+.day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;
+  scrollbar-width:none;-ms-overflow-style:none}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{padding:11px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:11px;
+  font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .15s;color:var(--text)}
+.day-tab:hover{border-color:var(--blue-l)}
+.day-tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+.exercise-list{display:flex;flex-direction:column;gap:12px}
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:16px;display:flex;flex-direction:column;gap:12px;
+  transition:all .2s;box-shadow:var(--shadow-sm)}
+.ex-card:hover{box-shadow:var(--shadow)}
+.ex-head{display:flex;gap:14px;align-items:flex-start}
+.ex-head .ex-info{flex:1;min-width:0}
+.ex-img-wrap{width:120px;height:120px;flex-shrink:0;border-radius:12px;overflow:hidden;
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);cursor:pointer;position:relative}
+.ex-video-inline{width:100%;height:100%;object-fit:cover;display:block}
+.ex-img-placeholder{color:var(--subtle);width:44px;height:44px;stroke-width:1.5;
+  stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ex-play{position:absolute;bottom:8px;right:8px;background:var(--blue);color:#fff;
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;opacity:.95;
+  box-shadow:0 4px 12px rgba(38,38,236,.4)}
+.ex-play .ico{width:12px;height:12px;fill:currentColor;stroke-width:0}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:15px;font-weight:800;margin-bottom:3px}
+.ex-name-en{font-size:12px;color:var(--muted);font-family:'Segoe UI',sans-serif;direction:ltr;text-align:right;margin-bottom:8px}
+.ex-muscle{display:inline-block;background:var(--blue-bg);color:var(--blue);padding:3px 10px;
+  border-radius:20px;font-size:11px;font-weight:800;margin-bottom:10px}
+.ex-scheme{display:flex;gap:16px;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:10px}
+.ex-scheme b{color:var(--text);font-weight:900}
+.btn-watch{width:100%;padding:10px 12px;background:var(--blue-bg);color:var(--blue);
+  border:1.5px solid var(--blue);border-radius:10px;font-family:var(--font);
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-watch:hover{background:var(--blue);color:#fff}
+.btn-watch .ico{width:14px;height:14px;fill:currentColor;stroke-width:0}
+.ex-head{display:flex;gap:14px;margin-bottom:12px}
+.ex-progress{display:flex;gap:8px;align-items:center}
+.ex-progress input{width:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:var(--font);font-size:13px;text-align:center;font-weight:700;direction:ltr;outline:none}
+.ex-progress input:focus{border-color:var(--blue)}
+
+/* Sets tracking */
+.sets-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:12px;margin-top:12px}
+.sets-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sets-title{font-size:13px;font-weight:800;color:var(--text)}
+.btn-history{background:var(--surface);border:1px solid var(--border);color:var(--blue);
+  padding:6px 10px;border-radius:8px;font-family:var(--font);font-size:11px;font-weight:800;
+  cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-history:hover{border-color:var(--blue);background:var(--blue-bg)}
+.set-row{display:flex;align-items:center;gap:8px;padding:7px 0;
+  border-bottom:1px dashed var(--border)}
+.set-row:last-of-type{border-bottom:none;margin-bottom:8px}
+.set-num{width:24px;height:24px;background:var(--blue);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.set-input{width:72px;padding:9px 8px;border:1.5px solid var(--border);border-radius:9px;
+  font-family:var(--font);font-size:14px;text-align:center;font-weight:700;direction:ltr;
+  outline:none;background:var(--surface)}
+.set-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(38,38,236,.08)}
+.set-x{color:var(--muted);font-weight:700;font-size:14px}
+.set-prev{font-size:11px;color:var(--muted);font-weight:600;margin-right:auto;
+  direction:rtl;text-align:right}
+.set-prev.muted{opacity:.5}
+.ex-save{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:10px;
+  font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:background .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+.ex-save:hover{background:var(--blue-d)}
+.ex-save:active{transform:scale(.98)}
+
+/* Exercise history modal content */
+.history-scroll{width:100%;height:100%;background:#fff;border-radius:16px;padding:20px;
+  overflow-y:auto;direction:rtl}
+.hist-row{padding:14px 0;border-bottom:1px solid var(--border)}
+.hist-row:last-child{border-bottom:none}
+.hist-date{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:6px}
+.hist-sets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.hist-set{background:var(--surface2);padding:4px 10px;border-radius:8px;font-size:12px;color:var(--text);
+  direction:ltr}
+.hist-set b{color:var(--blue);font-weight:800}
+.hist-total{font-size:11px;color:var(--muted);font-weight:600}
+
+.day-summary{background:var(--blue-bg2);border:1px solid var(--blue-bg);border-radius:12px;
+  padding:16px 20px;margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.day-title{font-size:16px;font-weight:900;color:var(--blue)}
+.day-count{font-size:12px;color:var(--muted);font-weight:700}
+
+/* ── TODAY'S WORKOUT CARD ── */
+.today-card{background:linear-gradient(135deg,#EEF0FF 0%,#F5F6FF 100%);
+  border:1.5px solid var(--blue);border-radius:18px;padding:22px;margin-bottom:16px;
+  box-shadow:0 8px 30px -8px rgba(38,38,236,.18);position:relative;overflow:hidden}
+.today-card::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;
+  background:radial-gradient(circle,rgba(38,38,236,.08),transparent 65%);pointer-events:none}
+.today-card.done{background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);border-color:var(--green)}
+.today-card.empty{background:var(--surface);border:1.5px dashed var(--border);text-align:center;padding:32px 20px}
+.today-empty-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.today-empty-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.today-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px;position:relative}
+.today-eyebrow{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:4px}
+.today-card.done .today-eyebrow{color:var(--green)}
+.today-title{font-size:19px;font-weight:900;color:var(--text);line-height:1.3}
+.today-day-badge{background:var(--blue);color:#fff;padding:6px 12px;border-radius:20px;
+  font-size:11px;font-weight:800;white-space:nowrap;letter-spacing:.3px}
+.today-card.done .today-day-badge{background:var(--green)}
+.today-meta{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.today-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:700}
+.today-meta-item .ico{width:16px;height:16px;color:var(--blue)}
+.today-card.done .today-meta-item .ico{color:var(--green)}
+.today-done-note{background:rgba(16,185,129,.12);color:#065F46;
+  padding:12px 14px;border-radius:12px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+.today-done-note .ico{color:var(--green);width:18px;height:18px;stroke-width:3}
+
+/* ── PROGRESS CARD ── */
+.progress-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.progress-card.empty{text-align:center;padding:28px 20px;background:var(--surface2);border-style:dashed}
+.progress-empty-title{font-size:14px;font-weight:800;margin-bottom:4px}
+.progress-empty-sub{font-size:12px;color:var(--muted)}
+.progress-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.progress-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:3px}
+.progress-title{font-size:17px;font-weight:900;color:var(--text)}
+.progress-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.p-stat{background:var(--surface2);border-radius:12px;padding:14px 8px;text-align:center;
+  border:1px solid var(--border)}
+.p-stat-val{font-size:20px;font-weight:900;color:var(--blue);letter-spacing:-.5px;margin-bottom:3px}
+.p-stat.up .p-stat-val{color:var(--green)}
+.p-stat.down .p-stat-val{color:var(--red)}
+.p-stat-lbl{font-size:10px;color:var(--muted);font-weight:700;line-height:1.3}
+
+.progress-gains{background:var(--blue-bg2);border:1px solid var(--blue-bg);
+  border-radius:12px;padding:14px}
+.progress-gains-title{font-size:12px;font-weight:800;color:var(--blue);
+  margin-bottom:10px;letter-spacing:.3px}
+.gain-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;
+  border-bottom:1px dashed rgba(38,38,236,.15);font-size:13px}
+.gain-row:last-child{border-bottom:none}
+.gain-name{font-weight:700;color:var(--text)}
+.gain-diff{color:var(--green);font-weight:900;background:rgba(16,185,129,.12);
+  padding:3px 10px;border-radius:12px;font-size:12px}
+
+/* ── COMPLETE DAY BUTTON (in workout) ── */
+.complete-day-wrap{background:linear-gradient(135deg,var(--green) 0%,#059669 100%);
+  border-radius:16px;padding:22px;margin-top:14px;text-align:center;color:#fff;
+  box-shadow:0 12px 30px -10px rgba(16,185,129,.4)}
+.complete-day-title{font-size:16px;font-weight:900;margin-bottom:6px}
+.complete-day-sub{font-size:13px;opacity:.9;margin-bottom:14px}
+.btn-complete-day{background:#fff;color:var(--green);border:none;
+  padding:14px 28px;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:900;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.14)}
+.btn-complete-day:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.btn-complete-day:active{transform:translateY(0)}
+.btn-complete-day .ico{width:18px;height:18px;stroke-width:3}
+
+/* ── CARDIO CARD ── */
+.cardio-card{background:linear-gradient(135deg,#FFF7ED 0%,#FFEDD5 100%);
+  border:1.5px solid #FDBA74;border-radius:14px;padding:16px;margin-top:14px;
+  box-shadow:0 4px 16px rgba(251,146,60,.10)}
+.cardio-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cardio-icon{width:44px;height:44px;background:rgba(251,146,60,.15);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;color:#EA580C;flex-shrink:0}
+.cardio-icon svg{width:24px;height:24px}
+.cardio-title{font-size:15px;font-weight:900;color:#7C2D12;margin-bottom:2px}
+.cardio-note{font-size:11px;color:#9A3412;font-weight:600}
+.cardio-duration{font-size:22px;font-weight:900;color:#EA580C;text-align:center;line-height:1;letter-spacing:-.5px}
+.cardio-duration span{font-size:11px;font-weight:700;display:block;margin-top:3px;color:#9A3412}
+.cardio-body{background:rgba(255,255,255,.6);border-radius:10px;padding:10px 14px}
+.cardio-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+.cardio-row:not(:last-child){border-bottom:1px dashed rgba(154,52,18,.15)}
+.cardio-lbl{color:#9A3412;font-weight:700}
+.cardio-val{color:#7C2D12;font-weight:800}
+
+/* ── VIDEO MODAL ── */
+.video-modal{position:fixed;inset:0;background:rgba(15,23,42,.92);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);
+  padding-top:calc(16px + env(safe-area-inset-top));
+  padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.video-modal.open{display:flex}
+.video-frame{width:100%;max-width:800px;aspect-ratio:16/9;background:#000;border-radius:16px;
+  overflow:hidden;position:relative;box-shadow:var(--shadow-lg)}
+.video-frame video,.video-frame iframe{width:100%;height:100%;background:#000;display:block;border:0}
+.video-close{position:absolute;top:12px;right:12px;background:rgba(15,23,42,.75);
+  border:1.5px solid rgba(255,255,255,.2);color:#fff;
+  width:44px;height:44px;border-radius:50%;cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;
+  z-index:5;backdrop-filter:blur(10px);transition:all .15s;padding:0}
+.video-close:hover{background:rgba(239,68,68,.9);border-color:transparent;transform:scale(1.06)}
+.video-close:active{transform:scale(.94)}
+.video-close svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+#videoTitle{position:absolute;top:16px;left:16px;color:#fff;font-weight:800;font-size:15px;
+  background:rgba(15,23,42,.6);backdrop-filter:blur(10px);
+  padding:8px 14px;border-radius:20px;max-width:calc(100% - 80px);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:4}
+
+/* ── LOCKED ── */
+.locked-overlay{background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:16px;padding:32px 24px;
+  text-align:center;margin:20px 0}
+.locked-icon{width:56px;height:56px;stroke:var(--amber);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block}
+.locked-title{font-size:17px;font-weight:800;color:#92400E;margin-bottom:8px}
+.locked-msg{font-size:14px;color:#92400E;margin-bottom:16px;line-height:1.7}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:40px 20px}
+.empty-ico{width:56px;height:56px;stroke:var(--subtle);stroke-width:1.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;margin:0 auto 14px;display:block}
+.empty-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:12px 22px;border-radius:12px;
+  font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow-lg)}
+.toast.show{display:block;animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+@keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ── PRINT ── */
+@media print {
+  body{background:#fff;padding:0}
+  .header,.tabs,.hero-card,.meal-actions,.tab-btn,.no-print{display:none !important}
+  .page:not(#pageMeals){display:none !important}
+  .page.active#pageMeals{display:block !important}
+  .container{max-width:100%;padding:0}
+  .meal-block{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:12px}
+  .card{border:1px solid #ccc;box-shadow:none}
+  .opt-box{background:#fafafa}
+  .print-header{display:block !important;margin-bottom:20px;padding:14px 0;border-bottom:2px solid var(--blue)}
+}
+.print-header{display:none}
+
+/* Day-tab done marker */
+.day-tab.done{border-color:var(--green);color:var(--green)}
+.day-tab.on.done{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* ── MOBILE-FIRST APP FEEL ── */
+@media(max-width:640px){
+  html,body{font-size:15px}
+  .container{padding:14px 14px}
+  .form-row{grid-template-columns:1fr}
+
+  /* Hero */
+  .hero-name{font-size:22px}
+  .hero-card{padding:22px 20px;border-radius:20px;margin-bottom:16px}
+  .hero-stat{padding:11px 12px;border-radius:12px}
+  .hero-stat-val{font-size:17px}
+  .hero-stat-lbl{font-size:10px}
+
+  /* Sections */
+  .macros-cal{font-size:40px}
+  .section-title{font-size:17px;margin-bottom:12px}
+  .card{padding:18px;border-radius:16px;margin-bottom:12px}
+
+  /* Today + Progress cards on mobile */
+  .today-card{padding:20px 18px;border-radius:20px}
+  .today-title{font-size:17px}
+  .today-day-badge{font-size:10px;padding:5px 10px}
+  .progress-card{padding:18px 16px;border-radius:16px}
+  .p-stat{padding:12px 6px}
+  .p-stat-val{font-size:17px}
+  .p-stat-lbl{font-size:9px}
+
+  /* Exercise cards */
+  .ex-card{padding:14px;border-radius:16px}
+  .ex-head{gap:12px;margin-bottom:10px}
+  .ex-img-wrap{width:100px;height:100px;border-radius:12px}
+  .ex-play{width:34px;height:34px;bottom:6px;right:6px}
+  .ex-play .ico{width:12px;height:12px}
+  .ex-name{font-size:15px}
+  .ex-name-en{font-size:11px}
+  .ex-muscle{font-size:10px;padding:2px 8px}
+
+  /* Sets — extra-friendly for touch */
+  .sets-wrap{padding:12px;margin-top:10px;border-radius:14px}
+  .set-row{padding:9px 0;gap:6px}
+  .set-num{width:26px;height:26px;font-size:12px}
+  .set-input{width:68px;padding:11px 6px;font-size:15px;min-height:44px;border-radius:10px}
+  .set-prev{font-size:10px}
+
+  /* Buttons min-touch-target */
+  .btn-primary,.btn-outline,.btn-form,.ex-save,.btn-complete-day{
+    padding:14px 20px;font-size:15px;min-height:50px;width:100%}
+  .btn-complete-day{padding:15px 28px}
+  .btn-watch{padding:12px;min-height:46px;font-size:13px}
+  .btn-history{padding:8px 12px;min-height:34px}
+
+  /* Inputs */
+  .form-input,.form-select{padding:14px 15px;font-size:16px;min-height:50px}
+  .chip{padding:12px 18px;font-size:14px;min-height:46px;display:flex;align-items:center}
+
+  /* Quick actions */
+  .quick-actions{gap:10px}
+  .qa-btn{padding:22px 10px;min-height:118px;border-radius:16px}
+  .qa-ico{width:34px;height:34px}
+  .qa-lbl{font-size:13px}
+
+  /* Day tabs */
+  .day-tab{padding:12px 20px;min-height:44px;font-size:13px;border-radius:12px}
+
+  /* Plans */
+  .plan-card{padding:22px 12px;min-height:120px;border-radius:16px}
+  .plan-card-days{font-size:34px}
+
+  /* Meals */
+  .meal-block{padding:16px 14px;border-radius:16px;margin-bottom:12px}
+  .meal-head{gap:10px}
+  .meal-icon{width:36px;height:36px;border-radius:10px}
+  .meal-name{font-size:15px}
+  .meal-tag{font-size:9px;padding:3px 8px}
+  .options-grid{grid-template-columns:1fr}
+  .opt-box{padding:14px}
+
+  .cardio-card{padding:16px 14px;border-radius:14px}
+  .cardio-duration{font-size:22px}
+
+  /* Header */
+  .badge-days{font-size:11px;padding:6px 12px}
+  .btn-icon{width:40px;height:40px}
+  .brand-name{font-size:16px}
+  .brand-mark{width:32px;height:32px}
+
+  /* Video modal on mobile */
+  .video-modal{padding:12px}
+  .video-frame{border-radius:14px}
+  .video-close{width:42px;height:42px;top:10px;right:10px}
+  .video-close svg{width:18px;height:18px}
+  #videoTitle{font-size:13px;top:10px;left:10px;padding:6px 12px}
+
+  /* Toast rides higher above nav */
+  .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
+}
+
+/* touch device polish — remove hover-based transforms on tap devices */
+@media(hover:none){
+  .qa-btn:hover,.card:hover,.plan-card:hover,.ex-card:hover,
+  .today-card:hover,.progress-card:hover{transform:none;box-shadow:var(--shadow-sm)}
+  .btn-primary:hover,.btn-outline:hover,.btn-watch:hover,
+  .ex-save:hover,.btn-complete-day:hover{transform:none;box-shadow:inherit}
+  /* Add "pressed" feedback on tap for buttons */
+  .btn-primary:active,.btn-outline:active,.btn-watch:active,
+  .ex-save:active,.btn-complete-day:active,.qa-btn:active,
+  .plan-card:active,.chip:active,.day-tab:active{transform:scale(.97);transition:transform .1s}
+}
+
+/* Standalone mode (added to home screen) */
+@media(display-mode:standalone){
+  .header{padding-top:calc(20px + env(safe-area-inset-top))}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="brand-mark"><img src="/logo.png" alt="UR PASS"></div>
+    <div class="brand-name">UR PASS</div>
+  </div>
+  <div class="header-actions">
+    <span class="badge-days" id="daysLeftBadge">—</span>
+    <button class="btn-icon" onclick="logout()" title="خروج">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ─── HOME ─── -->
+  <div class="page active" id="pageHome">
+    <div class="hero-card">
+      <div class="hero-greeting">أهلاً بك</div>
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-lbl">سعراتك اليومية</div>
+          <div class="hero-stat-val" id="heroCal">—</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-lbl">البروتين</div>
+          <div class="hero-stat-val"><span id="heroProt">—</span>غ</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-lbl">أيام متبقية</div>
+          <div class="hero-stat-val" id="heroDays">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- تمرين اليوم -->
+    <div id="todayCard"></div>
+
+    <!-- متابعة تطورك -->
+    <div id="progressCard"></div>
+
+    <div class="section-title">اختصارات سريعة</div>
+    <div class="quick-actions">
+      <div class="qa-btn" onclick="switchTab('calc')">
+        <svg class="qa-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+        <div class="qa-lbl">حاسبة السعرات</div>
+      </div>
+      <div class="qa-btn" onclick="switchTab('meals')">
+        <svg class="qa-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
+        <div class="qa-lbl">البرنامج الغذائي</div>
+      </div>
+      <div class="qa-btn" onclick="switchTab('workout')">
+        <svg class="qa-ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
+        <div class="qa-lbl">كل الجداول</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CALCULATOR ─── -->
+  <div class="page" id="pageCalc">
+    <div class="section-title">حاسبة السعرات</div>
+
+    <div id="lockedBox" style="display:none">
+      <div class="locked-overlay">
+        <svg class="locked-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <div class="locked-title">تعذّر تعديل البيانات</div>
+        <div class="locked-msg">تم إغلاق التعديل على هذه البيانات.<br>للتعديل، يُرجى التواصل مع المدرب.</div>
+      </div>
+    </div>
+
+    <div id="calcContent">
+      <div class="edits-warning" id="editsWarning">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <div>تنبيه: صُمِّمت هذه الحاسبة لضبط قيم برنامجك الغذائي بدقة، ولا يمكن تعديل بياناتك لاحقاً بعد الحفظ. يُرجى التأكد من صحة جميع البيانات قبل الحفظ.</div>
+      </div>
+
+      <div class="card">
+        <form class="calc-form" id="calcForm">
+          <div class="form-group">
+            <label class="form-label">الجنس</label>
+            <div class="chip-row" id="genderChips">
+              <div class="chip" data-v="female">أنثى</div>
+              <div class="chip" data-v="male">ذكر</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">العمر (سنة)</label>
+              <input type="number" class="form-input ltr" id="age" min="14" max="80" placeholder="25" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">الطول (سم)</label>
+              <input type="number" class="form-input ltr" id="height" min="120" max="220" placeholder="165" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">الوزن الحالي (كجم)</label>
+            <input type="number" class="form-input ltr" id="weight" min="30" max="200" step="0.1" placeholder="65" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">مستوى النشاط</label>
+            <select class="form-select" id="activity" required>
+              <option value="1.2">قليل الحركة — مكتبي، لا رياضة</option>
+              <option value="1.375">نشاط خفيف — رياضة 1-3 أيام</option>
+              <option value="1.55" selected>نشاط متوسط — رياضة 3-5 أيام</option>
+              <option value="1.725">نشاط عالي — رياضة 6-7 أيام</option>
+              <option value="1.9">نشاط شاق جداً — تمرين مرتين يومياً</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">الهدف</label>
+            <div class="chip-row" id="goalChips">
+              <div class="chip on" data-v="lose">خسارة وزن</div>
+              <div class="chip" data-v="maintain">ثبات</div>
+              <div class="chip" data-v="gain">زيادة عضل</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="calcBtn" style="width:100%">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            احسب واحفظ
+          </button>
+        </form>
+
+        <div class="macros-result" id="macrosResult">
+          <div class="macros-title">احتياجك اليومي</div>
+          <div class="macros-cal"><span id="rCal">0</span><span>سعرة</span></div>
+          <div class="macros-grid">
+            <div class="macro-card"><div class="macro-val"><span id="rProt">0</span>غ</div><div class="macro-lbl">بروتين</div></div>
+            <div class="macro-card"><div class="macro-val"><span id="rCarb">0</span>غ</div><div class="macro-lbl">كارب</div></div>
+            <div class="macro-card"><div class="macro-val"><span id="rFat">0</span>غ</div><div class="macro-lbl">دهون</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MEAL PLAN ─── -->
+  <div class="page" id="pageMeals">
+    <div class="print-header">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:22px;font-weight:900;color:var(--blue)">UR PASS</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px">FITNESS &amp; NUTRITION</div>
+        </div>
+        <div style="text-align:left">
+          <div style="font-size:14px;font-weight:800" id="printName">—</div>
+          <div style="font-size:11px;color:var(--muted)" id="printDate">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title no-print">البرنامج الغذائي</div>
+
+    <div id="mealsEmpty" class="card empty-state" style="display:none">
+      <svg class="empty-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
+      <div class="empty-title">لم تحسبي سعراتك بعد</div>
+      <div class="empty-sub">احسب سعراتك أولاً ليتكيّف البرنامج معك</div>
+      <button class="btn-primary" onclick="switchTab('calc')">الانتقال للحاسبة</button>
+    </div>
+
+    <div id="mealsContent" style="display:none">
+      <div class="meal-summary" id="mealSummary"></div>
+
+      <div class="meal-actions no-print">
+        <button class="btn-primary" onclick="printMealPlan()">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          طباعة البرنامج
+        </button>
+      </div>
+
+      <div id="mealsList"></div>
+
+      <div class="free-list">
+        <div class="free-list-title">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          التوابل والإضافات — صفر سعرات
+        </div>
+        <div class="free-items">
+          <span class="free-item">كل البهارات</span>
+          <span class="free-item">خل التفاح</span>
+          <span class="free-item">خردل / ديجون</span>
+          <span class="free-item">ثوم بودرة / بصل بودرة</span>
+          <span class="free-item">كمون / كركم / فلفل أسود</span>
+          <span class="free-item">عصير ليمون</span>
+          <span class="free-item">شاي / قهوة بدون سكر</span>
+          <span class="free-item">خضار ورقية (خس، سبانخ)</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:#FFFBEB;border-color:#FDE68A;margin-top:14px">
+        <div style="font-weight:800;color:#92400E;margin-bottom:6px">الأرقام دليل وليست إلزامية</div>
+        <div style="font-size:13px;color:#92400E;line-height:1.7">
+          هذه الوجبات مثال عملي. السعرات مرنة — تقدرين تحسبين أكلك بأي طريقة أخرى شريطة عدم تجاوز الكمية اليومية.
+          استخدمي تطبيق <b>MyFitnessPal</b> لتسهيل تسجيل ما تأكلينه.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── WORKOUT ─── -->
+  <div class="page" id="pageWorkout">
+    <div class="section-title">جدول التمارين</div>
+
+    <div class="card">
+      <div class="card-title">اختار الجدول الأسبوعي</div>
+      <div class="card-sub">ما هو عدد الأيام المناسب لك؟</div>
+      <div class="plan-picker" id="planPicker"></div>
+    </div>
+
+    <div id="workoutContent" style="display:none">
+      <div class="day-tabs" id="dayTabs"></div>
+      <div class="day-summary" id="daySummary"></div>
+      <div class="exercise-list" id="exerciseList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── VIDEO MODAL ─── -->
+<div class="video-modal" id="videoModal" onclick="videoBackdropClick(event)">
+  <div class="video-frame" onclick="event.stopPropagation()">
+    <div id="videoTitle"></div>
+    <button class="video-close" onclick="closeVideo()" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="videoFrame"></div>
+  </div>
+</div>
+
+<!-- ─── TABS ─── -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="home" onclick="switchTab('home')">
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M10 21v-6h4v6"/></svg>
+    <span class="tab-lbl">الرئيسية</span>
+  </button>
+  <button class="tab-btn" data-tab="calc" onclick="switchTab('calc')">
+    <svg class="tab-ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+    <span class="tab-lbl">الحاسبة</span>
+  </button>
+  <button class="tab-btn" data-tab="meals" onclick="switchTab('meals')">
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M8 3v18M8 12H5a2 2 0 01-2-2V4a1 1 0 011-1h6a1 1 0 011 1v6a2 2 0 01-2 2z"/><path d="M17 3c-2 0-3 2-3 5s1 5 3 5v8"/></svg>
+    <span class="tab-lbl">الغذاء</span>
+  </button>
+  <button class="tab-btn" data-tab="workout" onclick="switchTab('workout')">
+    <svg class="tab-ico" viewBox="0 0 24 24"><path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/></svg>
+    <span class="tab-lbl">التمارين</span>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
