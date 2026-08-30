@@ -382,11 +382,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="form-group">
           <label class="form-label">اسم المستخدم</label>
           <div style="display:flex;gap:8px">
-            <input type="text" class="form-input ltr" id="addUsername" placeholder="مثال: 482910" required
+            <input type="text" class="form-input ltr" id="addUsername" placeholder="يُملأ تلقائياً من رقم الجوال" required
               pattern="[a-z0-9_.-]{3,30}" inputmode="numeric" autocapitalize="off" autocomplete="off">
-            <button type="button" class="sub-btn" onclick="genUsername()">توليد</button>
+            <button type="button" class="sub-btn" onclick="genUsername()">من الجوال</button>
           </div>
-          <div class="form-hint">أرقام (أو أحرف إنجليزية) — من 3 إلى 30 خانة</div>
+          <div class="form-hint">يُملأ تلقائياً برقم الجوال — يمكنك تعديله يدوياً</div>
         </div>
         <div class="form-group">
           <label class="form-label">كلمة المرور</label>
@@ -998,6 +998,7 @@ function openAddModal() {
 
 function resetAddForm() {
   document.getElementById('addForm').reset();
+  usernameEditedManually = false;
   document.getElementById('addFormWrap').style.display = 'block';
   document.getElementById('addSuccessWrap').style.display = 'none';
   document.getElementById('addError').classList.remove('show');
@@ -1016,13 +1017,24 @@ function genPassword() {
   document.getElementById('addPassword').value = randomPassword();
 }
 
-// 6-digit numeric username — easier for subscribers to type than English letters.
-function randomUsername() {
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
+/* Username = the subscriber's phone number: unique, and easy for them to remember.
+   Auto-fills as the phone is typed, unless the admin has typed a username manually. */
+let usernameEditedManually = false;
+
+document.getElementById('addUsername').addEventListener('input', function () {
+  usernameEditedManually = this.value.trim() !== '';
+});
+
+document.getElementById('addPhone').addEventListener('input', function () {
+  if (usernameEditedManually) return;
+  document.getElementById('addUsername').value = this.value.replace(/\D/g, '');
+});
 
 function genUsername() {
-  document.getElementById('addUsername').value = randomUsername();
+  const phone = document.getElementById('addPhone').value.replace(/\D/g, '');
+  if (!phone) return toast('أدخل رقم الجوال أولاً', 'error');
+  document.getElementById('addUsername').value = phone;
+  usernameEditedManually = false;
 }
 
 // Track last-created subscriber's details for share buttons
