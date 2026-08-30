@@ -381,9 +381,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         </div>
         <div class="form-group">
           <label class="form-label">اسم المستخدم</label>
-          <input type="text" class="form-input ltr" id="addUsername" placeholder="fatima2026" required
-            pattern="[a-z0-9_.-]{3,30}" autocapitalize="off" autocomplete="off">
-          <div class="form-hint">أحرف إنجليزية وأرقام فقط (3-30 حرف)</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input ltr" id="addUsername" placeholder="مثال: 482910" required
+              pattern="[a-z0-9_.-]{3,30}" inputmode="numeric" autocapitalize="off" autocomplete="off">
+            <button type="button" class="sub-btn" onclick="genUsername()">توليد</button>
+          </div>
+          <div class="form-hint">أرقام (أو أحرف إنجليزية) — من 3 إلى 30 خانة</div>
         </div>
         <div class="form-group">
           <label class="form-label">كلمة المرور</label>
@@ -1011,6 +1014,15 @@ function randomPassword() {
 
 function genPassword() {
   document.getElementById('addPassword').value = randomPassword();
+}
+
+// 6-digit numeric username — easier for subscribers to type than English letters.
+function randomUsername() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function genUsername() {
+  document.getElementById('addUsername').value = randomUsername();
 }
 
 // Track last-created subscriber's details for share buttons
