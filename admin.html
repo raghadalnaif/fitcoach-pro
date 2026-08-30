@@ -903,6 +903,36 @@ function sendWaToSub(id) {
   document.getElementById('waModal').classList.add('open');
 }
 
+// Builds the welcome message sent to a subscriber.
+function welcomeMessage({ fullName, username, password }) {
+  const name  = firstName(fullName);
+  const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
+  const url   = location.origin + '/';
+  return `${greet}
+
+شكراً لاشتراكك معنا في UR PASS.
+لقد تم إنشاء حسابك في بوابة التدريب. ستجد بها جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
+
+بيانات الدخول:
+
+الرابط: ${url}
+اسم المستخدم: ${username}
+كلمة المرور: ${password}
+
+جاهزون للانطلاق.`;
+}
+
+// On desktop open WhatsApp Web directly (skips the wa.me redirect page).
+// On phones use wa.me so the native app opens instead.
+function waLink(phone, text) {
+  const p = String(phone || '').replace(/\D/g, '');
+  const t = encodeURIComponent(text);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return isMobile
+    ? `https://wa.me/${p}?text=${t}`
+    : `https://web.whatsapp.com/send?phone=${p}&text=${t}`;
+}
+
 async function confirmSendWa() {
   const id = currentWaSubId;
   if (!id) return;
@@ -919,63 +949,40 @@ async function confirmSendWa() {
     return;
   }
 
-  // Open a blank tab SYNCHRONOUSLY (before any await) so browsers don't block it
-  // as a popup. Only used as a fallback if WhatsApp Business API isn't configured
-  // or the auto-send fails — otherwise we close it since Meta sends the message.
+  // Open the tab SYNCHRONOUSLY (before any await) so the browser doesn't block it
+  // as a popup — we navigate it once the password update succeeds.
   const waTab = window.open('about:blank', '_blank');
 
   btn.disabled = true;
-  btn.textContent = 'جاري الإرسال...';
+  btn.textContent = 'جاري التحديث...';
   err.classList.remove('show');
 
-  let r;
   try {
-    r = await api('/api/admin/subscribers/' + id + '/send-whatsapp', {
-      method: 'POST',
+    await api('/api/admin/subscribers/' + id, {
+      method: 'PATCH',
       body: JSON.stringify({ newPassword: newPass }),
     });
   } catch (e) {
     if (waTab) waTab.close();
-    err.textContent = 'فشل التحديث: ' + e.message;
+    err.textContent = 'فشل تحديث كلمة المرور: ' + e.message;
     err.classList.add('show');
     btn.disabled = false;
     btn.textContent = 'إرسال واتساب';
     return;
   }
 
-  if (r.waSent) {
-    // Sent automatically via WhatsApp Business API — no manual tab needed.
-    if (waTab) waTab.close();
-    closeModal('waModal');
-    toast('تم الإرسال تلقائياً عبر واتساب بزنس');
-  } else {
-    // Not configured / failed → fall back to opening WhatsApp with the message pre-filled.
-    const name = firstName(sub.fullName);
-    const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
-    const url = location.origin + '/';
-    const msg = `${greet}
+  const url = waLink(sub.phone, welcomeMessage({
+    fullName: sub.fullName,
+    username: sub.username,
+    password: newPass,
+  }));
+  if (waTab) waTab.location.href = url;
+  else window.open(url, '_blank');
 
-شكراً لاشتراكك معنا في UR PASS.
-لقد تم إنشاء حسابك في بوابة التدريب. ستجد بها جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
-
-بيانات الدخول:
-
-الرابط: ${url}
-اسم المستخدم: ${sub.username}
-كلمة المرور: ${newPass}
-
-جاهزون للانطلاق.`;
-
-    const waUrl = `https://wa.me/${sub.phone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`;
-    if (waTab) waTab.location.href = waUrl;
-    else window.open(waUrl, '_blank'); // fallback if the pre-opened tab was blocked anyway
-
-    closeModal('waModal');
-    toast('تم فتح واتساب يدوياً — الإرسال التلقائي غير مُفعّل');
-  }
-
+  closeModal('waModal');
   btn.disabled = false;
   btn.textContent = 'إرسال واتساب';
+  toast('تم فتح واتساب — اضغط إرسال');
 }
 
 document.getElementById('searchInput').addEventListener('input', renderSubs);
@@ -1065,23 +1072,11 @@ function firstName(full) {
 }
 
 function buildFullMessage() {
-  const user  = document.getElementById('credUser').textContent;
-  const pass  = document.getElementById('credPass').textContent;
-  const url   = document.getElementById('credUrl').textContent;
-  const name  = firstName(document.getElementById('credName').textContent || lastCreated.fullName);
-  const greet = name ? `أهلاً ${name}` : 'أهلاً بك';
-  return `${greet}
-
-شكراً لاشتراكك معنا في UR PASS.
-لقد تم إنشاء حسابك في بوابة التدريب. ستجد بها جدولك الرياضي وبرنامجك الغذائي المخصص لك — لتصل لهدفك بأسرع وقت وأفضل نتيجة.
-
-بيانات الدخول:
-
-الرابط: ${url}
-اسم المستخدم: ${user}
-كلمة المرور: ${pass}
-
-سأتابع معك التقدم أسبوعياً. جاهزون للانطلاق.`;
+  return welcomeMessage({
+    fullName: document.getElementById('credName').textContent || lastCreated.fullName,
+    username: document.getElementById('credUser').textContent,
+    password: document.getElementById('credPass').textContent,
+  });
 }
 
 function copyField(id, btn) {
@@ -1104,10 +1099,8 @@ function copyFullMessage(btn) {
 }
 
 function shareWhatsapp() {
-  const msg   = encodeURIComponent(buildFullMessage());
-  const phone = (document.getElementById('credPhone').textContent || lastCreated.phone || '').replace(/\D/g, '');
-  const url   = phone ? `https://wa.me/${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
-  window.open(url, '_blank');
+  const phone = document.getElementById('credPhone').textContent || lastCreated.phone || '';
+  window.open(waLink(phone, buildFullMessage()), '_blank');
 }
 
 /* ═══════════════════ EDIT SUBSCRIBER ═══════════════════ */
