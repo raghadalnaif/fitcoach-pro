@@ -1064,10 +1064,11 @@ function computeStats() {
     if (bestPrev > 0) prevBest[exId] = bestPrev;
   }
 
-  // Recent PR gains (current PR - previous best)
+  // Recent PR gains (current PR - previous best).
+  // Requires a real prior best — a first-ever session is a baseline, not a gain.
   const gains = Object.entries(prs)
     .map(([id, curr]) => ({ id, curr, prev: prevBest[id] || 0, diff: curr - (prevBest[id] || 0) }))
-    .filter(g => g.diff > 0)
+    .filter(g => g.prev > 0 && g.diff > 0)
     .sort((a, b) => b.diff - a.diff)
     .slice(0, 3);
 
@@ -1138,6 +1139,13 @@ function renderProgressCard() {
       </div>
       ${gainsHtml}
     </div>`;
+}
+
+function printMealPlan() {
+  // Signal intent to the coach's dashboard, then print regardless of the result.
+  api('/api/me/track', { method: 'POST', body: JSON.stringify({ event: 'meal_print' }) })
+    .catch(() => {});
+  window.print();
 }
 
 function closeVideo() {

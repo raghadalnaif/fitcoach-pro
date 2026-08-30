@@ -38,14 +38,150 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   cursor:pointer;transition:all .2s}
 .btn-logout:hover{border-color:var(--red);color:var(--red)}
 
-/* Admin tabs */
-.tab-btn-admin{padding:14px 20px;background:none;border:none;border-bottom:3px solid transparent;
-  color:var(--muted);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;
-  transition:all .15s;margin-bottom:-1px;display:flex;align-items:center;gap:8px}
-.tab-btn-admin:hover{color:var(--blue)}
-.tab-btn-admin.on{color:var(--blue);border-bottom-color:var(--blue)}
 .btn-primary{display:inline-flex}
 .sub-btn{display:inline-flex;align-items:center;gap:6px}
+
+/* ── SHELL + SIDEBAR ── */
+.shell{display:flex;align-items:flex-start}
+.btn-burger{display:none;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);width:38px;height:38px;border-radius:10px;cursor:pointer;
+  align-items:center;justify-content:center;margin-left:4px}
+.btn-burger:hover{border-color:var(--blue);color:var(--blue)}
+.sidebar{width:248px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);
+  min-height:calc(100vh - 73px);position:sticky;top:73px;padding:18px 12px;overflow-y:auto;
+  max-height:calc(100vh - 73px)}
+.sidebar-backdrop{display:none}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;
+  background:none;border:none;border-radius:10px;cursor:pointer;text-align:right;
+  font-family:var(--font);font-size:14px;font-weight:700;color:var(--muted);transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.on{background:var(--blue);color:#fff}
+.nav-item.on .ico{color:#fff}
+.nav-item .ico{width:18px;height:18px;flex-shrink:0}
+.nav-item span{flex:1}
+.nav-parent .nav-caret{width:15px;height:15px;transition:transform .2s;opacity:.7}
+.nav-group.open .nav-caret{transform:rotate(180deg)}
+.nav-sub{display:none;flex-direction:column;gap:2px;padding:4px 0 6px 0;margin-right:14px;
+  border-right:2px solid var(--border)}
+.nav-group.open .nav-sub{display:flex}
+.nav-child{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 14px;background:none;border:none;border-radius:8px;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:600;color:var(--muted);
+  text-align:right;transition:all .15s}
+.nav-child:hover{background:var(--surface2);color:var(--text)}
+.nav-child.on{background:var(--blue-bg);color:var(--blue);font-weight:800}
+.nav-count{background:var(--surface2);color:var(--muted);font-size:11px;font-weight:800;
+  padding:2px 8px;border-radius:20px;min-width:24px;text-align:center}
+.nav-child.on .nav-count{background:var(--blue);color:#fff}
+.nav-count.amber{background:#FEF3C7;color:#92400E}
+.nav-count.red{background:#FEE2E2;color:#991B1B}
+
+.btn-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--muted);padding:9px 15px;border-radius:10px;
+  font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:18px;
+  transition:all .15s}
+.btn-back:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── ENGAGEMENT STATUS ── */
+.eng{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;
+  padding:3px 10px;border-radius:20px;white-space:nowrap}
+.eng::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.eng.green {background:#DCFCE7;color:#166534}
+.eng.amber {background:#FEF3C7;color:#92400E}
+.eng.orange{background:#FFEDD5;color:#9A3412}
+.eng.red   {background:#FEE2E2;color:#991B1B}
+.eng.slate {background:#F1F5F9;color:#475569}
+.eng.grey  {background:#F3F4F6;color:#6B7280}
+
+.metric-row{display:flex;gap:14px;font-size:11px;color:var(--muted);
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap}
+.metric-row b{color:var(--text);font-weight:800}
+.trend-up{color:var(--green);font-weight:800}
+.trend-down{color:var(--red);font-weight:800}
+
+/* ── OVERVIEW / REPORTS ── */
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.ov-val{font-size:28px;font-weight:900;color:var(--blue);letter-spacing:-.5px;line-height:1}
+.ov-val.green{color:var(--green)} .ov-val.amber{color:var(--amber)} .ov-val.red{color:var(--red)}
+.ov-lbl{font-size:12px;color:var(--muted);font-weight:700;margin-top:6px}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;margin-bottom:16px}
+.panel-title{font-size:16px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.panel-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+
+.rowlist{display:flex;flex-direction:column}
+.rowitem{display:flex;align-items:center;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.rowitem:last-child{border-bottom:none}
+.rowitem:hover{background:var(--surface2)}
+.rowitem-main{flex:1;min-width:0}
+.rowitem-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.rowitem-meta{font-size:11px;color:var(--muted)}
+.rowitem-side{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+.bar{height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;min-width:70px;width:70px}
+.bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width .3s}
+.bar-fill.green{background:var(--green)} .bar-fill.amber{background:var(--amber)} .bar-fill.red{background:var(--red)}
+.bar-fill.orange{background:#EA580C} .bar-fill.slate{background:#94A3B8} .bar-fill.grey{background:#CBD5E1}
+
+.empty-note{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+
+/* ── CLIENT FILE ── */
+.client-hero{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);color:#fff;
+  border-radius:18px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden;
+  box-shadow:0 16px 36px -14px rgba(38,38,236,.4)}
+.client-hero::before{content:'';position:absolute;top:-50px;left:-50px;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(255,255,255,.15),transparent 68%)}
+.ch-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  margin-bottom:18px;position:relative;flex-wrap:wrap}
+.ch-name{font-size:22px;font-weight:900;margin-bottom:4px}
+.ch-meta{font-size:12px;opacity:.9;font-family:monospace;direction:ltr;text-align:right}
+.ch-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;position:relative}
+.ch-stat{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;padding:12px}
+.ch-stat-val{font-size:19px;font-weight:900;line-height:1}
+.ch-stat-lbl{font-size:10px;opacity:.88;font-weight:700;margin-top:4px}
+
+.ctabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ctab{padding:11px 16px;background:none;border:none;border-bottom:3px solid transparent;
+  color:var(--muted);font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;
+  margin-bottom:-1px;transition:all .15s}
+.ctab:hover{color:var(--blue)}
+.ctab.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+.tl{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:30px;height:30px;border-radius:9px;background:var(--blue-bg);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-dot .ico{width:15px;height:15px}
+.tl-body{flex:1;min-width:0}
+.tl-title{font-size:13px;font-weight:700}
+.tl-time{font-size:11px;color:var(--muted);margin-top:2px}
+
+.exrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.exrow:last-child{border-bottom:none}
+.exrow-name{flex:1;font-size:13px;font-weight:800;min-width:0}
+.exrow-en{font-size:11px;color:var(--muted);direction:ltr;text-align:right;font-weight:500}
+.exrow-stat{text-align:center;min-width:62px}
+.exrow-val{font-size:14px;font-weight:900;color:var(--blue)}
+.exrow-lbl{font-size:10px;color:var(--muted);font-weight:700}
+
+@media(max-width:900px){
+  .btn-burger{display:flex}
+  .sidebar{position:fixed;top:0;right:0;bottom:0;z-index:60;max-height:100vh;min-height:100vh;
+    transform:translateX(100%);transition:transform .25s cubic-bezier(.16,1,.3,1);
+    box-shadow:var(--shadow-lg);padding-top:22px}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:55;
+    backdrop-filter:blur(3px)}
+  .sidebar-backdrop.show{display:block}
+  .container{width:100%;min-width:0}
+}
 
 /* Library */
 .library-info{background:#eef7ff;border:1px solid #b8dcff;color:#0c4a80;
@@ -101,7 +237,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px}
 
 /* ── MAIN LAYOUT ── */
-.container{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.container{flex:1;min-width:0;max-width:1240px;padding:24px 22px 60px}
 .page-title{font-size:26px;font-weight:900;margin-bottom:6px}
 .page-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
 
@@ -280,6 +416,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div id="dashboard" style="display:none">
   <div class="header">
     <div class="logo">
+      <button class="btn-burger" onclick="toggleSidebar()" aria-label="القائمة">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
       <div class="logo-mark"><img src="/logo.png" alt="UR PASS"></div>
       <div>
         <div class="logo-text">UR PASS</div>
@@ -291,21 +430,63 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
+  <div class="shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <nav class="nav">
+
+        <button class="nav-item" data-nav="overview" onclick="switchAdminTab('overview')">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>نظرة عامة</span>
+        </button>
+
+        <div class="nav-group" id="grpSubs">
+          <button class="nav-item nav-parent" onclick="toggleNavGroup('grpSubs')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>الاشتراكات</span>
+            <svg class="ico nav-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="nav-sub">
+            <button class="nav-child" data-nav="subs:all"      onclick="switchAdminTab('subs','all')">كل المشتركين <span class="nav-count" id="cntAll">0</span></button>
+            <button class="nav-child" data-nav="subs:active"   onclick="switchAdminTab('subs','active')">نشطة <span class="nav-count" id="cntActive">0</span></button>
+            <button class="nav-child" data-nav="subs:expiring" onclick="switchAdminTab('subs','expiring')">تنتهي قريباً <span class="nav-count amber" id="cntExpiring">0</span></button>
+            <button class="nav-child" data-nav="subs:expired"  onclick="switchAdminTab('subs','expired')">منتهية <span class="nav-count red" id="cntExpired">0</span></button>
+          </div>
+        </div>
+
+        <div class="nav-group" id="grpReports">
+          <button class="nav-item nav-parent" onclick="toggleNavGroup('grpReports')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg>
+            <span>التقارير</span>
+            <svg class="ico nav-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="nav-sub">
+            <button class="nav-child" data-nav="reports:engagement" onclick="switchAdminTab('reports','engagement')">الالتزام والنشاط</button>
+            <button class="nav-child" data-nav="reports:progress"   onclick="switchAdminTab('reports','progress')">التقدّم في الأوزان</button>
+            <button class="nav-child" data-nav="reports:revenue"    onclick="switchAdminTab('reports','revenue')">ملخص الاشتراكات</button>
+          </div>
+        </div>
+
+        <button class="nav-item" data-nav="library" onclick="switchAdminTab('library')">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
+          <span>مكتبة التمارين</span>
+        </button>
+
+      </nav>
+    </aside>
+
   <div class="container">
-    <div style="display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border)">
-      <button class="tab-btn-admin on" data-tab="subs" onclick="switchAdminTab('subs')">
-        <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        المشتركين
-      </button>
-      <button class="tab-btn-admin" data-tab="library" onclick="switchAdminTab('library')">
-        <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
-        مكتبة التمارين
-      </button>
+    <!-- ═══ OVERVIEW ═══ -->
+    <div id="tabOverview" style="display:none">
+      <div class="page-title">نظرة عامة</div>
+      <div class="page-sub">ملخص النادي ومن يحتاج متابعة اليوم</div>
+      <div id="overviewContent">جاري التحميل...</div>
     </div>
 
+    <!-- ═══ SUBSCRIBERS ═══ -->
     <div id="tabSubs">
-    <div class="page-title">المشتركين</div>
-    <div class="page-sub">إدارة اشتراكات النادي</div>
+    <div class="page-title" id="subsTitle">المشتركين</div>
+    <div class="page-sub" id="subsSubtitle">إدارة اشتراكات النادي</div>
 
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">إجمالي المشتركين</div><div class="stat-val" id="statTotal">0</div></div>
@@ -321,6 +502,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
     <div id="subsContainer"></div>
     </div><!-- /tabSubs -->
+
+    <!-- ═══ CLIENT FILE ═══ -->
+    <div id="tabClient" style="display:none">
+      <button class="btn-back" onclick="switchAdminTab('subs')">
+        <svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M9 18l6-6-6-6"/></svg>
+        رجوع للمشتركين
+      </button>
+      <div id="clientContent">جاري التحميل...</div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div id="tabReports" style="display:none">
+      <div class="page-title" id="reportTitle">التقارير</div>
+      <div class="page-sub" id="reportSubtitle">—</div>
+      <div id="reportContent">جاري التحميل...</div>
+    </div>
 
     <div id="tabLibrary" style="display:none">
       <div class="page-title">مكتبة التمارين</div>
@@ -338,7 +535,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
       <div class="ex-groups" id="libraryContainer">جاري التحميل...</div>
     </div>
-  </div>
+  </div><!-- /container -->
+  </div><!-- /shell -->
 </div>
 
 <!-- ADD MODAL -->
@@ -594,14 +792,73 @@ const EX_LIB = {
     leg_raise:     { ar:'ليج ريز', en:'Hanging Leg Raise' },
   }},
 };
+// Flat exerciseId → Arabic name lookup, derived from EX_LIB.
+const EX_NAME = {};
+Object.values(EX_LIB).forEach(g =>
+  Object.entries(g.items).forEach(([id, ex]) => { EX_NAME[id] = ex.ar; }));
+
+const PLAN_LABEL = {
+  'female-3': 'جدول ٣ أيام', 'female-4': 'جدول ٤ أيام', 'female-5': 'جدول ٥ أيام',
+  'male-3':   'جدول ٣ أيام', 'male-4':   'جدول ٤ أيام', 'male-5':   'جدول ٥ أيام',
+};
+
 let libraryVideos = {};
 let libraryYoutube = {};
 
-function switchAdminTab(tab) {
-  document.querySelectorAll('.tab-btn-admin').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  document.getElementById('tabSubs').style.display    = tab === 'subs' ? 'block' : 'none';
-  document.getElementById('tabLibrary').style.display = tab === 'library' ? 'block' : 'none';
-  if (tab === 'library') loadLibrary();
+/* ═══════════════════ NAVIGATION ═══════════════════ */
+let subsFilter = 'all';   // all | active | expiring | expired
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+}
+function toggleNavGroup(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function switchAdminTab(tab, sub) {
+  const panels = { overview:'tabOverview', subs:'tabSubs', client:'tabClient',
+                   reports:'tabReports', library:'tabLibrary' };
+  Object.entries(panels).forEach(([k, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = (k === tab) ? 'block' : 'none';
+  });
+
+  // Highlight the matching nav entry (parent items and children alike).
+  const key = sub ? `${tab}:${sub}` : tab;
+  document.querySelectorAll('[data-nav]').forEach(b =>
+    b.classList.toggle('on', b.dataset.nav === key));
+
+  if (tab === 'subs') {
+    subsFilter = sub || 'all';
+    document.getElementById('grpSubs').classList.add('open');
+    renderSubs();
+    updateSubsHeading();
+  }
+  if (tab === 'reports') {
+    document.getElementById('grpReports').classList.add('open');
+    loadReport(sub || 'engagement');
+  }
+  if (tab === 'overview') loadOverview();
+  if (tab === 'library')  loadLibrary();
+
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSubsHeading() {
+  const meta = {
+    all:      ['كل المشتركين', 'إدارة اشتراكات النادي'],
+    active:   ['الاشتراكات النشطة', 'المشتركون الذين لا يزال اشتراكهم سارياً'],
+    expiring: ['تنتهي قريباً', 'اشتراكات تنتهي خلال ٧ أيام — وقت التجديد'],
+    expired:  ['الاشتراكات المنتهية', 'انتهى اشتراكهم ولا يمكنهم الدخول'],
+  }[subsFilter] || ['المشتركين', ''];
+  document.getElementById('subsTitle').textContent    = meta[0];
+  document.getElementById('subsSubtitle').textContent = meta[1];
 }
 
 async function loadLibrary() {
@@ -781,10 +1038,12 @@ function showLoginGate() {
   document.getElementById('dashboard').style.display = 'none';
 }
 
-function showDashboard() {
+async function showDashboard() {
   document.getElementById('loginGate').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
-  loadSubscribers();
+  document.getElementById('grpSubs').classList.add('open');
+  await loadSubscribers();     // fills sidebar counters before the first paint
+  switchAdminTab('overview');  // land on the action list, not a raw table
 }
 
 /* ═══════════════════ ADMIN LOGIN ═══════════════════ */
@@ -833,6 +1092,23 @@ function renderStats() {
   document.getElementById('statActive').textContent = active;
   document.getElementById('statWarn').textContent = warn;
   document.getElementById('statExpired').textContent = expired;
+  // Sidebar counters
+  document.getElementById('cntAll').textContent      = total;
+  document.getElementById('cntActive').textContent   = active;
+  document.getElementById('cntExpiring').textContent = warn;
+  document.getElementById('cntExpired').textContent  = expired;
+}
+
+// Applies the sidebar filter on top of the search box.
+function filteredSubs() {
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  return subscribers.filter(s => {
+    if (subsFilter === 'active'   && !s.active) return false;
+    if (subsFilter === 'expired'  &&  s.active) return false;
+    if (subsFilter === 'expiring' && !(s.active && s.daysLeft <= 7)) return false;
+    if (search && !s.username.includes(search) && !s.fullName.toLowerCase().includes(search)) return false;
+    return true;
+  });
 }
 
 function initials(name = '') {
@@ -842,15 +1118,14 @@ function initials(name = '') {
 
 function fmtDate(ms) {
   if (!ms) return '-';
-  return new Date(ms).toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+  // Gregorian ('ar-SA' would render Hijri, which is confusing for subscription dates)
+  return new Date(ms).toLocaleDateString('ar-EG', { year:'numeric', month:'short', day:'numeric' });
 }
 
 function renderSubs() {
   const container = document.getElementById('subsContainer');
   const search = document.getElementById('searchInput').value.trim().toLowerCase();
-  const list = search
-    ? subscribers.filter(s => s.username.includes(search) || s.fullName.toLowerCase().includes(search))
-    : subscribers;
+  const list = filteredSubs();
 
   if (list.length === 0) {
     container.innerHTML = `
@@ -879,11 +1154,18 @@ function renderSubs() {
         </div>
         <div class="sub-meta">
           <div class="sub-meta-item">${fmtDate(sub.endDate)}</div>
-          <div class="sub-meta-item">${sub.editsLeft}/3 تعديل</div>
+          ${sub.status ? `<span class="eng ${sub.status.tone}">${sub.status.label}</span>` : ''}
           ${hasPhone ? `<div class="sub-meta-item" style="direction:ltr;font-family:monospace">${sub.phone}</div>` : ''}
         </div>
+        ${sub.status ? `<div class="metric-row">
+          <span>آخر نشاط: <b>${sub.daysSinceActivity === null ? '—' : (sub.daysSinceActivity === 0 ? 'اليوم' : sub.daysSinceActivity + ' يوم')}</b></span>
+          <span>تمارين: <b>${sub.completed30 || 0}</b> / ٣٠ يوم</span>
+          ${sub.adherencePct !== null && sub.adherencePct !== undefined ? `<span>التزام: <b>${sub.adherencePct}٪</b></span>` : ''}
+          ${sub.totalVolume ? `<span class="${sub.volumeTrendPct >= 0 ? 'trend-up' : 'trend-down'}">${sub.volumeTrendPct >= 0 ? '▲' : '▼'} ${Math.abs(sub.volumeTrendPct)}٪</span>` : ''}
+        </div>` : ''}
         <div class="sub-actions">
-          <button class="sub-btn primary" onclick="openEditModal('${sub.id}')">تعديل</button>
+          <button class="sub-btn primary" onclick="openClient('${sub.id}')">الملف</button>
+          <button class="sub-btn" onclick="openEditModal('${sub.id}')">تعديل</button>
           ${hasPhone ? `<button class="sub-btn wa" onclick="sendWaToSub('${sub.id}')" title="إرسال واتساب">
             <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487 2.981 1.287 2.981.859 3.518.804.537-.055 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
             واتساب</button>` : ''}
@@ -989,6 +1271,334 @@ async function confirmSendWa() {
 }
 
 document.getElementById('searchInput').addEventListener('input', renderSubs);
+
+/* ═══════════════════ OVERVIEW ═══════════════════ */
+function fmtWhen(ts) {
+  if (!ts) return '—';
+  const d = Math.floor((Date.now() - ts) / 86400000);
+  if (d <= 0) return 'اليوم';
+  if (d === 1) return 'أمس';
+  if (d < 30) return `قبل ${d} يوم`;
+  return fmtDate(ts);
+}
+
+function attentionRow(s) {
+  const why = {
+    stalled:         'متوقف عن التمرين',
+    never_logged_in: 'لم يفتح الموقع إطلاقاً',
+    at_risk:         'على وشك الانقطاع',
+    not_started:     'دخل ولم يبدأ التمرين',
+  }[s.status.key] || '';
+  // Only mention last activity when there actually was some.
+  const bits = [why];
+  if (s.daysSinceActivity !== null && s.daysSinceActivity !== undefined)
+    bits.push('آخر نشاط ' + fmtWhen(Date.now() - s.daysSinceActivity * 86400000));
+  bits.push(`${s.daysLeft} يوم متبقي`);
+  return `
+    <div class="rowitem" onclick="openClient('${s.id}')">
+      <div class="rowitem-main">
+        <div class="rowitem-name">${s.fullName}</div>
+        <div class="rowitem-meta">${bits.filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="rowitem-side">
+        <span class="eng ${s.status.tone}">${s.status.label}</span>
+      </div>
+    </div>`;
+}
+
+async function loadOverview() {
+  const el = document.getElementById('overviewContent');
+  try {
+    const r = await api('/api/admin/reports');
+    const t = r.totals;
+    const att = r.needsAttention;
+    const top = r.topPerformers;
+
+    el.innerHTML = `
+      <div class="ov-grid">
+        <div class="ov-card"><div class="ov-val">${t.subscribers}</div><div class="ov-lbl">إجمالي المشتركين</div></div>
+        <div class="ov-card"><div class="ov-val green">${t.active}</div><div class="ov-lbl">اشتراكات نشطة</div></div>
+        <div class="ov-card"><div class="ov-val amber">${t.expiringSoon}</div><div class="ov-lbl">تنتهي خلال ٧ أيام</div></div>
+        <div class="ov-card"><div class="ov-val">${t.sessions30}</div><div class="ov-lbl">جلسة خلال ٣٠ يوم</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          يحتاجون متابعة
+          ${att.length ? `<span class="nav-count red">${att.length}</span>` : ''}
+        </div>
+        <div class="panel-sub">مشتركون نشطون توقّف نشاطهم — تواصل معهم اليوم</div>
+        ${att.length
+          ? `<div class="rowlist">${att.map(attentionRow).join('')}</div>`
+          : `<div class="empty-note">لا أحد يحتاج متابعة — كل المشتركين على المسار الصحيح</div>`}
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">الأكثر التزاماً</div>
+        <div class="panel-sub">حسب عدد التمارين المكتملة خلال ٣٠ يوم</div>
+        ${top.length
+          ? `<div class="rowlist">${top.map(s => `
+              <div class="rowitem" onclick="openClient('${s.id}')">
+                <div class="rowitem-main">
+                  <div class="rowitem-name">${s.fullName}</div>
+                  <div class="rowitem-meta">${s.completed30} تمرين · التزام ${s.adherencePct ?? '—'}٪</div>
+                </div>
+                <div class="rowitem-side"><span class="eng ${s.status.tone}">${s.status.label}</span></div>
+              </div>`).join('')}</div>`
+          : `<div class="empty-note">لا توجد تمارين مسجّلة بعد</div>`}
+      </div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════ CLIENT FILE ═══════════════════ */
+let clientData = null;
+
+async function openClient(id) {
+  switchAdminTab('client');
+  const el = document.getElementById('clientContent');
+  el.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+  try {
+    clientData = await api(`/api/admin/subscribers/${id}/profile`);
+    renderClient('overview');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
+
+const EVENT_LABEL = {
+  login:            ['فتح الموقع',        '<path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>'],
+  workout_complete: ['أنهى تمرين اليوم',  '<path d="M5 12l5 5L20 7"/>'],
+  set_logged:       ['سجّل جولات تمرين',  '<path d="M6 4v16M4 6h4M4 18h4M18 4v16M16 6h4M16 18h4M8 12h8"/>'],
+  calc_saved:       ['حفظ حاسبة السعرات', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01"/>'],
+  meal_print:       ['طبع البرنامج الغذائي', '<path d="M6 9V2h12v7"/><rect x="6" y="14" width="12" height="8"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>'],
+};
+
+function renderClient(tab) {
+  const d = clientData;
+  if (!d) return;
+  const s = d.subscriber, m = d.metrics;
+
+  const head = `
+    <div class="client-hero">
+      <div class="ch-top">
+        <div>
+          <div class="ch-name">${s.fullName}</div>
+          <div class="ch-meta">@${s.username}${s.phone ? ' · +' + s.phone : ''}</div>
+        </div>
+        <span class="eng ${m.status.tone}" style="background:rgba(255,255,255,.9)">${m.status.label}</span>
+      </div>
+      <div class="ch-stats">
+        <div class="ch-stat"><div class="ch-stat-val">${s.daysLeft}</div><div class="ch-stat-lbl">يوم متبقي</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${m.completedCount}</div><div class="ch-stat-lbl">تمرين مكتمل</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${m.adherencePct ?? '—'}${m.adherencePct !== null ? '٪' : ''}</div><div class="ch-stat-lbl">الالتزام</div></div>
+        <div class="ch-stat"><div class="ch-stat-val">${(m.totalVolume||0).toLocaleString('en-US')}</div><div class="ch-stat-lbl">كجم إجمالي</div></div>
+      </div>
+    </div>
+
+    <div class="ctabs">
+      <button class="ctab ${tab==='overview'?'on':''}" onclick="renderClient('overview')">نظرة عامة</button>
+      <button class="ctab ${tab==='activity'?'on':''}" onclick="renderClient('activity')">سجل النشاط</button>
+      <button class="ctab ${tab==='exercises'?'on':''}" onclick="renderClient('exercises')">التمارين</button>
+    </div>`;
+
+  let body = '';
+
+  if (tab === 'overview') {
+    const p = d.profile, mac = d.macros;
+    const goalLbl = { lose:'خسارة وزن', maintain:'ثبات', gain:'زيادة عضل' }[p?.goal] || '—';
+    body = `
+      <div class="panel">
+        <div class="panel-title">الاشتراك</div>
+        <div class="rowlist">
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">البداية</div><div class="rowitem-name">${fmtDate(s.startDate)}</div></div>
+            <div class="rowitem-side"><div style="text-align:left"><div class="rowitem-meta">النهاية</div><div class="rowitem-name">${fmtDate(s.endDate)}</div></div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">الجدول المختار</div>
+            <div class="rowitem-name">${s.selectedPlan ? (PLAN_LABEL[s.selectedPlan] || s.selectedPlan) : 'لم يختر جدولاً'}</div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">آخر دخول</div>
+            <div class="rowitem-name">${fmtWhen(m.lastLogin)} · ${m.loginCount} مرة إجمالاً</div></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">الحاسبة والأهداف</div>
+        ${p ? `<div class="rowlist">
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">الهدف</div><div class="rowitem-name">${goalLbl}</div></div>
+            <div class="rowitem-side"><div style="text-align:left"><div class="rowitem-meta">الوزن</div><div class="rowitem-name">${p.weight} كجم</div></div></div></div>
+          <div class="rowitem" style="cursor:default"><div class="rowitem-main"><div class="rowitem-meta">السعرات اليومية</div>
+            <div class="rowitem-name">${(mac?.cal||0).toLocaleString('en-US')} سعرة · بروتين ${mac?.protein||0}غ · كارب ${mac?.carbs||0}غ · دهون ${mac?.fat||0}غ</div></div></div>
+        </div>` : `<div class="empty-note">لم يحسب سعراته بعد</div>`}
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">أفضل تقدّم</div>
+        <div class="panel-sub">زيادة الأوزان مقارنة بأفضل رقم سابق</div>
+        ${m.topGains.length ? `<div class="rowlist">${m.topGains.map(g => `
+          <div class="rowitem" style="cursor:default">
+            <div class="rowitem-main"><div class="rowitem-name">${EX_NAME[g.exId] || g.exId}</div>
+              <div class="rowitem-meta">من ${g.prevBest} إلى ${g.best} كجم</div></div>
+            <div class="rowitem-side"><span class="eng green">+ ${g.gain} كجم</span></div>
+          </div>`).join('')}</div>`
+          : `<div class="empty-note">لا توجد زيادات مسجّلة بعد</div>`}
+      </div>`;
+  }
+
+  if (tab === 'activity') {
+    body = `
+      <div class="panel">
+        <div class="panel-title">سجل النشاط</div>
+        <div class="panel-sub">آخر ${d.activity.length} حدث</div>
+        ${d.activity.length ? `<div class="tl">${d.activity.map(a => {
+          const [label, icon] = EVENT_LABEL[a.event] || [a.event, '<circle cx="12" cy="12" r="9"/>'];
+          let extra = '';
+          if (a.event === 'set_logged' && a.meta)      extra = ` — ${EX_NAME[a.meta.exerciseId] || a.meta.exerciseId} (${a.meta.sets} جولات · ${a.meta.volume} كجم)`;
+          if (a.event === 'calc_saved' && a.meta)      extra = ` — ${a.meta.cal} سعرة`;
+          if (a.event === 'workout_complete' && a.meta) extra = ` — يوم ${(a.meta.dayIdx ?? 0) + 1}`;
+          return `<div class="tl-item">
+            <div class="tl-dot"><svg class="ico" viewBox="0 0 24 24">${icon}</svg></div>
+            <div class="tl-body"><div class="tl-title">${label}${extra}</div>
+              <div class="tl-time">${new Date(a.at).toLocaleString('ar-EG',{dateStyle:'medium',timeStyle:'short'})}</div></div>
+          </div>`;
+        }).join('')}</div>` : `<div class="empty-note">لا يوجد نشاط مسجّل</div>`}
+      </div>`;
+  }
+
+  if (tab === 'exercises') {
+    body = `
+      <div class="panel">
+        <div class="panel-title">التمارين المسجّلة</div>
+        <div class="panel-sub">${d.exercises.length} تمرين · مرتّبة حسب عدد الجلسات</div>
+        ${d.exercises.length ? d.exercises.map(e => `
+          <div class="exrow">
+            <div class="exrow-name">${EX_NAME[e.exerciseId] || e.exerciseId}
+              <div class="exrow-en">${e.exerciseId}</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.sessions}</div><div class="exrow-lbl">جلسة</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.best}</div><div class="exrow-lbl">أعلى وزن</div></div>
+            <div class="exrow-stat"><div class="exrow-val">${e.last ? fmtWhen(e.last.at) : '—'}</div><div class="exrow-lbl">آخر مرة</div></div>
+          </div>`).join('')
+          : `<div class="empty-note">لم يسجّل أي تمرين بعد</div>`}
+      </div>`;
+  }
+
+  document.getElementById('clientContent').innerHTML = head + body;
+}
+
+/* ═══════════════════ REPORTS ═══════════════════ */
+const STATUS_ORDER = ['committed','wobbly','at_risk','stalled','not_started','never_logged_in'];
+const STATUS_META = {
+  committed:      ['ملتزم','green'],  wobbly:      ['متذبذب','amber'],
+  at_risk:        ['معرّض للانقطاع','orange'], stalled: ['متوقف','red'],
+  not_started:    ['لم يبدأ','slate'], never_logged_in: ['لم يدخل','grey'],
+};
+
+async function loadReport(kind) {
+  const el = document.getElementById('reportContent');
+  const meta = {
+    engagement: ['الالتزام والنشاط', 'كيف يتفاعل المشتركون مع البرنامج'],
+    progress:   ['التقدّم في الأوزان', 'من يزيد أوزانه ومن يتراجع'],
+    revenue:    ['ملخص الاشتراكات', 'حالة الاشتراكات والتجديدات القادمة'],
+  }[kind] || ['التقارير',''];
+  document.getElementById('reportTitle').textContent    = meta[0];
+  document.getElementById('reportSubtitle').textContent = meta[1];
+  el.innerHTML = '<div class="empty-note">جاري التحميل...</div>';
+
+  try {
+    const r = await api('/api/admin/reports');
+
+    if (kind === 'engagement') {
+      const total = r.totals.subscribers || 1;
+      el.innerHTML = `
+        <div class="panel">
+          <div class="panel-title">توزيع الحالات</div>
+          <div class="panel-sub">كل مشترك مصنّف حسب آخر نشاط له</div>
+          <div class="rowlist">
+            ${STATUS_ORDER.map(k => {
+              const n = r.byStatus[k] || 0;
+              const [label, tone] = STATUS_META[k];
+              const pct = Math.round((n / total) * 100);
+              return `<div class="rowitem" style="cursor:default">
+                <div class="rowitem-main"><div class="rowitem-name"><span class="eng ${tone}">${label}</span></div></div>
+                <div class="rowitem-side">
+                  <div class="bar"><div class="bar-fill ${tone}" style="width:${pct}%"></div></div>
+                  <div style="min-width:52px;text-align:left"><b>${n}</b> <span style="color:var(--muted);font-size:11px">${pct}٪</span></div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">يحتاجون متابعة</div>
+          <div class="panel-sub">اضغط على أي اسم لفتح ملفه</div>
+          ${r.needsAttention.length
+            ? `<div class="rowlist">${r.needsAttention.map(attentionRow).join('')}</div>`
+            : `<div class="empty-note">لا أحد يحتاج متابعة</div>`}
+        </div>`;
+    }
+
+    if (kind === 'progress') {
+      const withVol = subscribers.filter(s => s.totalVolume > 0)
+        .sort((a,b) => (b.volumeTrendPct||0) - (a.volumeTrendPct||0));
+      el.innerHTML = `
+        <div class="ov-grid">
+          <div class="ov-card"><div class="ov-val">${r.totals.sessions30}</div><div class="ov-lbl">جلسة خلال ٣٠ يوم</div></div>
+          <div class="ov-card"><div class="ov-val">${(r.totals.volume7||0).toLocaleString('en-US')}</div><div class="ov-lbl">كجم مرفوعة هذا الأسبوع</div></div>
+          <div class="ov-card"><div class="ov-val green">${withVol.filter(s=>s.volumeTrendPct>0).length}</div><div class="ov-lbl">في تحسّن</div></div>
+          <div class="ov-card"><div class="ov-val red">${withVol.filter(s=>s.volumeTrendPct<0).length}</div><div class="ov-lbl">في تراجع</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">اتجاه الأحمال</div>
+          <div class="panel-sub">مقارنة آخر ٧ أيام بالأسبوع السابق</div>
+          ${withVol.length ? `<div class="rowlist">${withVol.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">${(s.totalVolume||0).toLocaleString('en-US')} كجم إجمالاً · ${s.completed30||0} تمرين/٣٠ يوم</div></div>
+              <div class="rowitem-side">
+                <span class="${s.volumeTrendPct >= 0 ? 'trend-up' : 'trend-down'}">${s.volumeTrendPct >= 0 ? '▲' : '▼'} ${Math.abs(s.volumeTrendPct)}٪</span>
+              </div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد أوزان مسجّلة بعد</div>`}
+        </div>`;
+    }
+
+    if (kind === 'revenue') {
+      const expiring = subscribers.filter(s => s.active && s.daysLeft <= 14)
+        .sort((a,b) => a.daysLeft - b.daysLeft);
+      const expired = subscribers.filter(s => !s.active);
+      el.innerHTML = `
+        <div class="ov-grid">
+          <div class="ov-card"><div class="ov-val">${r.totals.subscribers}</div><div class="ov-lbl">إجمالي المشتركين</div></div>
+          <div class="ov-card"><div class="ov-val green">${r.totals.active}</div><div class="ov-lbl">نشطة</div></div>
+          <div class="ov-card"><div class="ov-val amber">${r.totals.expiringSoon}</div><div class="ov-lbl">تنتهي خلال ٧ أيام</div></div>
+          <div class="ov-card"><div class="ov-val red">${r.totals.expired}</div><div class="ov-lbl">منتهية</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">تجديدات قادمة</div>
+          <div class="panel-sub">اشتراكات تنتهي خلال ١٤ يوم</div>
+          ${expiring.length ? `<div class="rowlist">${expiring.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">ينتهي ${fmtDate(s.endDate)}</div></div>
+              <div class="rowitem-side"><span class="eng ${s.daysLeft<=7?'red':'amber'}">${s.daysLeft} يوم</span></div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد اشتراكات تنتهي قريباً</div>`}
+        </div>
+        <div class="panel">
+          <div class="panel-title">اشتراكات منتهية</div>
+          <div class="panel-sub">فرص إعادة تفعيل</div>
+          ${expired.length ? `<div class="rowlist">${expired.map(s => `
+            <div class="rowitem" onclick="openClient('${s.id}')">
+              <div class="rowitem-main"><div class="rowitem-name">${s.fullName}</div>
+                <div class="rowitem-meta">انتهى ${fmtDate(s.endDate)}</div></div>
+              <div class="rowitem-side"><span class="eng grey">منتهي</span></div>
+            </div>`).join('')}</div>`
+            : `<div class="empty-note">لا توجد اشتراكات منتهية</div>`}
+        </div>`;
+    }
+  } catch (e) {
+    el.innerHTML = `<div class="empty-note" style="color:var(--red)">فشل التحميل: ${e.message}</div>`;
+  }
+}
 
 /* ═══════════════════ ADD SUBSCRIBER ═══════════════════ */
 function openAddModal() {

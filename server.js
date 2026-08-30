@@ -79,6 +79,15 @@ db.exec(`
     phone TEXT
   );
   CREATE INDEX IF NOT EXISTS idx_username ON subscribers(username);
+
+  CREATE TABLE IF NOT EXISTS activity_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subscriber_id TEXT NOT NULL,
+    event TEXT NOT NULL,
+    meta TEXT,
+    created_at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_activity_sub ON activity_log(subscriber_id, created_at DESC);
 `);
 
 // Migrations: add columns if missing on existing DB
@@ -96,6 +105,14 @@ try {
   if (!names.includes('completed_days')) {
     db.exec("ALTER TABLE subscribers ADD COLUMN completed_days TEXT DEFAULT '[]'");
     console.log('✅ Migration: added completed_days column');
+  }
+  if (!names.includes('last_login')) {
+    db.exec("ALTER TABLE subscribers ADD COLUMN last_login INTEGER");
+    console.log('✅ Migration: added last_login column');
+  }
+  if (!names.includes('login_count')) {
+    db.exec("ALTER TABLE subscribers ADD COLUMN login_count INTEGER DEFAULT 0");
+    console.log('✅ Migration: added login_count column');
   }
 } catch (e) { console.warn('migration skipped:', e.message); }
 
@@ -169,6 +186,146 @@ function normalizePhone(raw, defaultCC = '966') {
 
 function firstNameOf(full) {
   return (full || '').trim().split(/\s+/)[0] || '';
+}
+
+/* ═══════════════════════════════════════
+   ACTIVITY LOG
+   Five high-signal events only — enough to tell engagement apart from
+   inactivity without drowning the coach in meaningless page-view noise.
+═══════════════════════════════════════ */
+const VALID_EVENTS = new Set([
+  'login',            // opened the portal
+  'workout_complete', // finished a training day
+  'set_logged',       // recorded sets for an exercise
+  'calc_saved',       // saved calorie/macro profile
+  'meal_print',       // printed the meal plan
+]);
+
+const MAX_LOG_PER_SUB = 400;
+
+function logActivity(subscriberId, event, meta) {
+  if (!subscriberId || !VALID_EVENTS.has(event)) return;
+  try {
+    stmts.insertActivity.run(
+      subscriberId, event,
+      meta ? JSON.stringify(meta) : null,
+      Date.now()
+    );
+    // Trim occasionally so the log can't grow without bound.
+    if (Math.random() < 0.05) stmts.trimActivity.run(subscriberId, subscriberId, MAX_LOG_PER_SUB);
+  } catch (e) { /* logging must never break the request */ }
+}
+
+/* ═══════════════════════════════════════
+   CLIENT METRICS  — turns raw data into decisions
+═══════════════════════════════════════ */
+const DAY = 86400000;
+
+// Flattens workout_progress into a chronological list of sessions.
+function sessionsOf(progress) {
+  const out = [];
+  for (const [exId, entries] of Object.entries(progress || {})) {
+    if (!Array.isArray(entries)) continue;
+    for (const e of entries) {
+      const sets = Array.isArray(e.sets) ? e.sets
+                 : (e.weight != null ? [{ w: e.weight, r: e.reps }] : []);
+      const volume = sets.reduce((a, s) => a + (Number(s.w) || 0) * (Number(s.r) || 0), 0);
+      const maxW   = sets.reduce((m, s) => Math.max(m, Number(s.w) || 0), 0);
+      out.push({ exId, at: new Date(e.date).getTime() || 0, sets: sets.length, volume, maxW });
+    }
+  }
+  return out.sort((a, b) => a.at - b.at);
+}
+
+function daysSince(ts) {
+  if (!ts) return null;
+  return Math.floor((Date.now() - ts) / DAY);
+}
+
+/* Status drives the coach's action list — the whole point of tracking. */
+function classify({ lastActivityAt, lastLogin, hasAnyActivity }) {
+  if (!lastLogin && !hasAnyActivity) return { key: 'never_logged_in', label: 'لم يدخل',            tone: 'grey'   };
+  if (!hasAnyActivity)               return { key: 'not_started',     label: 'لم يبدأ',            tone: 'slate'  };
+  const d = daysSince(lastActivityAt);
+  if (d <= 3)  return { key: 'committed', label: 'ملتزم',              tone: 'green'  };
+  if (d <= 7)  return { key: 'wobbly',    label: 'متذبذب',             tone: 'amber'  };
+  if (d <= 14) return { key: 'at_risk',   label: 'معرّض للانقطاع',      tone: 'orange' };
+  return         { key: 'stalled',   label: 'متوقف',              tone: 'red'    };
+}
+
+/* Adherence = actual sessions ÷ sessions the chosen plan expects so far. */
+function adherence(sub, completedDays) {
+  const planDays = { '3': 3, '4': 4, '5': 5 }[String(sub.selected_plan || '').split('-')[1]] || 0;
+  if (!planDays) return null;
+  const start = sub.start_date || sub.created_at || Date.now();
+  const weeks = Math.max(1, (Date.now() - start) / (7 * DAY));
+  const expected = Math.round(weeks * planDays);
+  if (expected <= 0) return null;
+  return Math.min(100, Math.round((completedDays.length / expected) * 100));
+}
+
+/* Compares total volume of the last 7 days against the 7 before it. */
+function volumeTrend(sessions) {
+  const now = Date.now();
+  let recent = 0, prior = 0;
+  for (const s of sessions) {
+    if (s.at >= now - 7 * DAY)       recent += s.volume;
+    else if (s.at >= now - 14 * DAY) prior  += s.volume;
+  }
+  const pct = prior > 0 ? Math.round(((recent - prior) / prior) * 100)
+            : (recent > 0 ? 100 : 0);
+  return { recent, prior, pct };
+}
+
+/* Builds every derived metric for one subscriber. */
+function clientMetrics(sub) {
+  const progress      = parseJson(sub.workout_progress, {});
+  const completedDays = parseJson(sub.completed_days, []);
+  const sessions      = sessionsOf(progress);
+
+  const lastSet      = sessions.length ? sessions[sessions.length - 1].at : null;
+  const lastComplete = completedDays.length
+    ? Math.max(...completedDays.map(c => new Date(c.date).getTime() || 0))
+    : null;
+  const lastActivityAt = Math.max(lastSet || 0, lastComplete || 0) || null;
+  const hasAnyActivity = !!(sessions.length || completedDays.length);
+
+  const now = Date.now();
+  const sessions30 = sessions.filter(s => s.at >= now - 30 * DAY);
+  const trend      = volumeTrend(sessions);
+
+  // Personal bests, and how much each improved over the prior best.
+  const bests = {};
+  for (const s of sessions) {
+    if (!s.maxW) continue;
+    const b = bests[s.exId] || (bests[s.exId] = { best: 0, prevBest: 0 });
+    if (s.maxW > b.best) { b.prevBest = b.best; b.best = s.maxW; }
+  }
+  // prevBest must be > 0 — a first-ever session is a baseline, not an improvement.
+  const topGains = Object.entries(bests)
+    .map(([exId, b]) => ({ exId, best: b.best, prevBest: b.prevBest, gain: b.best - b.prevBest }))
+    .filter(g => g.prevBest > 0 && g.gain > 0)
+    .sort((a, b) => b.gain - a.gain)
+    .slice(0, 3);
+
+  return {
+    status:            classify({ lastActivityAt, lastLogin: sub.last_login, hasAnyActivity }),
+    lastActivityAt,
+    daysSinceActivity: daysSince(lastActivityAt),
+    lastLogin:         sub.last_login || null,
+    daysSinceLogin:    daysSince(sub.last_login),
+    loginCount:        sub.login_count || 0,
+    completedCount:    completedDays.length,
+    completed30:       completedDays.filter(c => (new Date(c.date).getTime() || 0) >= now - 30 * DAY).length,
+    sessionsLogged:    sessions.length,
+    sessions30:        sessions30.length,
+    totalVolume:       Math.round(sessions.reduce((a, s) => a + s.volume, 0)),
+    volume7:           Math.round(trend.recent),
+    volumeTrendPct:    trend.pct,
+    adherencePct:      adherence(sub, completedDays),
+    exercisesTracked:  Object.keys(progress).length,
+    topGains,
+  };
 }
 
 /* ═══════════════════════════════════════
@@ -251,6 +408,17 @@ const stmts = {
   saveProgress:      db.prepare('UPDATE subscribers SET workout_progress = ? WHERE id = ?'),
   saveCurrentDay:    db.prepare('UPDATE subscribers SET current_day = ?, completed_days = ? WHERE id = ?'),
   delete:            db.prepare('DELETE FROM subscribers WHERE id = ?'),
+
+  touchLogin:        db.prepare('UPDATE subscribers SET last_login = ?, login_count = COALESCE(login_count,0) + 1 WHERE id = ?'),
+  insertActivity:    db.prepare('INSERT INTO activity_log (subscriber_id, event, meta, created_at) VALUES (?, ?, ?, ?)'),
+  activityFor:       db.prepare('SELECT event, meta, created_at FROM activity_log WHERE subscriber_id = ? ORDER BY created_at DESC LIMIT ?'),
+  deleteActivityFor: db.prepare('DELETE FROM activity_log WHERE subscriber_id = ?'),
+  // Keeps only the newest N rows for one subscriber.
+  trimActivity:      db.prepare(`DELETE FROM activity_log
+                                 WHERE subscriber_id = ? AND id NOT IN (
+                                   SELECT id FROM activity_log WHERE subscriber_id = ?
+                                   ORDER BY created_at DESC LIMIT ?
+                                 )`),
 };
 
 /* ═══════════════════════════════════════
@@ -275,6 +443,9 @@ app.post('/api/login', async (req, res) => {
         message: 'يرجى التواصل مع خدمة العملاء لتجديد الاشتراك'
       });
     }
+
+    stmts.touchLogin.run(Date.now(), sub.id);
+    logActivity(sub.id, 'login');
 
     const token = signToken({ sub: sub.id, username: sub.username });
     res.json({
@@ -336,12 +507,20 @@ app.post('/api/me/profile', auth, requireSubscriber, (req, res) => {
     });
   }
   stmts.saveProfile.run(JSON.stringify(profile), JSON.stringify(macros), sub.id);
+  logActivity(sub.id, 'calc_saved', { goal: profile.goal, cal: macros.cal });
   res.json({ ok: true, editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits + 1) });
 });
 
 app.post('/api/me/plan', auth, requireSubscriber, (req, res) => {
   const { selectedPlan } = req.body || {};
   stmts.savePlan.run(selectedPlan || null, '[]', req.user.sub);
+  res.json({ ok: true });
+});
+
+// Fire-and-forget signal that the subscriber printed their meal plan.
+app.post('/api/me/track', auth, requireSubscriber, (req, res) => {
+  const { event } = req.body || {};
+  if (event === 'meal_print') logActivity(req.user.sub, 'meal_print');
   res.json({ ok: true });
 });
 
@@ -359,6 +538,7 @@ app.post('/api/me/complete-day', auth, requireSubscriber, (req, res) => {
   // Keep only last 60 completions
   const trimmed = completed.slice(-60);
   stmts.saveCurrentDay.run(next, JSON.stringify(trimmed), sub.id);
+  logActivity(sub.id, 'workout_complete', { dayIdx: curr, plan: sub.selected_plan });
   res.json({ ok: true, currentDay: next, previousDay: curr });
 });
 
@@ -389,6 +569,11 @@ app.post('/api/me/progress', auth, requireSubscriber, (req, res) => {
   // keep only last 30 sessions per exercise
   if (progress[exerciseId].length > 30) progress[exerciseId] = progress[exerciseId].slice(-30);
   stmts.saveProgress.run(JSON.stringify(progress), sub.id);
+  logActivity(sub.id, 'set_logged', {
+    exerciseId,
+    sets: setArr.length,
+    volume: Math.round(setArr.reduce((a, s) => a + s.w * s.r, 0)),
+  });
   res.json({ ok: true, saved: setArr.length });
 });
 
@@ -407,6 +592,7 @@ app.get('/api/admin/subscribers', auth, requireAdmin, (_req, res) => {
   const rows = stmts.listAll.all();
   const subscribers = rows.map(sub => {
     const st = subscriptionStatus(sub);
+    const m  = clientMetrics(sub);
     return {
       id: sub.id,
       username: sub.username,
@@ -422,9 +608,141 @@ app.get('/api/admin/subscribers', auth, requireAdmin, (_req, res) => {
       editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits || 0),
       locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
       hasProfile: !!sub.profile,
+      selectedPlan: sub.selected_plan || null,
+      // engagement snapshot
+      status: m.status,
+      daysSinceActivity: m.daysSinceActivity,
+      daysSinceLogin: m.daysSinceLogin,
+      loginCount: m.loginCount,
+      completedCount: m.completedCount,
+      completed30: m.completed30,
+      adherencePct: m.adherencePct,
+      volumeTrendPct: m.volumeTrendPct,
+      totalVolume: m.totalVolume,
     };
   });
   res.json({ subscribers });
+});
+
+/* Full client file — everything known about one subscriber. */
+app.get('/api/admin/subscribers/:id/profile', auth, requireAdmin, (req, res) => {
+  const sub = stmts.findById.get(req.params.id);
+  if (!sub) return res.status(404).json({ error: 'not found' });
+
+  const st       = subscriptionStatus(sub);
+  const metrics  = clientMetrics(sub);
+  const progress = parseJson(sub.workout_progress, {});
+  const activity = stmts.activityFor.all(sub.id, 60).map(a => ({
+    event: a.event,
+    meta: parseJson(a.meta, null),
+    at: a.created_at,
+  }));
+
+  // Per-exercise history, newest first.
+  const exercises = Object.entries(progress).map(([exId, entries]) => {
+    const list = (Array.isArray(entries) ? entries : []).map(e => {
+      const sets = Array.isArray(e.sets) ? e.sets
+                 : (e.weight != null ? [{ w: e.weight, r: e.reps }] : []);
+      return {
+        at: new Date(e.date).getTime() || 0,
+        sets,
+        volume: Math.round(sets.reduce((a, s) => a + (Number(s.w)||0) * (Number(s.r)||0), 0)),
+        maxW: sets.reduce((m, s) => Math.max(m, Number(s.w)||0), 0),
+      };
+    }).sort((a, b) => b.at - a.at);
+    return {
+      exerciseId: exId,
+      sessions: list.length,
+      best: list.reduce((m, s) => Math.max(m, s.maxW), 0),
+      first: list.length ? list[list.length - 1] : null,
+      last: list[0] || null,
+      history: list.slice(0, 12),
+    };
+  }).sort((a, b) => b.sessions - a.sessions);
+
+  res.json({
+    subscriber: {
+      id: sub.id,
+      username: sub.username,
+      fullName: sub.full_name,
+      gender: sub.gender,
+      phone: sub.phone || '',
+      createdAt: sub.created_at,
+      startDate: st.startDate,
+      endDate: st.endDate,
+      daysLeft: st.daysLeft,
+      active: st.active,
+      expired: st.expired,
+      selectedPlan: sub.selected_plan || null,
+      currentDay: sub.current_day || 0,
+      editsLeft: MAX_PROFILE_EDITS - (sub.profile_edits || 0),
+      locked: (sub.profile_edits || 0) >= MAX_PROFILE_EDITS,
+    },
+    profile: parseJson(sub.profile, null),
+    macros:  parseJson(sub.macros, null),
+    completedDays: parseJson(sub.completed_days, []),
+    metrics,
+    activity,
+    exercises,
+  });
+});
+
+/* Aggregated reports for the dashboard. */
+app.get('/api/admin/reports', auth, requireAdmin, (_req, res) => {
+  const rows = stmts.listAll.all();
+  const now  = Date.now();
+
+  const byStatus = {};
+  let activeCount = 0, expiredCount = 0, expiringSoon = 0;
+  let totalVolume30 = 0, sessions30 = 0, withProfile = 0;
+  const needsAttention = [];
+  const topPerformers  = [];
+
+  for (const sub of rows) {
+    const st = subscriptionStatus(sub);
+    const m  = clientMetrics(sub);
+
+    if (st.active) activeCount++; else expiredCount++;
+    if (st.active && st.daysLeft <= 7) expiringSoon++;
+    if (sub.profile) withProfile++;
+
+    byStatus[m.status.key] = (byStatus[m.status.key] || 0) + 1;
+    totalVolume30 += m.volume7;
+    sessions30    += m.sessions30;
+
+    const brief = {
+      id: sub.id, fullName: sub.full_name, username: sub.username,
+      phone: sub.phone || '', daysLeft: st.daysLeft,
+      status: m.status, daysSinceActivity: m.daysSinceActivity,
+      adherencePct: m.adherencePct, volumeTrendPct: m.volumeTrendPct,
+      completed30: m.completed30,
+    };
+
+    // Only chase people whose subscription is still live.
+    if (st.active && ['at_risk', 'stalled', 'never_logged_in', 'not_started'].includes(m.status.key))
+      needsAttention.push(brief);
+    if (st.active && m.completed30 > 0) topPerformers.push(brief);
+  }
+
+  const order = { stalled: 0, never_logged_in: 1, at_risk: 2, not_started: 3 };
+  needsAttention.sort((a, b) => (order[a.status.key] ?? 9) - (order[b.status.key] ?? 9));
+  topPerformers.sort((a, b) => b.completed30 - a.completed30 || (b.adherencePct||0) - (a.adherencePct||0));
+
+  res.json({
+    totals: {
+      subscribers: rows.length,
+      active: activeCount,
+      expired: expiredCount,
+      expiringSoon,
+      withProfile,
+      sessions30,
+      volume7: Math.round(totalVolume30),
+    },
+    byStatus,
+    needsAttention: needsAttention.slice(0, 20),
+    topPerformers: topPerformers.slice(0, 10),
+    generatedAt: now,
+  });
 });
 
 app.post('/api/admin/subscribers', auth, requireAdmin, async (req, res) => {
@@ -553,6 +871,7 @@ app.patch('/api/admin/subscribers/:id', auth, requireAdmin, async (req, res) => 
 app.delete('/api/admin/subscribers/:id', auth, requireAdmin, (req, res) => {
   const result = stmts.delete.run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: 'not found' });
+  stmts.deleteActivityFor.run(req.params.id); // don't leave orphaned activity rows
   res.json({ ok: true });
 });
 
